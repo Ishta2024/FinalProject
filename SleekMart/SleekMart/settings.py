@@ -65,7 +65,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # 'social_django.middleware.SocialAuthExceptionMiddleware'
 ]
-CACHE_MIDDLEWARE_SECONDS = 0
+
 ROOT_URLCONF = 'SleekMart.urls'
 
 TEMPLATES = [

@@ -1122,8 +1122,7 @@ class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
 def loggout(request):
     print('Logged Out')
     logout(request)
-    request.session.flush()
-    
+
     return redirect('dashboard_home')
        
 # def register(request):
