@@ -254,12 +254,13 @@ https://templatemo.com/tm-571-hexashop
                     <tr>
                         <td>{{ cart_item.product.name }}</td>
                         <td>
-                            <form method="post" action="{% url 'update_cart_item' cart_item.id %}">
+                             <form method="post" action="{% url 'update_cart_item' cart_item.id %}">
                                 {% csrf_token %}
                                 <input type="number" name="quantity" value="{{ cart_item.quantity }}" id="quantityInput" class="quantity-input" min="1" max="{{ cart_item.product.quantity }}">
                                 <button type="submit" class="update-button">Update</button>
-                            </form> 
+                            </form>  
                             {% comment %} <input type="number" name="quantity" value="{{ cart_item.quantity }}" class="quantity-input" data-cart-item-id="{{ cart_item.id }}"> {% endcomment %}
+                            
                         </td>
                         <td>${{ cart_item.product.selling_price }}</td>
                         <td class="total-price">${{ cart_item.total_price }}</td>
@@ -369,6 +370,38 @@ https://templatemo.com/tm-571-hexashop
                 
             });
         });
+         $('[id^="quantityInput_"]').on('input', function () {
+            updateTotalPrice($(this));
+        });
+        
+        // Add event listeners for the plus and minus buttons
+        $('.plus').on('click', function () {
+            console.log('entered')
+            var input = $(this).siblings('input[name="quantity"]');
+            console.log(input.val())
+            var currentVal = parseInt(input.val(), 10);
+            input.val(currentVal + 1);
+            console.log(currentVal)
+            updateTotalPrice(input);
+        });
+
+        $('.minus').on('click', function () {
+            var input = $(this).siblings('input[name="quantity"]');
+            var currentVal = parseInt(input.val(), 10);
+            if (currentVal > 1) {
+                input.val(currentVal - 1);
+                updateTotalPrice(input);
+            }
+        });
+     
+        function updateTotalPrice(input) {
+            var quantity = parseInt(input.val(), 10);
+            var productId = input.attr('id').split('_')[1];
+            var sellingPrice = parseFloat($('#totalPrice_' + productId).data('selling-price'));
+            var newTotalPrice = sellingPrice * quantity;
+            $('#totalPrice_' + productId).text('$' + newTotalPrice.toFixed(2));
+        } 
+        
         document.addEventListener('DOMContentLoaded', function () {
             console.log('entered')
             var quantityInput = document.getElementById('quantityInput');

@@ -429,18 +429,19 @@ def editseller(request):
         return redirect('sellerprofile')  # Redirect to the profile page
 
     return render(request, 'Seller/editseller.html', {'user_profile': user_profile, 'seller_profile': seller_profile})  
-
+@login_required
 def sellerslist(request):
     sellers = Seller.objects.all()  # Fetch all customer profiles from the database
     seller_count = sellers.count() 
     context = {'sellers': sellers, 'seller_count': seller_count}
     return render(request, 'MainUser/sellerslist.html', context)
+@login_required
 def seller_details(request, seller_id):
     seller = get_object_or_404(Seller, pk=seller_id)
     product_count = Product.objects.filter(seller=seller, status=False).count()
     context = {'seller': seller, 'product_count' : product_count}
     return render(request, 'MainUser/seller_details.html', context)
-
+@login_required
 def productlist(request):
     role = request.user.role
     subcategories = Subcategory.objects.filter(status=False)  # Fetch all categories from the database
@@ -482,7 +483,7 @@ def productlist(request):
         'selected_subcategory': selected_subcategory,
     }
     return render(request, template_name, context)
-
+@login_required
 def editproduct(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
 
@@ -505,12 +506,12 @@ def editproduct(request, product_id):
 
     context = {'product': product}
     return render(request, 'Seller/editproduct.html', context)
-
+@login_required
 def view_detail(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     context = {'product': product}
     return render(request, 'Seller/view_detail.html', context)
-
+@login_required
 def addproduct(request):
     categories = Category.objects.filter(status=False)
     seller = Seller.objects.get(user=request.user)
@@ -588,13 +589,14 @@ def addproduct(request):
     }
     
     return render(request, 'Seller/addproduct.html', context)
+
 def get_subcategories(request):
     category_id = request.GET.get('category_id')
     print(f'Category ID: {category_id}')
     subcategories = Subcategory.objects.filter(category_id=category_id, status=False).values('id', 'name')
     print('Subcategories:', list(subcategories))
     return JsonResponse({'subcategories': list(subcategories)})
-
+@login_required
 def productdelete(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     
@@ -607,7 +609,7 @@ def productdelete(request, product_id):
 
     context = {'product': product}
     return render(request, 'Seller/productdelete.html', context)
-
+@login_required
 def categories(request):
     
     if request.method == 'POST':
@@ -653,6 +655,7 @@ def categories(request):
  # Fetch all categories
     context = {'categories': categories}
     return render(request, template_name, context)
+@login_required
 def update_category(request, category_slug):
     category = Category.objects.get(slug=category_slug)
     if request.method == 'POST':
@@ -688,7 +691,7 @@ def update_category(request, category_slug):
 
     context = {'category': category}
     return render(request, 'MainUser/editcategory.html', context)
-
+@login_required
 def delete_category(request, category_slug):
     category = Category.objects.get(slug=category_slug)
     
@@ -705,6 +708,7 @@ def delete_category(request, category_slug):
 
     context = {'category': category}
     return render(request, 'MainUser/deletecategory.html', context)
+@login_required
 def subcategories(request):
 
     categories = Category.objects.filter(status=False)
@@ -762,7 +766,7 @@ def subcategories(request):
 
     context = {'categories': categories, 'subcategories': subcategories}
     return render(request, template_name, context)
-
+@login_required
 def edit_subcategory(request, subcategory_id):
     categories = Category.objects.filter(status=False)
     subcategory = get_object_or_404(Subcategory, pk=subcategory_id)
@@ -802,7 +806,7 @@ def edit_subcategory(request, subcategory_id):
 
     context = {'subcategory': subcategory, 'categories': categories}
     return render(request, 'MainUser/editsubcategory.html', context)
-
+@login_required
 def delete_subcategory(request, subcategory_id):
     subcategory = get_object_or_404(Subcategory, pk=subcategory_id)
     
@@ -864,6 +868,7 @@ def login_page(request):
             return redirect('login_page')
     else:
         return render(request, 'Customer/login.html')
+@login_required
 def blockcustomer(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
     if request.method == 'POST':
@@ -875,7 +880,7 @@ def blockcustomer(request, user_id):
         
     context={'customer': user}
     return render(request, 'MainUser/blockcustomer.html', context)
-
+@login_required
 def unblockcustomer(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
     if request.method == 'POST':
@@ -900,6 +905,7 @@ def unblockcustomer(request, user_id):
 
 #     context = {'category': category}
 #     return render(request, 'MainUser/deletecategory.html', context)
+@login_required
 def approveseller(request, seller_id):
     seller = get_object_or_404(Seller, pk=seller_id)
     seller.is_approved = Seller.APPROVED  # Set the status to 'approved'
@@ -912,10 +918,17 @@ def approveseller(request, seller_id):
     send_mail(subject, message, from_email, recipient_list, fail_silently=False)
     messages.success(request, 'Seller approval successful. An approval email with the login link has been sent to the seller.')
     return redirect('sellerslist')
+@login_required
 def rejectseller(request, seller_id):
     seller = get_object_or_404(Seller, pk=seller_id)
     seller.is_approved = Seller.DECLINED  # Set the status to 'approved'
     seller.save() # Call the reject method to change the status to 'declined'
+    subject = 'Seller Account Rejected'
+    message = f'Your seller account has been rejected.'
+    from_email = 'mailtoshowvalidationok@gmail.com'  # Replace with your email
+    recipient_list = [seller.user.email]
+    send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+    messages.success(request, 'Seller Requestt Rejected')
     return redirect('sellerslist') 
 
 
@@ -1009,9 +1022,10 @@ def register(request):
         return render(request, 'Customer/register.html')
 def custnotification_page(request):
     return render(request, 'Customer/notification.html')
+@login_required
 def profile(request):
     return render(request, 'Customer/profile.html')
-
+@login_required
 def edit_profile(request):
     user_profile = CustomUser.objects.get(pk=request.user.pk)  # Get the CustomUser object
 
@@ -1037,13 +1051,13 @@ def edit_profile(request):
         return redirect('profile')  # Redirect to the profile page
 
     return render(request, 'Customer/edit-profile.html', {'user_profile': user_profile})  
-
+@login_required
 def view_customer(request):
     customers = CustomUser.objects.filter(role='customer')  # Fetch all customer profiles from the database
     customer_count = customers.count() 
     context = {'customers': customers, 'customer_count': customer_count}
     return render(request, 'MainUser/userslist.html', context)
-
+@login_required
 def delete_customer(request, customer_id):
     try:
         customer = Customer.objects.get(id=customer_id)
@@ -1101,10 +1115,11 @@ class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
     success_message = "Successfully Changed Your Password"
     success_url = reverse_lazy('dashboard_home')
 
-
 def loggout(request):
     print('Logged Out')
     logout(request)
+    request.session.flush()
+    
     return redirect('dashboard_home')
        
 # def register(request):

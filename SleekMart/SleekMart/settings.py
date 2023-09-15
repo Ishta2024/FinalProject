@@ -58,14 +58,16 @@ SOCIALACCOUNT_LOGIN_ON_GET=True
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # 'social_django.middleware.SocialAuthExceptionMiddleware'
 ]
-
+CACHE_MIDDLEWARE_SECONDS = 0
 ROOT_URLCONF = 'SleekMart.urls'
 
 TEMPLATES = [
