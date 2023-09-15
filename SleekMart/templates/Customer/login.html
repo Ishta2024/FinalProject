@@ -1,0 +1,276 @@
+{% load static %}
+{% load socialaccount %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- meta tags and CSS links here -->
+  <link rel="stylesheet" href="{% static 'css/login.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+
+</head>
+<style>
+  .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #34a3b4;
+  }
+
+  .login-content {
+      width: 100%;
+      max-width: 500px;
+      background-color: #f2f2f2;
+    border-radius: 5px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 50px;
+  }
+
+  .login-form {
+    background-color: #f2f2f2;
+    width: 350px;
+    padding: 60px;
+    border-radius: 5px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #34a3b4;
+}
+.close-button {
+  position: absolute;
+  top: 20px; /* Adjust as needed */
+  right: 20px; /* Adjust as needed */
+  color: #090909;
+  text-decoration: none;
+  font-size: 18px;
+}
+.btn-primary {
+    background-color: #34a3b4;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #278ca3;
+}
+
+.forgot-password {
+    margin-top: 10px;
+    font-size: 14px;
+    text-align: right;
+}
+
+.signup-link {
+  text-align: center;
+  margin-top: 20px; /* Adjust as needed */
+}
+
+.signup-link a {
+    color: #090909;
+    text-decoration: none;
+    
+}
+
+.signup-link a:hover {
+    text-decoration: underline;
+}
+
+.social-icons a.google-login-button {
+    display: inline-block;
+    background-color: #34a3b4; 
+    color: white;
+    padding: 10px 94px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.social-icons a.google-login-button:hover {
+    background-color: #278ca3; /* Darker shade on hover */
+}
+
+@media (max-width: 768px) {
+    .login-form {
+        padding: 35px;
+    }
+
+      .login-content {
+          padding: 20px; /* Add padding for better readability */
+      }
+      .close-button {
+        top: 10px; /* Adjust for smaller screens */
+        right: 10px; /* Adjust for smaller screens */
+    }
+    .signup-link {
+      margin-top: 20px; /* Adjust for smaller screens */
+  }
+  }
+
+</style>
+
+<body>
+    <div class="login-container">
+        <div class="login-content">
+            <div class="login-form">
+                <h2>Login</h2>
+                <a href="{% url 'dashboard_home' %}"> <button class="close-button" onclick="closeLoginForm()"><i class="fas fa-times"></i></button></a>
+                {% for messages in messages %}
+                <h3 style="color: blue">{{ messages }}</h3>
+                {% endfor %}
+                <form action="#" method="post" onsubmit="return validateLoginForm()">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="username">Email</label>
+                        <input type="username" id="username" name="email" required>
+                        <span id="usernameError" class="error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required>
+                        <span id="passwordError" class="error"></span>
+                    </div>
+                    {% comment %} <div class="form-group">
+                        <label for="role">Role</label>
+                        <select id="role" name="role" required>
+                            <option value="customer">Customer</option>
+                            <option value="seller">Seller</option>
+                            <option value="admin">Admin</option>
+                            <option value="delivery_agent">Delivery Agent</option>
+                        </select>
+                    </div> {% endcomment %}
+                    <button type="submit" class="btn btn-primary"><b>Login</b></button><br><br>
+                    <button class="btn btn-primary">
+                        <a href="{% provider_login_url 'google' %}?next=/"> 
+                            <i class="fab fa-google"></i>
+                            Login With Google
+                         </a> 
+                        </button>
+                    {% comment %} <div class="forgot-password">
+                        <a href="#">Forgot Password?</a>
+                    </div> {% endcomment %}
+                    
+                    {% comment %} <h3 style="text-align:center;">OR</h3>
+                <div class="social-icons">
+                    <a href="{% url 'social:begin' 'google-oauth2' %}" class="google-login-button"><i class="fab fa-google"></i> Login with Google</a>
+                </div> {% endcomment %}
+                </form>
+                <form action="{% url 'password_reset' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <a href="{% url 'password_reset' %}" class="forgot-password">Forgot Password?</a>
+                    </div>
+                </form>
+                <div class="signup-link">
+                    <a href="{% url 'register' %}"> Don't have an account? Sign Up</a>
+                    {% comment %} <a href="{% url 'sellregister' %}"> Don't have an Seller account? Sign Up</a> {% endcomment %}
+                </div>
+                <div class="signup-link">
+                     <a href="{% url 'sellregister' %}"> Don't have an Seller account? Sign Up</a> 
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% comment %} <script>
+        function validateLoginForm() {
+            var email = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+    
+            var usernameError = document.getElementById("usernameError");
+            var passwordError = document.getElementById("passwordError");
+    
+            usernameError.textContent = "";
+            passwordError.textContent = "";
+    
+            var emailRegex = /\S+@\S+\.\S+/;
+            var passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9!@#$%^&*()_+,.?]{8,}$/;
+    
+            if (!emailRegex.test(email)) {
+                usernameError.textContent = "Invalid email address";
+                return false;
+            }
+    
+            if (!passwordRegex.test(password)) {
+                passwordError.textContent = getInvalidPasswordMessage(password);
+                return false;
+            }
+    
+            return true;
+        }
+    
+        function getInvalidPasswordMessage(password) {
+            if (password.length < 8) {
+                return "Minimum 8 characters required";
+            } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+                return "Password must contain at least one uppercase letter, one lowercase letter, and one digit";
+            } else {
+                return "";
+            }
+        }
+    
+        var emailInput = document.getElementById("username");
+        var passwordInput = document.getElementById("password");
+    
+        // Add input event listener to email input
+        emailInput.addEventListener("input", function() {
+            var email = emailInput.value;
+            var errorMessage = /\S+@\S+\.\S+/.test(email) ? "" : "Invalid email address";
+            document.getElementById("usernameError").textContent = errorMessage;
+        });
+    
+        // Add input event listener to password input
+        passwordInput.addEventListener("input", function() {
+            var password = passwordInput.value;
+            var errorMessage = getInvalidPasswordMessage(password);
+            document.getElementById("passwordError").textContent = errorMessage;
+        });
+    </script>
+     {% endcomment %}
+  
+  
+  
+  
+  
+  
+
+
+  {% comment %} <script>
+    function closeLoginForm() {
+      // Hide the login form container
+      document.querySelector(".login-container").style.display = "none";
+    }
+  </script> {% endcomment %}
+
+</body>
+</html>

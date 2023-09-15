@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>SleekMart Dashboard</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'assets/imgs/theme/favicon.svg' %}">
+    <!-- Template CSS -->
+    <link href="{% static 'assets/css/main.css' %}" rel="stylesheet" type="text/css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+</head>
+
+<style>
+    .col-md-3 {
+        display:flex;
+        justify-content:center;
+        flex-direction:center;
+        position: relative;
+        left: 350px;
+        top:25px;
+        width: 55%;
+    }
+</style>
+<body>
+    <div class="card" >
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label for="product_name" class="form-label">Name</label>
+                            <input type="text" name = "name" placeholder="Type here" value="{{ category.name }}" class="form-control" id="product_name" />
+                        </div>
+                        <div class="mb-4">
+                            <label for="product_slug" class="form-label">Slug</label>
+                            <input type="text" name = "slug" placeholder="Type here" value="{{ category.slug }}" class="form-control" id="product_slug" />
+                        </div>
+                        {% comment %} <div class="mb-4">
+                            <label class="form-label">Parent</label>
+                            <select class="form-select">
+                                <option>Clothes</option>
+                                <option>T-Shirts</option>
+                            </select>
+                        </div> {% endcomment %}
+                        <div class="mb-4">
+                            <label class="form-label">Description</label>
+                            <textarea placeholder="Type here" name = "description" value="{{ category.description }}" class="form-control"></textarea>
+                        </div>
+                        <div class="mb-4">
+                        <label for="image">Image:</label>
+                        <input type="file" name="image" required><br>
+                        </div>
+                        <div class="d-grid">
+                            {% comment %} <button class="btn btn-primary">Update category</button> {% endcomment %}
+                            <input class="btn btn-primary" type="submit" value="Update Category">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>

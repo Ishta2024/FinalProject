@@ -1,0 +1,144 @@
+{% load static %}
+<!DOCTYPE html>
+<!-- Coding by CodingNepal | www.codingnepalweb.com-->
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8">
+    <title> Login and Registration Form in HTML & CSS | CodingLab </title>
+    <link rel="stylesheet" href="{% static 'css/selleregister.css' %}">
+    <!-- Fontawesome CDN Link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   </head>
+   <style>
+    /* CSS for styling the file upload field */
+.file-upload-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.file-upload-label {
+    font-size: 14px; /* Adjust the font size as needed */
+    margin-bottom: 10px;
+    cursor: pointer;
+    color: #007bff; /* Change the color to your preferred color */
+}
+
+/* Style the input visually as a button */
+input[type="file"] {
+    display: none; /* Hide the actual file input */
+}
+
+/* Style the file upload button */
+.file-upload-label i {
+    font-size: 24px; /* Adjust the icon size as needed */
+    margin-bottom: 5px;
+}
+
+/* Add some additional styling for visual appeal */
+.file-upload-label:hover {
+    text-decoration: underline;
+}
+</style>
+<body>
+  <div class="container">
+    <input type="checkbox" id="flip">
+    <div class="cover">
+      <div class="front">
+        <img src="{% static 'images/frontimage.avif' %}" alt="">
+        <div class="text">
+          <span class="text-1">Every new seller is a <br> new adventure</span>
+          <span class="text-2">Let's get connected</span>
+        </div>
+      </div>
+      <div class="back">
+        <!--<img class="backImg" src="images/backImg.jpg" alt="">-->
+        <div class="text">
+          <span class="text-1">Every new seller is a <br>  new adventure</span>
+          <span class="text-2">Let's get started</span>
+        </div>
+      </div>
+    </div>
+    <div class="forms">
+        <div class="form-content">
+          {% comment %} <div class="login-form"> {% endcomment %}
+            {% comment %} <div class="title">Login</div>
+          <form action="#">
+            <div class="input-boxes">
+              <div class="input-box">
+                <i class="fas fa-envelope"></i>
+                <input type="text" placeholder="Enter your email" required>
+              </div>
+              <div class="input-box">
+                <i class="fas fa-lock"></i>
+                <input type="password" placeholder="Enter your password" required>
+              </div>
+              <div class="text"><a href="#">Forgot password?</a></div>
+              <div class="button input-box">
+                <input type="submit" value="Sumbit">
+              </div>
+              <div class="text sign-up-text">Don't have an account? <label for="flip">Sigup now</label></div>
+            </div>
+        </form>
+      </div> {% endcomment %}
+        <div class="signup-form">
+          <div class="title">Signup</div>
+          <form action="#" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="input-boxes">
+                <div class="input-box">
+                    <i class="fas fa-user"></i>
+                    <input type="text" name = "name" placeholder="Enter your name" required>
+                </div>
+                <div class="input-box">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email"  name = "email" placeholder="Enter your email" required>
+                </div>
+                <div class="input-box">
+                    <i class="fas fa-lock"></i>
+                    <input type="password"  name = "password" placeholder="Enter your password" required>
+                </div>
+                <div class="input-box">
+                    <i class="fas fa-lock"></i>
+                    <input type="password"  name = "confirm_password" placeholder="Confirm password" required>
+                </div>
+                <div class="input-box">
+                    <i class="fas fa-phone"></i>
+                    <input type="tel"  name = "mobile" placeholder="Enter your phone number" required>
+                </div>
+                <div class="input-box">
+                    <i class="fas fa-building"></i>
+                    <input type="text"  name = "business_name" placeholder="Enter your business name" required>
+                </div>
+                <div class="input-box">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <input type="text"  name = "business_address" placeholder="Enter your business address" required>
+                </div>
+                <div class="input-box">
+                    <i class="fas fa-link"></i>
+                    <input type="url"  name = "business_website" placeholder="Enter your business website (optional)">
+                </div>
+                <div class="file-upload-container">
+                    <label for="seller_proof" class="file-upload-label">
+                        <i class="fas fa-upload"></i> Upload proof of seller status (PDF, JPG, or PNG)
+                    </label>
+                    <input type="file" name="seller_proof" id="seller_proof" accept=".pdf, .jpg, .png" required>
+                </div>
+                <div class="button input-box">
+                    <input type="submit" value="Submit">
+                </div>
+                <div class="text sign-up-text">
+                  <a href="{% url 'login_page' %}">Already have an account? Login now</a>
+                </div>
+            </div>
+        </form>
+        
+    </div>
+    </div>
+    </div>
+  </div>
+</body>
+</html>

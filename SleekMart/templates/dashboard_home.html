@@ -1,0 +1,1032 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap" rel="stylesheet">
+
+    <title>Sleek Mart</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/templatemo-hexashop.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/owl-carousel.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/lightbox.css' %}">
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <style>
+        .header-area.header-sticky {
+            min-height: 80px;
+            background-color: black;
+        }
+        /* Style the profile dropdown container */
+        .profile-dropdown {
+          position: relative;
+          display: inline-block;
+        }
+        
+        /* Style the dropdown button */
+        .dropbtn {
+          background-color: transparent;
+          color: #333;
+          border: none;
+          padding: 10px;
+          font-size: 16px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+        }
+        
+        .dropbtn img {
+          width: 40px; /* Set the desired width for the profile picture */
+          height: 40px; /* Set the desired height for the profile picture */
+          margin-right: 10px;
+          border-radius: 50%;
+        }
+        
+        /* Style the dropdown content (hidden by default) */
+        .dropdown-content {
+          display: none;
+          position: absolute;
+          background-color: #f9f9f9;
+          min-width: 160px;
+          box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+          z-index: 1;
+          border-radius: 5px;
+          top: 60px; /* Adjust the distance below the button */
+        }
+        
+        /* Style the user info section */
+        .user-info {
+          display: flex;
+          align-items: center;
+          padding: 10px;
+        }
+        
+        .user-info img {
+          width: 30px; /* Set the desired width for the profile picture */
+          height: 30px; /* Set the desired height for the profile picture */
+          margin-right: 10px;
+          border-radius: 50%;
+        }
+        
+       .dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  border-radius: 5px;
+  top: 40px; /* Adjust the distance below the button */
+}
+
+/* Style the user info section */
+.user-info {
+  padding: 10px;
+  background-color: #333;
+  color: white;
+  display: flex;
+  align-items: center;
+}
+
+.user-info span {
+  margin-left: 10px;
+}
+
+/* Style the dropdown links */
+.dropdown-content a {
+  color: #333;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  transition: background-color 0.3s;
+}
+
+/* Change link color on hover */
+.dropdown-content a:hover {
+  background-color: #ddd;
+}
+
+/* Show the dropdown content on hover */
+.profile-dropdown:hover .dropdown-content {
+  display: block;
+}
+         .carousel-inner {
+          position: relative;
+          width: 100%;
+          overflow: hidden;
+         top: 30px;
+        }
+
+        .banner-container {
+          max-width: 1200px;
+          margin: 0 auto;
+          overflow-x: hidden;
+        }
+    
+        .carousel-item img {
+            width: 100%;
+            height: 700px; 
+            object-fit: cover;
+        }
+        .header-area {
+            border-bottom: 3px #eee;
+            box-shadow: none;
+            background-color: #0e0d0d;
+            position: absolute;
+            top: 110px;
+            left: 0px;
+            right: 0px;
+            z-index: 100;
+            height: 60px;
+            -webkit-transition: all .5s ease 0s;
+            -moz-transition: all .5s ease 0s;
+            -o-transition: all .5s ease 0s;
+            transition: all .5s ease 0s;
+          }
+          .background-header .logo,
+          .background-header .main-nav .nav li a {
+           color: #f8f9fa!important;
+        }
+
+         .sticky-header {
+            position: sticky;
+            top: 0; 
+            z-index: 999;
+         } 
+
+         .main-nav
+         {
+            position:absolute;
+            left:95px;
+         }
+   
+         .navbar-toggler {
+            display: none;
+        }
+        .header-area .main-nav {
+            min-height: 80px;
+            background: transparent;
+            margin-left:95px;
+          
+          }
+          
+        @media (max-width: 768px) {
+            .navbar-toggler {
+                display: block;
+            }
+    
+            .navbar-collapse {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                background-color: #34a3b4; /* Adjust the background color of the collapsed menu */
+                padding-top: 10px; /* Add some top padding for better spacing */
+            }
+    
+            .navbar-collapse.show {
+                display: flex;
+            }
+    
+            .navbar-toggler-icon {
+                background-image: url('path/to/triple-bar-icon.png'); /* Replace with the path to your triple bar icon image */
+                width: 30px; /* Adjust the width and height of the icon as needed */
+                height: 30px;
+                background-size: cover;
+            }
+    
+            .navbar-nav {
+                margin: 0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+    
+            .navbar-nav .nav-item {
+                margin: 5px 0;
+            }
+    
+            .form-inline .input-group {
+                margin-top: 10px;
+                display: flex;
+                flex-wrap: nowrap;
+                align-items: center;
+            }
+    
+            .form-inline .input-group .form-control {
+                flex: 1;
+                border-radius: 0;
+            }
+    
+            .form-inline .input-group .btn {
+                border-radius: 0;
+            }
+        }
+        @media (max-width: 768px) {
+            .col-sm-12 {
+                text-align: center;
+            }
+            .col-sm-12 .search-form {
+                flex-direction: column;
+            }
+            .col-sm-12 .input-group {
+                width: 100%;
+            }
+            .col-sm-12 .input-group-append {
+                margin-top: 10px;
+            }
+            .col-sm-12 .btn {
+                width: 100%;
+            }
+        }
+      
+            @media (max-width: 768px) {
+                #main-menu {
+                    display: none;
+                }
+        
+                .menu-trigger {
+                    display: block;
+                    cursor: pointer;
+                }
+        
+                .menu-trigger span {
+                    display: block;
+                }
+        
+                .menu-trigger.active + ul#main-menu {
+                    display: block;
+                }
+        
+                .dropdown-menu {
+                    list-style: none;
+                    padding: 0;
+                    margin: 0;
+                    display: flex;
+                    flex-direction: column;
+                    background-color: #34a3b4; /* Adjust the background color of the dropdown menu */
+                }
+        
+                .dropdown-menu li {
+                    margin: 0;
+                    padding: 10px 20px;
+                }
+        
+                .dropdown-menu li a {
+                    color: white;
+                    text-decoration: none;
+                    display: block;
+                }
+
+            }
+            /* Initially hide the hover content */
+.hover-content {
+    display: none;
+}
+
+/* Create a hover effect for the product container */
+.product-container:hover .hover-content {
+    display: block; /* Show the hover content on hover */
+    position: absolute; /* Position it over the product image */
+    top: 50%; /* Adjust the vertical position as needed */
+    left: 50%; /* Adjust the horizontal position as needed */
+    transform: translate(-50%, -50%); /* Center the content within the container */
+    background-color: rgba(255, 255, 255, 0.9); /* Optional: Add a background color */
+    padding: 10px; /* Optional: Add padding to the hover content */
+    z-index: 1; /* Optional: Adjust the z-index if needed */
+}
+
+/* Style the icon links */
+.hover-content ul {
+    list-style: none;
+    padding: 0;
+    text-align: center;
+}
+
+.hover-content ul li {
+    display: inline;
+    margin-right: 10px;
+}
+
+.hover-content ul li a {
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+}
+
+/* Add hover styles to the icon links (optional) */
+.hover-content ul li a:hover {
+    color: #ff6600; /* Change the color on hover */
+}
+/* Style the custom navigation buttons */
+.custom-nav-container {
+    position: relative;
+    margin-top: 20px;
+}
+
+.custom-nav {
+    background: #ff6600;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.custom-prev {
+    left: -70px;
+    top:150px;
+}
+
+.custom-next {
+    right: -70px;
+    top:150px;
+}
+.custom-prev,
+.custom-next {
+    background: #ff6600;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.custom-prev:hover,
+.custom-next:hover {
+    background: #e54d00;
+}
+.custom-prev:hover,
+.custom-next:hover {
+    background: #e54d00;
+}
+    
+      </style>
+    </head>
+    
+    <body>
+    
+    <!-- ***** Preloader Start ***** -->
+    <div id="preloader">
+        <div class="jumper">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>  
+    <!-- ***** Preloader End ***** -->
+    
+   <!-- Navigation bar or header section -->
+   
+   <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color:#34a3b4;">
+    <div class="container">
+        <!-- Add the button here -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Sleek Mart logo, search bar, cart button, and Sign In/Sign Up link -->
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mx-auto"> <!-- Change "mr-auto" to "mx-auto" to center the logo -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'dashboard_home' %}">
+                        <h2 style="color:white; margin-top: 5px;">SLEEK MART</h2>
+                    </a>
+                </li>
+            </ul>
+            <div class="col-lg-6 col-md-6 col-sm-12" style="margin-top: 10px;">
+                <form class="search-form" action="/search" method="GET" style="display: flex;">
+                    <div class="input-group" style="flex: 1;">
+                        <input type="text" class="form-control" name="q" placeholder="Search for products..." style="width: 100%;">
+                    </div>
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit" style="background-color: black; color: white; border-radius: 0;">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-lg-2 col-md-2 col-sm-12 text-right" style="margin-top: 10px;">
+                <a href="{% url 'cart_details' %}" class="btn btn-primary" style="background-color: black; color: white; text-decoration: none;">
+                    <i class="fa fa-shopping-cart"></i> <span class="cart-count" style="color:white;">Cart({{ cart_count }})</span>
+                </a>
+            </div>
+            <div class="col-lg-2 col-md-2 col-sm-12 text-center text-lg-right" style="margin-top: 10px;">
+                <!-- Landing Page Content -->
+                {% if user.is_authenticated %}
+                <div class="profile-dropdown">
+                    <button class="dropbtn">
+                        {% if request.user.profile_pic %}
+                           <img src="{{ request.user.profile_pic.url }}" alt="Profile Picture">
+                        {% else %}
+                           <img src="{% static 'images/propic.jpg' %}" alt="Customer" class="img-xs rounded-circle" />
+                        {% endif %}
+                        
+                    </button>
+                    <div class="dropdown-content">
+                      <div class="user-info">
+                        <span>{{ request.user.name }}</span>
+                      </div>
+                      <a href="{% url 'profile' %}">My Profile</a>
+                      <a href="{% url 'loggout' %}">Logout</a>
+                    </div>
+                  </div>
+                  
+                  
+                {% else %}
+
+                <a href="{% url 'login_page' %}" style="color: white; text-decoration: none; margin-left: 10px;">Sign In/Sign Up</a>
+                
+                {% comment %} <a href="{% url 'index' %}" style="color: white; text-decoration: none; margin-left: 10px;">Seller</a> {% endcomment %}
+                {% endif %}
+                          
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Add this CSS for the collapsed menu -->
+<header class="header-area header-sticky" >
+    <div class="container" > <!-- Add padding here -->
+        <div class="row">
+            <div class="col-12">
+                <nav class="main-nav">
+                   <div class="menu-trigger" onclick="toggleMenu()">
+                       <span style="color: white;">Menu</span>
+                    </div>
+                    <!-- ***** Menu Start ***** -->
+                   
+                    <ul class="nav" id="main-menu">
+                        <!-- Add other navigation items -->
+                        {% for category_data in category_data %}
+                        {% if category_data.subcategories %}
+                            <li class="scroll-to-section"><a href="{% url 'products' category_data.category.id %}" style="color: white;">{{ category_data.category.name }}</a></li>
+                            {% comment %} <li class="scroll-to-section"><a href="{% url 'dashboard_home' %}">Women's</a></li>
+                            <li class="scroll-to-section"><a href="{% url 'dashboard_home' %}">Kid's</a></li> {% endcomment %}
+                        {% endif %}
+                        {% endfor %}
+                        <li class="scroll-to-section"><a href="" style="color: white;">Products</a></li>
+                        <li class="scroll-to-section"><a href="#social" style="color: white;">More</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Add the JavaScript and CSS for responsiveness and dropdown menu -->
+
+
+
+    <!-- ***** Header Area Start ***** -->
+    
+    <!-- ***** Main Banner Area Start ***** -->
+    <div class="main-banner" id="top" >
+        <div class="banner-container" style="overflow: hidden;"> <!-- Add a container around the banner content -->
+          <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+            <ol class="carousel-indicators">
+              <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+              <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+              <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+             
+            </ol>
+            <div class="carousel-inner">
+              <div class="carousel-item active">
+                <img src="{% static 'images/about-left-image.jpg' %}" alt="">
+              </div>
+              <div class="carousel-item">
+                <img src="{% static 'images/headsecond.jpg' %}" alt="">
+              </div>
+              <div class="carousel-item">
+                <img src="{% static 'images/headthird.jpg' %}" alt="">
+              </div>
+           
+            </div>
+            <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="sr-only">Next</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    
+    <!-- ***** Main Banner Area End ***** -->
+
+    <!-- ***** Men Area Starts ***** -->
+    <!-- products.html -->
+   <br><br>
+    {% for category_data in category_data %}
+    {% if category_data.subcategories %}
+    <section class="section" id="{{ category_data.category.name }}">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="section-heading">
+                        <h2>{{ category_data.category.name }}</h2>
+                      
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="men-item-carousel">
+                        <div class="custom-nav-container">
+                            <div class="custom-nav custom-prev"><i class="fa fa-chevron-left"></i></div>
+                            <div class="custom-nav custom-next"><i class="fa fa-chevron-right"></i></div>
+                        </div>
+                        {% comment %} <div class="owl-men-item owl-carousel">
+                            {% for subcategory in category_data.subcategories %}
+                            <div class="item">
+                                <!-- ... Your product item content ... -->
+                            </div>
+                            {% endfor %}
+                        </div> {% endcomment %}
+                        
+                        <div class="owl-men-item owl-carousel">
+                            {% for subcategory in category_data.subcategories %}
+                            <div class="item">
+                                <div class="thumb">
+                                    <div class="product-container">
+                                        <a href="{% url 'single_product' subcategory.id %}">
+                                        <img src="{{ subcategory.image.url }}" alt="Product Image" style="width:300px;height:300px;">
+                                        </a>
+                                        <div class="hover-content">
+                                            <ul>
+                                                <li><a href="{% url 'single_product' subcategory.id %}"><i class="fa fa-eye"></i></a></li>
+                                                {% comment %} <li><a href="{% url 'single_product' subcategory.id %}"><i class="fa fa-star"></i></a></li>
+                                                <li><a href="{% url 'single_product' subcategory.id %}"><i class="fa fa-shopping-cart"></i></a></li> {% endcomment %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                                <div class="down-content">
+                                    <h4>{{ subcategory.name }}</h4>
+                                    {% comment %} <span>${{ product.selling_price }}</span> {% endcomment %}
+                                    
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <br><br><br>
+    {% endif %}
+    {% endfor %}
+    
+
+
+    <!-- ***** Men Area Ends ***** -->
+
+    <!-- ***** Women Area Starts ***** -->
+ 
+    {% comment %}
+    <!-- ***** Women Area Ends ***** -->
+
+    <!-- ***** Kids Area Starts ***** -->
+    <section class="section" id="kids">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="section-heading">
+                        <h2>Gadget's Latest</h2>
+                        <span>Details to details is what makes SleekMart different from the other themes.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="kid-item-carousel">
+                        <div class="owl-kid-item owl-carousel">
+                            <div class="item">
+                                <div class="thumb">
+                                    <div class="hover-content">
+                                        <ul>
+                                            <li><a href="single-product"><i class="fa fa-eye"></i></a></li>
+                                            <li><a href="single-product"><i class="fa fa-star"></i></a></li>
+                                            <li><a href="single-product"><i class="fa fa-shopping-cart"></i></a></li>
+                                        </ul>
+                                    </div>
+                                    <img src="{% static 'images/home_4.jpg' %}" alt="" style="width:420px; height:220px;">
+                                </div>
+                                <div class="down-content">
+                                    <h4>School Collection</h4>
+                                    <span>$80.00</span>
+                                    <ul class="stars">
+                                        <li><i class="fa fa-star"></i></li>
+                                        <li><i class="fa fa-star"></i></li>
+                                        <li><i class="fa fa-star"></i></li>
+                                        <li><i class="fa fa-star"></i></li>
+                                        <li><i class="fa fa-star"></i></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="thumb">
+                                    <div class="hover-content">
+                                        <ul>
+                                            <li><a href="single-product"><i class="fa fa-eye"></i></a></li>
+                                            <li><a href="single-product"><i class="fa fa-star"></i></a></li>
+                                            <li><a href="single-product"><i class="fa fa-shopping-cart"></i></a></li>
+                                        </ul>
+                                    </div>
+                                    <img src="{% static 'images/home_3.jpg' %}" alt="" style="width:420px; height:220px;">
+                                </div>
+                                <div class="down-content">
+                                    <h4>Summer Cap</h4>
+                                    <span>$12.00</span>
+                                    <ul class="stars">
+                                        <li><i class="fa fa-star"></i></li>
+                                        <li><i class="fa fa-star"></i></li>
+                                        <li><i class="fa fa-star"></i></li>
+                                        <li><i class="fa fa-star"></i></li>
+                                        <li><i class="fa fa-star"></i></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="thumb">
+                                    <div class="hover-content">
+                                        <ul>
+                                            <li><a href="single-product"><i class="fa fa-eye"></i></a></li>
+                                            <li><a href="single-product"><i class="fa fa-star"></i></a></li>
+                                            <li><a href="single-product"><i class="fa fa-shopping-cart"></i></a></li>
+                                        </ul>
+                                    </div>
+                                    <img src="{% static 'images/home_1.jpg' %}" alt="" style="width:320px; height:220px;">
+                                </div>
+                                <div class="down-content">
+                                    <h4>Classic Kid</h4>
+                                    <span>$30.00</span>
+                                    <ul class="stars">
+                                        <li><i class="fa fa-star"></i></li>
+                                        <li><i class="fa fa-star"></i></li>
+                                        <li><i class="fa fa-star"></i></li>
+                                        <li><i class="fa fa-star"></i></li>
+                                        <li><i class="fa fa-star"></i></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="thumb">
+                                    <div class="hover-content">
+                                        <ul>
+                                            <li><a href="single-product"><i class="fa fa-eye"></i></a></li>
+                                            <li><a href="single-product"><i class="fa fa-star"></i></a></li>
+                                            <li><a href="single-product"><i class="fa fa-shopping-cart"></i></a></li>
+                                        </ul>
+                                    </div>
+                                    <img src="{% static 'images/home_3.jpg' %}" alt="" style="width:320px; height:220px;">
+                                </div>
+                                <div class="down-content">
+                                    <h4>Classic Spring</h4>
+                                    <span>$120.00</span>
+                                    <ul class="stars">
+                                        <li><i class="fa fa-star"></i></li>
+                                        <li><i class="fa fa-star"></i></li>
+                                        <li><i class="fa fa-star"></i></li>
+                                        <li><i class="fa fa-star"></i></li>
+                                        <li><i class="fa fa-star"></i></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section> {% endcomment %}
+    <!-- ***** Kids Area Ends ***** -->
+
+    <!-- ***** Explore Area Starts ***** -->
+    <section class="section" id="explore">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="left-content">
+                        <h2>Explore Our Products</h2>
+                        <span>You are allowed to use this HexaShop HTML CSS template. You can feel free to modify or edit this layout. You can convert this template as any kind of ecommerce CMS theme as you wish.</span>
+                        <div class="quote">
+                            <i class="fa fa-quote-left"></i><p>You are not allowed to redistribute this template ZIP file on any other website.</p>
+                        </div>
+                        <p>There are 5 pages included in this HexaShop Template and we are providing it to you for absolutely free of charge at our TemplateMo website. There are web development costs for us.</p>
+                        <p>If this template is beneficial for your website or business, please kindly <a rel="nofollow" href="https://paypal.me/templatemo" target="_blank">support us</a> a little via PayPal. Please also tell your friends about our great website. Thank you.</p>
+                        <div class="main-border-button">
+                            <a href="products">Discover More</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="right-content">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="leather">
+                                    <h4>Leather Bags</h4>
+                                    <span>Latest Collection</span>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="first-image">
+                                    <img src="{% static 'images/explore_image_1.jpg' %}" alt="">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="second-image">
+                                    <img src="{% static 'images/explore_image_2.jpg' %}" alt="">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="types">
+                                    <h4>Different Types</h4>
+                                    <span>Over 304 Products</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- ***** Explore Area Ends ***** -->
+
+    <!-- ***** Social Area Starts ***** -->
+    <section class="section" id="social">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-heading">
+                        <h2>Social Media</h2>
+                        <span>Details to details is what makes Hexashop different from the other themes.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row images">
+                <div class="col-2">
+                    <div class="thumb">
+                        <div class="icon">
+                            <a href="http://instagram.com">
+                                <h6>Fashion</h6>
+                                <i class="fa fa-instagram"></i>
+                            </a>
+                        </div>
+                        <img src="{% static 'images/instagram_1.jpg' %}" alt="">
+                    </div>
+                </div>
+                <div class="col-2">
+                    <div class="thumb">
+                        <div class="icon">
+                            <a href="http://instagram.com">
+                                <h6>New</h6>
+                                <i class="fa fa-instagram"></i>
+                            </a>
+                        </div>
+                        <img src="{% static 'images/instagram_2.jpg' %}" alt="">
+                    </div>
+                </div>
+                <div class="col-2">
+                    <div class="thumb">
+                        <div class="icon">
+                            <a href="http://instagram.com">
+                                <h6>Brand</h6>
+                                <i class="fa fa-instagram"></i>
+                            </a>
+                        </div>
+                        <img src="{% static 'images/instagram_3.jpg' %}" alt="">
+                    </div>
+                </div>
+                <div class="col-2">
+                    <div class="thumb">
+                        <div class="icon">
+                            <a href="http://instagram.com">
+                                <h6>Makeup</h6>
+                                <i class="fa fa-instagram"></i>
+                            </a>
+                        </div>
+                        <img src="{% static 'images/instagram_4.jpg' %}" alt="">
+                    </div>
+                </div>
+                <div class="col-2">
+                    <div class="thumb">
+                        <div class="icon">
+                            <a href="http://instagram.com">
+                                <h6>Leather</h6>
+                                <i class="fa fa-instagram"></i>
+                            </a>
+                        </div>
+                        <img src="{% static 'images/instagram_5.jpg' %}" alt="">
+                    </div>
+                </div>
+                <div class="col-2">
+                    <div class="thumb">
+                        <div class="icon">
+                            <a href="http://instagram.com">
+                                <h6>Bag</h6>
+                                <i class="fa fa-instagram"></i>
+                            </a>
+                        </div>
+                        <img src="{% static 'images/instagram_6.jpg' %}" alt="">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- ***** Social Area Ends ***** -->
+
+    <!-- ***** Subscribe Area Starts ***** -->
+    <div class="subscribe">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="section-heading">
+                        <h2>By Subscribing To Our Newsletter You Can Get 30% Off</h2>
+                        <span>Details to details is what makes Hexashop different from the other themes.</span>
+                    </div>
+                    <form id="subscribe" action="" method="get">
+                        <div class="row">
+                          <div class="col-lg-5">
+                            <fieldset>
+                              <input name="name" type="text" id="name" placeholder="Your Name" required="">
+                            </fieldset>
+                          </div>
+                          <div class="col-lg-5">
+                            <fieldset>
+                              <input name="email" type="text" id="email" pattern="[^ @]*@[^ @]*" placeholder="Your Email Address" required="">
+                            </fieldset>
+                          </div>
+                          <div class="col-lg-2">
+                            <fieldset>
+                              <button type="submit" id="form-submit" class="main-dark-button"><i class="fa fa-paper-plane"></i></button>
+                            </fieldset>
+                          </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-lg-4">
+                    <div class="row">
+                        <div class="col-6">
+                            <ul>
+                                <li>Store Location:<br><span>Kakkand, Kochi, Kerala</span></li>
+                                <li>Phone:<br><span>918832 7926</span></li>
+                                <li>Office Location:<br><span>North Paravoor</span></li>
+                            </ul>
+                        </div>
+                        <div class="col-6">
+                            <ul>
+                                <li>Work Hours:<br><span>24/7</span></li>
+                                <li>Email:<br><span>sleekmart@gmail.com</span></li>
+                                <li>Social Media:<br><span><a href="#">Facebook</a>, <a href="#">Instagram</a>, <a href="#">Behance</a>, <a href="#">Linkedin</a></span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ***** Subscribe Area Ends ***** -->
+    
+    <!-- ***** Footer Start ***** -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="first-item">
+                        <div class="logo">
+                            <img src="{% static 'images/white-logo.png' %}" alt="hexashop ecommerce templatemo">
+                        </div>
+                        <ul>
+                            <li><a href="#">Kakkand, Kochi, Kerala</a></li>
+                            <li><a href="#">sleekmart@gmail.com</a></li>
+                            <li><a href="#">918832 7926</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <h4>Shopping &amp; Categories</h4>
+                    <ul>
+                        <li><a href="#">Electronic Appliances</a></li>
+                        <li><a href="#">Kitchen Appliances</a></li>
+                        <li><a href="#">Home Appliances</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h4>Useful Links</h4>
+                    <ul>
+                        <li><a href="#">Homepage</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Help</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h4>Help &amp; Information</h4>
+                    <ul>
+                        <li><a href="#">Help</a></li>
+                        <li><a href="#">FAQ's</a></li>
+                        <li><a href="#">Shipping</a></li>
+                        <li><a href="#">Tracking ID</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-12">
+                    <div class="under-footer">
+                        <p>Copyright © 2023 SleekMart Co., Ltd. All Rights Reserved. 
+                        
+                        {% comment %} <br>Design: <a href="https://templatemo.com" target="_parent" title="free css templates">TemplateMo</a></p> {% endcomment %}
+                        <ul>
+                            <li><a href="#"><i class="fa fa-facebook"></i></a></li>
+                            <li><a href="#"><i class="fa fa-twitter"></i></a></li>
+                            <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
+                            <li><a href="#"><i class="fa fa-behance"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- jQuery -->
+    <script src="{% static 'js/jquery-2.1.0.min.js' %}"></script>
+
+    <!-- Bootstrap -->
+    <script src="{% static 'js/popper.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+    <!-- Plugins -->
+    <script src="{% static 'js/owl-carousel.js' %}"></script>
+    <script src="{% static 'js/accordions.js' %}"></script>
+    <script src="{% static 'js/datepicker.js' %}"></script>
+    <script src="{% static 'js/scrollreveal.min.js' %}"></script>
+    <script src="{% static 'js/waypoints.min.js' %}"></script>
+    <script src="{% static 'js/jquery.counterup.min.js' %}"></script>
+    <script src="{% static 'js/imgfix.min.js' %}"></script> 
+    <script src="{% static 'js/slick.js' %}"></script> 
+    <script src="{% static 'js/lightbox.js' %}"></script> 
+    <script src="{% static 'js/isotope.js' %}"></script> 
+    
+    <!-- Global Init -->
+    <script src="{% static 'js/custom.js' %}"></script>
+
+    <script>
+
+        $(function() {
+            var selectedClass = "";
+            $("p").click(function(){
+            selectedClass = $(this).attr("data-rel");
+            $("#portfolio").fadeTo(50, 0.1);
+                $("#portfolio div").not("."+selectedClass).fadeOut();
+            setTimeout(function() {
+              $("."+selectedClass).fadeIn();
+              $("#portfolio").fadeTo(50, 1);
+            }, 500);
+                
+            });
+        });
+        
+    
+        
+  
+    </script>
+
+  </body>
+</html>

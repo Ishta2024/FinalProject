@@ -1,0 +1,14 @@
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Password reset on 127.0.0.1:8000
+From: webmaster@localhost
+To: ishtarachelmathew2000@gmail.com
+Date: Wed, 09 Aug 2023 08:01:48 -0000
+Message-ID: <169156810847.16676.8336550257985026083@LAPTOP-J01ME18A.AJCE>
+
+Someone asked for password reset for email ishtarachelmathew2000@gmail.com.
+ Follow the linkbelow:http://127.0.0.1:8000
+ /reset/MTA/bso2x0-19d89d0b7b90fdf6a6a0b524e7154110/
+Your username, in case you've forgotten: Adhrishya
+-------------------------------------------------------------------------------

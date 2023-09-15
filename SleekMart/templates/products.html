@@ -1,0 +1,562 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap" rel="stylesheet">
+
+    <title>SLEEK MART</title>
+
+
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %} ">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/templatemo-hexashop.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/owl-carousel.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/lightbox.css' %}">
+<!--
+
+TemplateMo 571 Hexashop
+
+https://templatemo.com/tm-571-hexashop
+
+-->
+<style>
+    .page-heading {
+        margin-top: 80px;
+        margin-bottom: 30px;
+        background-image: url('{{ category.image.url }}');
+        background-position: center center;
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+    .header-area.header-sticky {
+        min-height: 80px;
+        background-color: #34a3b4;
+      }
+      .products-heading {
+        background-color: #34a3b4;
+        padding: 20px 0;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    /* Define styles for the section title */
+    .section-title {
+        color: #333;
+        font-size: 30px;
+        margin: 0;
+        text-transform: uppercase;
+        background-color: #fff;
+        border: 2px solid #007bff;
+        padding: 10px 20px;
+        border-radius: 4px;
+        display: inline-block;
+        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+        animation: floatAnimation 3s ease-in-out infinite, colorChange 4s alternate infinite; /* Apply both animations */
+    }
+    
+    /* Keyframes for the floating animation */
+    @keyframes floatAnimation {
+        0% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-10px); /* Adjust the vertical float distance */
+        }
+        100% {
+            transform: translateY(0);
+        }
+    }
+    
+    /* Keyframes for changing text color */
+    @keyframes colorChange {
+        0% {
+            color: #007bff; /* Initial color */
+        }
+        100% {
+            color: #ff0000; /* New color (you can adjust this) */
+        }
+    }
+    </style>
+    </head>
+    
+    <body>
+    
+    <!-- ***** Preloader Start ***** -->
+    <div id="preloader">
+        <div class="jumper">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>  
+    <!-- ***** Preloader End ***** -->
+    
+    
+    <!-- ***** Header Area Start ***** -->
+    <header class="header-area header-sticky">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <nav class="main-nav">
+                        <!-- ***** Logo Start ***** -->
+                        <a href="{% url 'dashboard_home' %}" class="logo">
+                            <h2 style="color:black; margin-top: 25px;">SLEEK MART</h2>
+                        </a>
+                        <!-- ***** Logo End ***** -->
+                        <!-- ***** Menu Start ***** -->
+                        <ul class="nav">
+                            <li class="scroll-to-section"><a href="{% url 'dashboard_home' %}" class="active">Home</a></li>
+                            {% for category_item in categories %}
+                            <li class="scroll-to-section"><a href="{% url 'products' category_item.id %}">{{ category_item.name }}</a></li>
+                            {% endfor %}
+                            {% comment %} <li class="submenu">
+                                <a href="javascript:;">Pages</a>
+                                <ul>
+                                    <li><a href="about">About Us</a></li>
+                                    <li><a href="products">Products</a></li>
+                                    <li><a href="single-product">Single Product</a></li>
+                                    <li><a href="contact">Contact Us</a></li>
+                                </ul>
+                            </li>
+                            <li class="submenu">
+                                <a href="javascript:;">Features</a>
+                                <ul>
+                                    <li><a href="#">Features Page 1</a></li>
+                                    <li><a href="#">Features Page 2</a></li>
+                                    <li><a href="#">Features Page 3</a></li>
+                                    <!--<li><a rel="nofollow" href="https://templatemo.com/page/4" target="_blank">Template Page 4</a></li>-->
+                                </ul>
+                            </li> {% endcomment %}
+                            <li class="scroll-to-section">
+                                <a href="{% url 'cart_details' %}">Cart <span class="cart-count" style="color:red;">({{ cart_count }})</span></a>
+                            </li>
+                            <li class="scroll-to-section">
+                                <a href="{% url 'view_wishlist' %}"> Wishlist <span class="wishlist-count" style="color:red;">({{ wishlist_count }})</span></a>
+                            </li>
+                            {% if user.is_authenticated %}
+                            <li class="scroll-to-section"><a href="{% url 'loggout' %}">Logout</a></li>
+                            {% else %}
+                            <li class="scroll-to-section"><a href="{% url 'loggout' %}">SignIn/Signup</a></li>
+                            {% endif %}
+                        </ul>        
+                        <a class='menu-trigger'>
+                            <span>Menu</span>
+                        </a>
+                        <!-- ***** Menu End ***** -->
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- ***** Header Area End ***** -->
+
+    <!-- ***** Main Banner Area Start ***** -->
+    <div class="page-heading" id="top">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="inner-content">
+                        <h2>Check Our Products</h2>
+                        <span>Explore &amp; More Products</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ***** Main Banner Area End ***** -->
+
+
+    <!-- ***** Products Area Starts ***** -->
+    <section class="section" id="products">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-heading">
+                        <h2>Our Latest Products</h2>
+                        <span>Check out all of our products.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+<div class="container">
+    <div class="row">
+        {% for subcategory in subcategories %}
+        {% if subcategory.product_set.exists %}
+        <div class="col-lg-12">
+           <div class="products-heading">
+            <h2 class="section-title">Products in {{ subcategory.name }}</h2>
+           </div>
+        </div>
+    <div class="row">
+        {% for product in subcategory.product_set.all %}
+                <div class="col-lg-4">
+                    <div class="item">
+                        <div class="thumb">
+                            <div class="hover-content">
+                                <ul>
+                                    <li><a href="{% url 'each_product' product.id %}"><i class="fa fa-eye"></i></a></li>
+                                    <li><a href=""><i class="fa fa-star"></i></a></li>
+                                    <li><a href=""><i class="fa fa-shopping-cart"></i></a></li>
+                                </ul>
+                            </div>
+                            <img src="{{ product.product_image.url }}" alt="{{ product.name }}" style="width: 300px;height:350px;">
+                        </div>
+                        <div class="down-content">
+                            <h4>{{ product.name }}</h4>
+                            <span>${{ product.selling_price }}</span>
+                            <br><br><br>
+                            {% comment %} <ul class="stars">
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                            </ul> {% endcomment %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+               
+                {% comment %} <div class="col-lg-4">
+                    <div class="item">
+                        <div class="thumb">
+                            <div class="hover-content">
+                                <ul>
+                                    <li><a href="single-product"><i class="fa fa-eye"></i></a></li>
+                                    <li><a href="single-product"><i class="fa fa-star"></i></a></li>
+                                    <li><a href="single-product"><i class="fa fa-shopping-cart"></i></a></li>
+                                </ul>
+                            </div>
+                            <img src="{% static 'images/AC_2.jpg' %}" alt="">
+                        </div>
+                        <div class="down-content">
+                            <h4>AC</h4>
+                            <span>$90.00</span>
+                            <ul class="stars">
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="item">
+                        <div class="thumb">
+                            <div class="hover-content">
+                                <ul>
+                                    <li><a href="single-product"><i class="fa fa-eye"></i></a></li>
+                                    <li><a href="single-product"><i class="fa fa-star"></i></a></li>
+                                    <li><a href="single-product"><i class="fa fa-shopping-cart"></i></a></li>
+                                </ul>
+                            </div>
+                            <img src="{% static 'images/AC_3.jpg' %}" alt="">
+                        </div>
+                        <div class="down-content">
+                            <h4>AC</h4>
+                            <span>$150.00</span>
+                            <ul class="stars">
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="item">
+                        <div class="thumb">
+                            <div class="hover-content">
+                                <ul>
+                                    <li><a href="single-product"><i class="fa fa-eye"></i></a></li>
+                                    <li><a href="single-product"><i class="fa fa-star"></i></a></li>
+                                    <li><a href="single-product"><i class="fa fa-shopping-cart"></i></a></li>
+                                </ul>
+                            </div>
+                            <img src="{% static 'images/Cloth-Dryer.jpg' %}" alt="">
+                        </div>
+                        <div class="down-content">
+                            <h4>New Green Jacket</h4>
+                            <span>$75.00</span>
+                            <ul class="stars">
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="item">
+                        <div class="thumb">
+                            <div class="hover-content">
+                                <ul>
+                                    <li><a href="single-product"><i class="fa fa-eye"></i></a></li>
+                                    <li><a href="single-product"><i class="fa fa-star"></i></a></li>
+                                    <li><a href="single-product"><i class="fa fa-shopping-cart"></i></a></li>
+                                </ul>
+                            </div>
+                            <img src="{% static 'images/home_1.jpg' %}" alt="">
+                        </div>
+                        <div class="down-content">
+                            <h4>Classic Dress</h4>
+                            <span>$45.00</span>
+                            <ul class="stars">
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="item">
+                        <div class="thumb">
+                            <div class="hover-content">
+                                <ul>
+                                    <li><a href="single-product"><i class="fa fa-eye"></i></a></li>
+                                    <li><a href="single-product"><i class="fa fa-star"></i></a></li>
+                                    <li><a href="single-product"><i class="fa fa-shopping-cart"></i></a></li>
+                                </ul>
+                            </div>
+                            <img src="{% static 'images/home_2.jpg' %}" alt="">
+                        </div>
+                        <div class="down-content">
+                            <h4>Spring Collection</h4>
+                            <span>$130.00</span>
+                            <ul class="stars">
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="item">
+                        <div class="thumb">
+                            <div class="hover-content">
+                                <ul>
+                                    <li><a href="single-product"><i class="fa fa-eye"></i></a></li>
+                                    <li><a href="single-product"><i class="fa fa-star"></i></a></li>
+                                    <li><a href="single-product"><i class="fa fa-shopping-cart"></i></a></li>
+                                </ul>
+                            </div>
+                            <img src="{% static 'images/home_3.jpg' %}" alt="">
+                        </div>
+                        <div class="down-content">
+                            <h4>School Collection</h4>
+                            <span>$80.00</span>
+                            <ul class="stars">
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="item">
+                        <div class="thumb">
+                            <div class="hover-content">
+                                <ul>
+                                    <li><a href="single-product"><i class="fa fa-eye"></i></a></li>
+                                    <li><a href="single-product"><i class="fa fa-star"></i></a></li>
+                                    <li><a href="single-product"><i class="fa fa-shopping-cart"></i></a></li>
+                                </ul>
+                            </div>
+                            <img src="{% static 'images/home_4.jpg' %}" alt="">
+                        </div>
+                        <div class="down-content">
+                            <h4>Summer Cap</h4>
+                            <span>$12.00</span>
+                            <ul class="stars">
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="item">
+                        <div class="thumb">
+                            <div class="hover-content">
+                                <ul>
+                                    <li><a href="single-product"><i class="fa fa-eye"></i></a></li>
+                                    <li><a href="single-product"><i class="fa fa-star"></i></a></li>
+                                    <li><a href="single-product"><i class="fa fa-shopping-cart"></i></a></li>
+                                </ul>
+                            </div>
+                            <img src="{% static 'images/Ref_1.jpg' %}" alt="">
+                        </div>
+                        <div class="down-content">
+                            <h4>Classic Kid</h4>
+                            <span>$30.00</span>
+                            <ul class="stars">
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                                <li><i class="fa fa-star"></i></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div> {% endcomment %}
+                <div class="col-lg-12">
+                    <div class="pagination">
+                        <ul>
+                            <li>
+                                <a href="#">1</a>
+                            </li>
+                            <li class="active">
+                                <a href="#">2</a>
+                            </li>
+                            <li>
+                                <a href="#">3</a>
+                            </li>
+                            <li>
+                                <a href="#">4</a>
+                            </li>
+                            <li>
+                                <a href="#">5</a>
+                            </li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+               
+            </div>
+        </div>
+    </section>
+    <!-- ***** Products Area Ends ***** -->
+    
+    <!-- ***** Footer Start ***** -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="first-item">
+                        <div class="logo">
+                            <img src="{% static 'images/Ref_2.png' %}" alt="hexashop ecommerce templatemo">
+                        </div>
+                        <ul>
+                            <li><a href="#">16501 Sleek Mart, Kochi, FL 33160, Kerala</a></li>
+                            <li><a href="#">sleekmart@company.com</a></li>
+                            <li><a href="#">010-020-0340</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <h4>Shopping &amp; Categories</h4>
+                    <ul>
+                        <li><a href="#">Men’s Shopping</a></li>
+                        <li><a href="#">Women’s Shopping</a></li>
+                        <li><a href="#">Kid's Shopping</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h4>Useful Links</h4>
+                    <ul>
+                        <li><a href="#">Homepage</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Help</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h4>Help &amp; Information</h4>
+                    <ul>
+                        <li><a href="#">Help</a></li>
+                        <li><a href="#">FAQ's</a></li>
+                        <li><a href="#">Shipping</a></li>
+                        <li><a href="#">Tracking ID</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-12">
+                    <div class="under-footer">
+                        <p>Copyright © 2022 sleekmart Co., Ltd. All Rights Reserved. 
+                        
+                        {% comment %} <br>Design: <a href="https://templatemo.com" target="_parent" title="free css templates">TemplateMo</a></p> {% endcomment %}
+                        <ul>
+                            <li><a href="#"><i class="fa fa-facebook"></i></a></li>
+                            <li><a href="#"><i class="fa fa-twitter"></i></a></li>
+                            <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
+                            <li><a href="#"><i class="fa fa-behance"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+
+    <!-- jQuery -->
+    <script src="{% static 'js/jquery-2.1.0.min.js' %}"></script>
+
+    <!-- Bootstrap -->
+    <script src="{% static 'js/popper.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+    <!-- Plugins -->
+    <script src="{% static 'js/owl-carousel.js' %}"></script>
+    <script src="{% static 'js/accordions.js' %}"></script>
+    <script src="{% static 'js/datepicker.js' %}"></script>
+    <script src="{% static 'js/scrollreveal.min.js' %}"></script>
+    <script src="{% static 'js/waypoints.min.js' %}"></script>
+    <script src="{% static 'js/jquery.counterup.min.js' %}"></script>
+    <script src="{% static 'js/imgfix.min.js' %}"></script> 
+    <script src="{% static 'js/slick.js' %}"></script> 
+    <script src="{% static 'js/lightbox.js' %}"></script> 
+    <script src="{% static 'js/isotope.js' %}"></script> 
+    
+    <!-- Global Init -->
+    <script src="{% static 'js/custom.js' %}"></script>
+
+    <script>
+
+        $(function() {
+            var selectedClass = "";
+            $("p").click(function(){
+            selectedClass = $(this).attr("data-rel");
+            $("#portfolio").fadeTo(50, 0.1);
+                $("#portfolio div").not("."+selectedClass).fadeOut();
+            setTimeout(function() {
+              $("."+selectedClass).fadeIn();
+              $("#portfolio").fadeTo(50, 1);
+            }, 500);
+                
+            });
+        });
+
+    </script>
+
+  </body>
+
+</html>

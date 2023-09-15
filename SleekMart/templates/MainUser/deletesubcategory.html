@@ -1,0 +1,28 @@
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
+    {% block content %}
+    <div class="container mt-5">
+      <div class="row justify-content-center">
+        <div class="col-md-6 mx-auto"> <!-- Added mx-auto class for horizontal centering -->
+          <div class="card">
+            <div class="card-header bg-danger text-white">
+              <h2 class="m-0">Delete SubCategory</h2>
+            </div>
+            <div class="card-body">
+              <p>Are you sure you want to delete the subcategory "{{ subcategory.name }}"?</p>
+            </div>
+            <div class="card-footer text-center">
+              <form method="post">
+                {% csrf_token %}
+                <button class="btn btn-danger" type="submit">Delete</button>
+                <a class="btn btn-secondary" href="{% url 'subcategories' %}">Cancel</a>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endblock content %}
+    

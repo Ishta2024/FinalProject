@@ -1,0 +1,661 @@
+{% load static %}
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>SleekMart Dashboard</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'assets/imgs/theme/favicon.svg' %}">
+    <!-- Template CSS -->
+    <link href="{% static 'assets/css/main.css' %}" rel="stylesheet" type="text/css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <style>
+        .error {
+            color: red;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="screen-overlay"></div>
+    <aside class="navbar-aside" id="offcanvas_aside">
+        <div class="aside-top">
+            <a href="index.html" class="brand-wrap">
+                <img src="{% static 'assets/imgs/theme/logo.svg' %}" class="logo" alt="Evara Dashboard">
+            </a>
+            <div>
+                <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
+            </div>
+        </div>
+        <nav>
+            <ul class="menu-aside">
+                <li class="menu-item">
+                    <a class="menu-link" href="{% url 'index' %}"> <i class="icon material-icons md-home"></i>
+                        <span class="text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item has-submenu active">
+                    <a class="menu-link" href="page-products-list.html"> <i class="icon material-icons md-shopping_bag"></i>
+                        <span class="text">Manage</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="{% url 'categories' %}" class="active">Categories</a>
+                        <a href="{% url 'subcategories' %}">Sub Categories</a>
+                        <a href="{% url 'productlist' %}">Product List</a>
+                        {% comment %} <a href="page-products-grid.html">Product grid</a>
+                        <a href="page-products-grid-2.html">Product grid 2</a> {% endcomment %}
+                        
+                    </div>
+                </li>
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" href="page-orders-1.html"> <i class="icon material-icons md-shopping_cart"></i>
+                        <span class="text">Orders</span>
+                    </a>
+                    <div class="submenu">
+                        {% comment %} <a href="page-orders-1.html">Order list 1</a>
+                        <a href="page-orders-2.html">Order list 2</a> {% endcomment %}
+                        <a href="">Order detail</a>
+                        <a href="">Order tracking</a>
+<a href="">Invoice</a>
+                    </div>
+                </li>
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" href="page-sellers-cards.html"> <i class="icon material-icons md-store"></i>
+                        <span class="text">Sellers</span>
+                    </a>
+                    <div class="submenu">
+                        {% comment %} <a href="page-sellers-cards.html">Sellers cards</a> {% endcomment %}
+                        <a href="{% url 'sellerslist' %}">Sellers list</a>
+                        {% comment %} <a href="page-seller-detail.html">Seller profile</a> {% endcomment %}
+                    </div>
+                </li>
+                {% comment %} <li class="menu-item has-submenu">
+                    <a class="menu-link" href="page-form-product-1.html"> <i class="icon material-icons md-add_box"></i>
+                        <span class="text">Add product</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="page-form-product-1.html">Add product 1</a>
+                        <a href="page-form-product-2.html">Add product 2</a>
+                        <a href="page-form-product-3.html">Add product 3</a>
+                        <a href="page-form-product-4.html">Add product 4</a>
+                    </div>
+                </li> {% endcomment %}
+                {% comment %} <li class="menu-item has-submenu">
+                    <a class="menu-link" href="page-transactions-1.html"> <i class="icon material-icons md-monetization_on"></i>
+                        <span class="text">Transactions</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="page-transactions-1.html">Transaction 1</a>
+                        <a href="page-transactions-2.html">Transaction 2</a>
+                        <a href="page-transactions-details.html">Transaction Details</a>
+                    </div>
+                </li> {% endcomment %}
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" href="page-categories.html#"> <i class="icon material-icons md-person"></i>
+                        <span class="text">Account</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="{% url 'view_customer' %}">User Details</a>
+                        {% comment %} <a href="page-account-login.html">User login</a>
+                        <a href="page-account-register.html">User registration</a>
+                        <a href="page-error-404.html">Error 404</a> {% endcomment %}
+                    </div>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href=""> <i class="icon material-icons md-comment"></i>
+                        <span class="text">Reviews</span>
+                    </a>
+                </li>
+                {% comment %} <li class="menu-item">
+                    <a class="menu-link" href="page-brands.html"> <i class="icon material-icons md-stars"></i>
+                        <span class="text">Brands</span> </a>
+                </li> {% endcomment %}
+                {% comment %} <li class="menu-item">
+                    <a class="menu-link" disabled href="page-categories.html#"> <i class="icon material-icons md-pie_chart"></i>
+                        <span class="text">Statistics</span>
+                    </a>
+                </li> {% endcomment %}
+            </ul>
+            <hr>
+            <ul class="menu-aside">
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" href="page-categories.html#"> <i class="icon material-icons md-settings"></i>
+                        <span class="text">Settings</span>
+                    </a>
+                    {% comment %} <div class="submenu">
+                        <a href="page-settings-1.html">Setting sample 1</a>
+                        <a href="page-settings-2.html">Setting sample 2</a>
+                    </div> {% endcomment %}
+                </li>
+                <li class="menu-item">
+                    {% comment %} <a class="menu-link" href="page-blank.html"> <i class="icon material-icons md-local_offer"></i>
+                        <span class="text"> Starter page </span>
+                    </a> {% endcomment %}
+                </li>
+            </ul>
+            <br>
+            <br>
+        </nav>
+    </aside>
+    <main class="main-wrap">
+        <header class="main-header navbar">
+            <div class="col-search">
+                <form class="searchform">
+                    <div class="input-group">
+                        <input list="search_terms" type="text" class="form-control" placeholder="Search term">
+                        <button class="btn btn-light bg" type="button"> <i class="material-icons md-search"></i></button>
+                    </div>
+                    <datalist id="search_terms">
+                        <option value="Products">
+                        <option value="New orders">
+                        <option value="Apple iphone">
+                        <option value="Ahmed Hassan">
+                    </datalist>
+                </form>
+            </div>
+            <div class="col-nav">
+                <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link btn-icon" href="page-categories.html#">
+                            <i class="material-icons md-notifications animation-shake"></i>
+                            <span class="badge rounded-pill">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn-icon darkmode" href="#"> <i class="material-icons md-nights_stay"></i> </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="requestfullscreen nav-link btn-icon"><i class="material-icons md-cast"></i></a>
+                    </li>
+                    {% comment %} <li class="dropdown nav-item">
+                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="page-categories.html#" id="dropdownLanguage" aria-expanded="false"><i class="material-icons md-public"></i></a>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownLanguage">
+                            <a class="dropdown-item text-brand" href="page-categories.html#"><img src="assets/imgs/theme/flag-us.png" alt="English">English</a>
+                            <a class="dropdown-item" href="page-categories.html#"><img src="assets/imgs/theme/flag-fr.png" alt="Français">Français</a>
+                            <a class="dropdown-item" href="page-categories.html#"><img src="assets/imgs/theme/flag-jp.png" alt="Français">日本語</a>
+                            <a class="dropdown-item" href="page-categories.html#"><img src="assets/imgs/theme/flag-cn.png" alt="Français">中国人</a>
+                        </div>
+                    </li> {% endcomment %}
+                    <li class="dropdown nav-item">
+                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="{% static 'assets/imgs/people/avatar2.jpg' %}" alt="User"></a>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
+                            {% comment %} <a class="dropdown-item" href="page-categories.html#"><i class="material-icons md-perm_identity"></i>Edit Profile</a>
+                            <a class="dropdown-item" href="page-categories.html#"><i class="material-icons md-settings"></i>Account Settings</a>
+                            <a class="dropdown-item" href="page-categories.html#"><i class="material-icons md-account_balance_wallet"></i>Wallet</a>
+                            <a class="dropdown-item" href="page-categories.html#"><i class="material-icons md-receipt"></i>Billing</a>
+                            <a class="dropdown-item" href="page-categories.html#"><i class="material-icons md-help_outline"></i>Help center</a> {% endcomment %}
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger" href="{% url 'loggout' %}"><i class="material-icons md-exit_to_app"></i>Logout</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </header>
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">SubCategories </h2>
+                    <p>Add, edit or delete a Subcategory</p>
+                </div>
+            </div>
+            <div class="card mb-4">
+                <header class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col col-check flex-grow-0">
+                            <div class="form-check ms-2">
+                                {% comment %} <input class="form-check-input" type="checkbox" value=""> {% endcomment %}
+                            </div>
+                        </div>
+                        {% comment %} <form id="category-filter-form" name="category_filter_form" method="post">
+                            {% csrf_token %}
+                            <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
+                                <select class="form-select" name="category" id="category-select" onchange="this.form.submit()">
+                                    <option value="all_category" {% if selected_category == 'all_category' %}selected{% endif %}>All Category</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.id }}" {% if selected_category == category.id %}selected{% endif %}>{{ category.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </form> {% endcomment %}
+                        {% comment %} <div class="col-md-2 col-6">
+                            <input type="date" value="02.05.2022" class="form-control">
+                        </div>
+                        <div class="col-md-2 col-6">
+                            <select class="form-select">
+                                <option selected>Status</option>
+                                <option>Active</option>
+                                <option>Disabled</option>
+                                <option>Show all</option>
+                            </select>
+                        </div> {% endcomment %}
+                    </div>
+                </header>
+            </div> <!-- card-header end// -->
+            {% if messages %}
+<div class="messages text-center"> <!-- Add "text-center" class -->
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+      {{ message }}
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <form name="subcategory_form" method="post" enctype="multipart/form-data" onsubmit="return validateProductForm()">
+                                {% csrf_token %}
+                                <div class="mb-4">
+                                    <label for="product_name" class="form-label">Name</label>
+                                    <input type="text" name="name" placeholder="Type here" class="form-control" id="product_name" required>
+                                    <span id="nameError" class="error"></span>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label">Description</label>
+                                    <textarea placeholder="Type here" name="description" id="descriptionInput" class="form-control" required></textarea>
+                                    <span id="descriptionError" class="error"></span>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="subcategory_category" class="form-label">Category</label>
+                                    <select name="category" class="form-select" id="subcategory_category">
+                                        <option value="" disabled selected>Select a category</option>
+                                        {% for category in categories %}
+                                            <option value="{{ category.id }}">{{ category.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <div class="card-body">
+                                    <div class="input-upload">
+                                        <img src="{% static 'assets/imgs/theme/upload.svg' %}" alt="">
+                                        <input class="form-control" type="file" name="image">
+                                        <span id="imageError" class="error"></span>
+                                    </div>
+                                </div>
+                                <div class="d-grid">
+                                    <button class="btn btn-primary">Create Subcategory</button>
+                                </div>
+                            </form>
+                            
+                        </div>
+                        <div class="col-md-9">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">
+                                                <div class="form-check">
+                                                    {% comment %} <input class="form-check-input" type="checkbox" value="" /> {% endcomment %}
+                                                </div>
+                                            </th>
+                                            {% comment %} <th>ID</th> {% endcomment %}
+                                            <th>Name</th>
+                                            <th>Description</th>
+                                            <th>Category</th>
+                                            <th>Image</th>
+                                            {% comment %} <th>Order</th> {% endcomment %}
+                                            <th class="text-end">Action</th>
+                                        </tr>
+                                    </thead>
+                                     <tbody>
+                                        {% for subcategory in subcategories %}
+                                        <tr>
+                                            <td class="text-center">
+                                                <div class="form-check">
+                                                    {% comment %} <input class="form-check-input" type="checkbox" value="" /> {% endcomment %}
+                                                </div>
+                                            </td>
+                                            <td>{{ subcategory.name }}</td>
+                                            <td><b>{{ subcategory.description }}</b></td>
+                                            <td>{{ subcategory.category }}</td>
+                                            <td><img src="{{ subcategory.image.url }}" alt="{{ subcategory.name }}" height="40px" width="40px" /></td>
+                                            <td class="text-end">
+                                                <div class="dropdown">
+                                                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
+                                                    <div class="dropdown-menu">
+                                                        <a class="dropdown-item" href="#">View detail</a>
+                                                        <a class="dropdown-item" href="{% url 'edit_subcategory' subcategory.id %}">Edit info</a>
+                                                        <a class="dropdown-item text-danger" href="{% url 'delete_subcategory' subcategory.id %}">Delete</a>
+                                                    </div>
+                                                </div> <!-- dropdown //end -->
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                        {% comment %} <tr>
+                                            <td class="text-center">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="" />
+                                                </div>
+                                            </td>
+                                            <td>2</td>
+                                            <td><b>Women fashion</b></td>
+                                            <td>Fashions for Women</td>
+                                            <td>/women</td>
+                                            <td>2</td>
+                                            <td class="text-end">
+                                                <div class="dropdown">
+                                                    <a href="page-categories.html#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
+                                                    <div class="dropdown-menu">
+                                                        <a class="dropdown-item" href="page-categories.html#">View detail</a>
+                                                        <a class="dropdown-item" href="page-categories.html#">Edit info</a>
+                                                        <a class="dropdown-item text-danger" href="page-categories.html#">Delete</a>
+                                                    </div>
+                                                </div> <!-- dropdown //end -->
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="" />
+                                                </div>
+                                            </td>
+                                            <td>3</td>
+                                            <td><b>Kids clothes</b></td>
+                                            <td>Clothes for kids</td>
+                                            <td>/kids</td>
+                                            <td>3</td>
+                                            <td class="text-end">
+                                                <div class="dropdown">
+                                                    <a href="page-categories.html#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
+                                                    <div class="dropdown-menu">
+                                                        <a class="dropdown-item" href="page-categories.html#">View detail</a>
+                                                        <a class="dropdown-item" href="page-categories.html#">Edit info</a>
+                                                        <a class="dropdown-item text-danger" href="page-categories.html#">Delete</a>
+                                                    </div>
+                                                </div> <!-- dropdown //end -->
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center"><i class="material-icons md-subdirectory_arrow_right text-muted"></i></td>
+                                            <td>4</td>
+                                            <td><b>Hot Gifts</b></td>
+                                            <td>Hot Gifts</td>
+                                            <td>/gifts</td>
+                                            <td>4</td>
+                                            <td class="text-end">
+                                                <div class="dropdown">
+                                                    <a href="page-categories.html#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
+                                                    <div class="dropdown-menu">
+                                                        <a class="dropdown-item" href="page-categories.html#">View detail</a>
+                                                        <a class="dropdown-item" href="page-categories.html#">Edit info</a>
+                                                        <a class="dropdown-item text-danger" href="page-categories.html#">Delete</a>
+                                                    </div>
+                                                </div> <!-- dropdown //end -->
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center"><i class="material-icons md-subdirectory_arrow_right text-muted"></i></td>
+                                            <td>5</td>
+                                            <td><b>Electronics</b></td>
+                                            <td>Electronics</td>
+                                            <td>/electr</td>
+                                            <td>5</td>
+                                            <td class="text-end">
+                                                <div class="dropdown">
+                                                    <a href="page-categories.html#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
+                                                    <div class="dropdown-menu">
+                                                        <a class="dropdown-item" href="page-categories.html#">View detail</a>
+                                                        <a class="dropdown-item" href="page-categories.html#">Edit info</a>
+                                                        <a class="dropdown-item text-danger" href="page-categories.html#">Delete</a>
+                                                    </div>
+                                                </div> <!-- dropdown //end -->
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="" />
+                                                </div>
+                                            </td>
+                                            <td>6</td>
+                                            <td><b>Accessories</b></td>
+                                            <td>Accessories</td>
+                                            <td>/accessories</td>
+                                            <td>6</td>
+                                            <td class="text-end">
+                                                <div class="dropdown">
+                                                    <a href="page-categories.html#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
+                                                    <div class="dropdown-menu">
+                                                        <a class="dropdown-item" href="page-categories.html#">View detail</a>
+                                                        <a class="dropdown-item" href="page-categories.html#">Edit info</a>
+                                                        <a class="dropdown-item text-danger" href="page-categories.html#">Delete</a>
+                                                    </div>
+                                                </div> <!-- dropdown //end -->
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="" />
+                                                </div>
+                                            </td>
+                                            <td>7</td>
+                                            <td><b>Jewellery</b></td>
+                                            <td>Jewellery</td>
+                                            <td>/jewel</td>
+                                            <td>7</td>
+                                            <td class="text-end">
+                                                <div class="dropdown">
+                                                    <a href="page-categories.html#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
+                                                    <div class="dropdown-menu">
+                                                        <a class="dropdown-item" href="page-categories.html#">View detail</a>
+                                                        <a class="dropdown-item" href="page-categories.html#">Edit info</a>
+                                                        <a class="dropdown-item text-danger" href="page-categories.html#">Delete</a>
+                                                    </div>
+                                                </div> <!-- dropdown //end -->
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="" />
+                                                </div>
+                                            </td>
+                                            <td>8</td>
+                                            <td><b>Interiors</b></td>
+                                            <td>Interiors</td>
+                                            <td>/interior</td>
+                                            <td>8</td>
+                                            <td class="text-end">
+                                                <div class="dropdown">
+                                                    <a href="page-categories.html#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
+                                                    <div class="dropdown-menu">
+                                                        <a class="dropdown-item" href="page-categories.html#">View detail</a>
+                                                        <a class="dropdown-item" href="page-categories.html#">Edit info</a>
+                                                        <a class="dropdown-item text-danger" href="page-categories.html#">Delete</a>
+                                                    </div>
+                                                </div> <!-- dropdown //end -->
+                                            </td>
+                                        </tr>
+                                    </tbody>  {% endcomment %}
+                                </table>
+                            </div>
+                        </div> <!-- .col// -->
+                    </div> <!-- .row // -->
+                </div> <!-- card body .// -->
+            </div> <!-- card .// -->
+        </section> <!-- content-main end// -->
+        <footer class="main-footer font-xs">
+            <div class="row pb-30 pt-15">
+                <div class="col-sm-6">
+                    <script>
+                    document.write(new Date().getFullYear())
+                    </script> ©, SleekMart - A Home Appliances Ecommerce Website .
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-sm-end">
+                        All rights reserved
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </main>
+    <script src="{% static 'assets/js/vendors/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/select2.min.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/perfect-scrollbar.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/jquery.fullscreen.min.js' %}"></script>
+    <!-- Main Script -->
+    <script src="{% static 'assets/js/main.js' %}" type="text/javascript"></script>
+    <script>
+        $(document).ready(function () {
+            $("#category-select").change(function () {
+                $("#category-filter-form").submit();
+            });
+        });
+        // Add input event listener to the name input
+        var nameInput = document.getElementById("product_name");
+        var nameError = document.getElementById("nameError");
+        nameInput.addEventListener("input", function () {
+            console.log("Input event triggered.");
+            validateName();
+        });
+    
+        // Add input event listener to the slug input
+        {% comment %} var slugInput = document.getElementById("product_slug");
+        var slugError = document.getElementById("slugError");
+        slugInput.addEventListener("input", function () {
+            validateSlug();
+        }); {% endcomment %}
+    
+        // Add input event listener to the description textarea
+        var descriptionInput = document.querySelector("textarea[name='description']");
+        var descriptionError = document.getElementById("descriptionError");
+        descriptionInput.addEventListener("input", function () {
+            console.log("Triggered")
+            validateDescription();
+        });
+    
+        // Add input event listener to the image input
+        var imageInput = document.querySelector("input[type='file']");
+        var imageError = document.getElementById("imageError");
+        imageInput.addEventListener("input", function () {
+            validateImage();
+        });
+    
+        function validateName() {
+            var nameValue = nameInput.value.trim();
+            nameError.textContent = "";
+            if (nameValue === "") {
+                nameError.textContent = "Name is required.";
+            } else if (nameValue.length < 3) {
+                nameError.textContent = "Name should be at least 3 characters long.";
+            } else if (!/^[a-zA-Z\s]+$/.test(nameValue)) {
+                nameError.textContent = "Name should only contain letters and spaces.";
+            } else if (!/^[A-Z][a-zA-Z\s]*$/.test(nameValue)) {
+                nameError.textContent = "Name should start with a capital letter.";
+            } else if (!/^[^0-9]+$/.test(nameValue)) {
+                nameError.textContent = "Name should not contain numbers.";
+            }
+            else if (!/^(?!.*(\w)\1{2,})[A-Z][a-zA-Z\s]*$/.test(nameValue)) {
+                nameError.textContent = "Name should not contain more than 2 consecutive identical letters.";
+                return false;
+            }
+              else if (isAscendingOrDescendingSequence(nameValue)) {
+                nameError.textContent = "Ascending or descending sequences are not allowed";
+            }  else if (!/^[^\s]+(\s+[^\s]+)*$/.test(nameValue)) {
+                nameError.textContent = "Name should not start or end with spaces and should not have consecutive spaces.";
+            }
+
+        }
+        function isAscendingOrDescendingSequence(str) {
+            const ascending = 'abcdefghijklmnopqrstuvwxyz';
+            const descending = 'zyxwvutsrqponmlkjihgfedcba';
+            return ascending.includes(str.toLowerCase()) || descending.includes(str.toLowerCase());
+        }
+        function validateSlug() {
+            var nameValue = nameInput.value.trim();
+            var slugValue = nameValue.toLowerCase().replace(/\s+/g, '-');
+            slugInput.value = slugValue;
+
+            slugError.textContent = "";
+
+  
+            if (slugValue === "") {
+                  slugError.textContent = "Slug is required.";
+            } else if (!/^[a-z_\-]+$/.test(slugValue)) {
+                  slugError.textContent = "Slug should only contain lowercase letters, underscores, and hyphens.";
+            }
+        }
+    
+        function validateDescription() {
+            var descriptionValue = descriptionInput.value.trim();
+            descriptionError.textContent = "";
+            if (descriptionValue === "") {
+                descriptionError.textContent = "Description is required.";
+            }
+            else if (!/^[A-Z][a-zA-Z\s]*$/.test(descriptionValue)) {
+                descriptionError.textContent = "Description should start with a capital letter.";
+            }
+            else if (/^[0-9]+$/.test(descriptionValue)) {
+                descriptionError.textContent = "Description cannot consist of numbers only.";
+            }
+            else if (!/^(?!.*(\w)\1{2,})[A-Z][a-zA-Z\s]*$/.test(descriptionValue)) {
+                descriptionError.textContent = "Description should not contain more than 2 consecutive identical letters.";
+                return false;
+            }
+
+            else if (isAscendingOrDescendingSequence(descriptionValue)) {
+                descriptionError.textContent = "Ascending or descending sequences are not allowed";
+            } 
+            else if (!/[a-zA-Z]/.test(descriptionValue)) {
+                descriptionError.textContent = "Description should contain at least one letter.";
+            } else if (descriptionValue.length < 10) {
+                descriptionError.textContent = "Description should be at least 10 characters long.";
+            } else if (descriptionValue.length > 200) {
+                descriptionError.textContent = "Description is too long. Maximum 200 characters allowed.";
+            } 
+              
+        }
+        function isAscendingOrDescendingSequence(str) {
+            const ascending = 'abcdefghijklmnopqrstuvwxyz';
+            const descending = 'zyxwvutsrqponmlkjihgfedcba';
+            return ascending.includes(str.toLowerCase()) || descending.includes(str.toLowerCase());
+        }
+    
+        function validateImage() {
+    imageError.textContent = "";
+    var allowedExtensions = ["jpg", "jpeg", "png", "gif"]; // Define the allowed image file extensions
+    var maxFileSizeMB = 5; // Define the maximum file size in megabytes (MB)
+
+    if (!imageInput.files || imageInput.files.length === 0) {
+        imageError.textContent = "Please select an image file.";
+    } 
+    else {
+        var imageFile = imageInput.files[0];
+        var fileName = imageFile.name;
+        var fileExtension = fileName.split('.').pop().toLowerCase();
+
+        if (allowedExtensions.indexOf(fileExtension) === -1) {
+            imageError.textContent = "Invalid file format. Allowed formats: " + allowedExtensions.join(", ");
+        } else if (imageFile.size > maxFileSizeMB * 1024 * 1024) {
+            imageError.textContent = "File size exceeds the maximum limit of " + maxFileSizeMB + "MB.";
+        }
+    }
+        }
+    
+       
+
+        function validateProductForm()
+        {
+            return true
+        }
+    
+    </script>   
+</body>
+
+</html>

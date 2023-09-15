@@ -1,0 +1,395 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap" rel="stylesheet">
+
+    <title>SleekMart - Product Detail Page</title>
+
+
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/templatemo-hexashop.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/owl-carousel.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/lightbox.css' %}">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'js/popper.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/popper.js' %}"></script>
+    <script src="{% static 'js/myscript.js' %}"></script>
+
+    
+<!--
+   
+TemplateMo 571 Hexashop
+
+https://templatemo.com/tm-571-hexashop
+
+-->
+<style>
+    .page-heading {
+        margin-top: 80px;
+        margin-bottom: 30px;
+        background-image: url('{{ subcategory.image.url }}');
+        background-position: center center;
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+    .main-border-button {
+        position:absolute;
+        right:35px;
+    }
+    .header-area.header-sticky {
+        min-height: 80px;
+        background-color: #34a3b4;
+      }
+      #product .right-content ul.stars {
+        position: absolute;
+        right: -90px;
+        top: 0;
+      }
+    /* Define styles for the products heading container */
+    .products-heading {
+        background-color: #34a3b4;
+        padding: 20px 0;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    /* Define styles for the section title */
+    .section-title {
+        color: #333;
+        font-size: 30px;
+        margin: 0;
+        text-transform: uppercase;
+        background-color: #fff;
+        border: 2px solid #007bff;
+        padding: 10px 20px;
+        border-radius: 4px;
+        display: inline-block;
+        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+        animation: floatAnimation 3s ease-in-out infinite, colorChange 4s alternate infinite; /* Apply both animations */
+    }
+    
+    /* Keyframes for the floating animation */
+    @keyframes floatAnimation {
+        0% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-10px); /* Adjust the vertical float distance */
+        }
+        100% {
+            transform: translateY(0);
+        }
+    }
+    
+    /* Keyframes for changing text color */
+    @keyframes colorChange {
+        0% {
+            color: #007bff; /* Initial color */
+        }
+        100% {
+            color: #ff0000; /* New color (you can adjust this) */
+        }
+    }
+    
+
+</style>
+    </head>
+    
+    <body>
+    
+    <!-- ***** Preloader Start ***** -->
+    <div id="preloader">
+        <div class="jumper">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>  
+    <!-- ***** Preloader End ***** -->
+    
+    
+    <!-- ***** Header Area Start ***** -->
+    <header class="header-area header-sticky">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <nav class="main-nav">
+                        <!-- ***** Logo Start ***** -->
+                        <a href="{% url 'dashboard_home' %}" class="logo">
+                            {% comment %} <h5 style="color:black;position:absolute;top:35px;">Sleek Mart </h5> {% endcomment %}
+                        </a>
+                        <!-- ***** Logo End ***** -->
+                        <!-- ***** Menu Start ***** -->
+                        <ul class="nav">
+                            <li class="scroll-to-section"><a href="{% url 'dashboard_home' %}" class="active">Home</a></li>
+                            {% for category in categories %}
+                            {% if category.subcategory_set.exists %}
+                            <li class="scroll-to-section"><a href="{% url 'products' category.id %}">{{ category.name }}</a></li>
+                            {% endif %}
+                            {% endfor %}
+                            <li class="scroll-to-section">
+                                <a href="{% url 'cart_details' %}">Cart <span class="cart-count" style="color:red;">({{ cart_count }})</span></a>
+                            </li>
+                            <li class="scroll-to-section">
+                                <a href="{% url 'view_wishlist' %}"> Wishlist <span class="wishlist-count" style="color:red;">({{ wishlist_count }})</span></a>
+                            </li>
+                            
+                            
+                            
+                            {% comment %} <li class="submenu">
+                                <a href="javascript:;">Pages</a>
+                                <ul>
+                                    <li><a href="about">About Us</a></li>
+                                    <li><a href="products">Products</a></li>
+                                    <li><a href="single-product">Single Product</a></li>
+                                    <li><a href="contact">Contact Us</a></li>
+                                </ul>
+                            </li>
+                            <li class="submenu">
+                                <a href="javascript:;">Features</a>
+                                <ul>
+                                    <li><a href="#">Features Page 1</a></li>
+                                    <li><a href="#">Features Page 2</a></li>
+                                    <li><a href="#">Features Page 3</a></li>
+                                    <li><a rel="nofollow" href="https://templatemo.com/page/4" target="_blank">Template Page 4</a></li>
+                                </ul>
+                            </li> {% endcomment %}
+                            {% if user.is_authenticated %}
+                            <li class="scroll-to-section"><a href="{% url 'loggout' %}">Logout</a></li>
+                            {% else %}
+                            <li class="scroll-to-section"><a href="{% url 'loggout' %}">SignIn/Signup</a></li>
+                            {% endif %}
+                        </ul>        
+                        <a class='menu-trigger'>
+                            <span>Menu</span>
+                        </a>
+                        <!-- ***** Menu End ***** -->
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- ***** Header Area End ***** -->
+
+    <!-- ***** Main Banner Area Start ***** -->
+    <div class="page-heading" id="top">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="inner-content">
+                        <h2>{{ subcategory.name }}</h2>
+                        <span>{{ subcategory.description }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ***** Main Banner Area End ***** -->
+    <div class="products-heading">
+        <h2 class="section-title">Products in {{ subcategory.name }}</h2>
+    </div>
+
+    <!-- ***** Product Area Starts ***** -->
+    {% for product in products %}
+    <section class="section" id="product">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                <div class="left-images">
+                 <a href="{% url 'each_product' product.id %}"> 
+                     <img src="{{ product.product_image.url }}" alt="{{ product.name }}" style="max-width: 300px;">
+                 </a>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="right-content">
+                    <a href="{% url 'each_product' product.id %}"> 
+                 
+                    <h4>{{ product.name }}</h4>
+                </a>
+                    <span class="price">$ {{ product.selling_price }}</span>
+                    <ul class="stars">
+                        <li><i class="fa fa-star"></i></li>
+                        <li><i class="fa fa-star"></i></li>
+                        <li><i class="fa fa-star"></i></li>
+                        <li><i class="fa fa-star"></i></li>
+                        <li><i class="fa fa-star"></i></li>
+                    </ul>
+                    <span>{{ product.description }}</span>
+
+                    
+                    <div class="total">
+                    {% if user.is_authenticated %}
+                        {% if product.id in wishlist %}
+                        
+                        {% comment %} <div class="main-border-button"><a href="#">Add To Wishlist</a></div> {% endcomment %}
+                        <a pid="{{ product.id }}" class="minus-wishlist btn btn-danger shadow px-5 py-2 ms-4">
+                            <i class="fas fa-heart fa-lg" ></i>
+                        </a>
+                        {% else %}
+                        <a pid="{{ product.id }}" class="plus-wishlist btn btn-success shadow px-5 py-2 ms-4">
+                            <i class="fas fa-heart fa-lg" ></i>
+                        </a>
+                        {% endif %}
+                        {% else %}
+                        <a href="{% url 'login_page' %}" class="plus-wishlist btn btn-success shadow px-5 py-2 ms-4">
+                            <i class="fas fa-heart fa-lg"></i>
+                        </a>
+                    {% endif %}
+                    </div> 
+                </div>
+            </div>
+            </div>
+        </div>
+    </section>
+    {% endfor %}
+    <!-- ***** Product Area Ends ***** -->
+    
+    <!-- ***** Footer Start ***** -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="first-item">
+                        <div class="logo">
+                            <img src="{% static 'images/white-logo.png' %}" alt="hexashop ecommerce templatemo">
+                        </div>
+                        <ul>
+                            <li><a href="#">16501 SleekMart, Kochi, FL 33160, Kerala</a></li>
+                            <li><a href="#">sleekmart@company.com</a></li>
+                            <li><a href="#">010-020-0340</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <h4>Shopping &amp; Categories</h4>
+                    <ul>
+                        <li><a href="#">Men’s Shopping</a></li>
+                        <li><a href="#">Women’s Shopping</a></li>
+                        <li><a href="#">Kid's Shopping</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h4>Useful Links</h4>
+                    <ul>
+                        <li><a href="#">Homepage</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Help</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h4>Help &amp; Information</h4>
+                    <ul>
+                        <li><a href="#">Help</a></li>
+                        <li><a href="#">FAQ's</a></li>
+                        <li><a href="#">Shipping</a></li>
+                        <li><a href="#">Tracking ID</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-12">
+                    <div class="under-footer">
+                        <p>Copyright © 2022 sleekmart Co., Ltd. All Rights Reserved. 
+                        
+                        {% comment %} <br>Design: <a href="https://templatemo.com" target="_parent" title="free css templates">TemplateMo</a></p> {% endcomment %}
+                        <ul>
+                            <li><a href="#"><i class="fa fa-facebook"></i></a></li>
+                            <li><a href="#"><i class="fa fa-twitter"></i></a></li>
+                            <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
+                            <li><a href="#"><i class="fa fa-behance"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Plugins -->
+    <script src="{% static 'js/owl-carousel.js' %}"></script>
+    <script src="{% static 'js/accordions.js' %}"></script>
+    <script src="{% static 'js/datepicker.js' %}"></script>
+    <script src="{% static 'js/scrollreveal.min.js' %}"></script>
+    <script src="{% static 'js/waypoints.min.js' %}"></script>
+    <script src="{% static 'js/jquery.counterup.min.js' %}"></script>
+    <script src="{% static 'js/imgfix.min.js' %}"></script> 
+    <script src="{% static 'js/slick.js' %}"></script> 
+    <script src="{% static 'js/lightbox.js' %}"></script> 
+    <script src="{% static 'js/isotope.js' %}"></script> 
+    <script src="{% static 'js/quantity.js' %}"></script>
+   
+    <!-- Global Init -->
+    <script src="{% static 'js/custom.js' %}"></script>
+   
+    <script>
+
+        $(function() {
+            var selectedClass = "";
+            $("p").click(function(){
+            selectedClass = $(this).attr("data-rel");
+            $("#portfolio").fadeTo(50, 0.1);
+                $("#portfolio div").not("."+selectedClass).fadeOut();
+            setTimeout(function() {
+              $("."+selectedClass).fadeIn();
+              $("#portfolio").fadeTo(50, 1);
+            }, 500);
+                
+            });
+        });
+        
+        
+        $(document).ready(function () {
+            // Add an event listener for changes to the quantity input
+            $('[id^="quantityInput_"]').on('input', function () {
+                updateTotalPrice($(this));
+            });
+    
+            // Add event listeners for the plus and minus buttons
+            $('.plus').on('click', function () {
+                var input = $(this).siblings('input[name="quantity"]');
+                console.log(input.val())
+                var currentVal = parseInt(input.val(), 10);
+                input.val(currentVal + 1);
+                console.log(currentVal)
+                updateTotalPrice(input);
+            });
+    
+            $('.minus').on('click', function () {
+                var input = $(this).siblings('input[name="quantity"]');
+                var currentVal = parseInt(input.val(), 10);
+                if (currentVal > 1) {
+                    input.val(currentVal - 1);
+                    updateTotalPrice(input);
+                }
+            });
+    
+            function updateTotalPrice(input) {
+                var quantity = parseInt(input.val(), 10);
+                var productId = input.attr('id').split('_')[1];
+                var sellingPrice = parseFloat($('#totalPrice_' + productId).data('selling-price'));
+                var newTotalPrice = sellingPrice * quantity;
+                $('#totalPrice_' + productId).text('$' + newTotalPrice.toFixed(2));
+            }
+        });
+    </script>
+
+  </body>
+
+</html>

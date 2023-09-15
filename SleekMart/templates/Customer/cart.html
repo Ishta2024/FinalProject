@@ -1,0 +1,414 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap" rel="stylesheet">
+
+    <title>SleekMart - Product Detail Page</title>
+
+
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/templatemo-hexashop.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/owl-carousel.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/lightbox.css' %}">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'js/popper.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+    
+<!--
+   
+TemplateMo 571 Hexashop
+
+https://templatemo.com/tm-571-hexashop
+
+-->
+<style>
+    /* Add some basic styling to the table */
+    .quantity-input {
+        width: 90px; /* Adjust the width as needed */
+        padding: 5px;
+        text-align: center;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        outline: none;
+    }
+
+    /* Style the update button */
+    .update-button {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+
+    .update-button:hover {
+        background-color: #45a049;
+    }
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+    }
+
+    .table th,
+    .table td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .table th {
+        background-color: #f2f2f2;
+    }
+
+    .table tbody tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    .table tbody tr:hover {
+        background-color: #ddd;
+    }
+
+    /* Style the buttons */
+    .table button {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+
+    .table button:hover {
+        background-color: #45a049;
+    }
+    .page-heading {
+        margin-top: 80px;
+        margin-bottom: 30px;
+        background-image: url('{{ product.subcategory.image.url }}');
+        background-position: center center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        
+       
+    }
+    .header-area.header-sticky {
+        min-height: 80px;
+        background-color: #34a3b4;
+      }
+      #product .right-content ul.stars {
+        position: relative;
+        right: -210px;
+        top: -45px;
+      }
+    /* Define styles for the products heading container */
+    .products-heading {
+        background-color: #34a3b4;
+        padding: 20px 0;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    /* Define styles for the section title */
+    .section-title {
+        color: #333;
+        font-size: 30px;
+        margin: 0;
+        text-transform: uppercase;
+        background-color: #fff;
+        border: 2px solid #007bff;
+        padding: 10px 20px;
+        border-radius: 4px;
+        display: inline-block;
+        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+        animation: floatAnimation 3s ease-in-out infinite, colorChange 4s alternate infinite; /* Apply both animations */
+    }
+    
+    /* Keyframes for the floating animation */
+    @keyframes floatAnimation {
+        0% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-10px); /* Adjust the vertical float distance */
+        }
+        100% {
+            transform: translateY(0);
+        }
+    }
+    
+    /* Keyframes for changing text color */
+    @keyframes colorChange {
+        0% {
+            color: #007bff; /* Initial color */
+        }
+        100% {
+            color: #ff0000; /* New color (you can adjust this) */
+        }
+    }
+    
+
+</style>
+    </head>
+    
+    <body>
+    
+    <!-- ***** Preloader Start ***** -->
+    <div id="preloader">
+        <div class="jumper">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>  
+    <!-- ***** Preloader End ***** -->
+    
+    
+    <!-- ***** Header Area Start ***** -->
+    <header class="header-area header-sticky">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <nav class="main-nav">
+                        <!-- ***** Logo Start ***** -->
+                        <a href="{% url 'dashboard_home' %}" class="logo">
+                            <h5 style="color:black;position:relative;top:35px;left:-124px;">Sleek Mart </h5>
+                        </a>
+                        <!-- ***** Logo End ***** -->
+                        <!-- ***** Menu Start ***** -->
+                        <ul class="nav">
+                            <li class="scroll-to-section"><a href="{% url 'dashboard_home' %}" class="active">Home</a></li>
+                            {% for category in categories %}
+                            <li class="scroll-to-section"><a href="{% url 'products' category.id %}">{{ category.name }}</a></li>
+                            {% comment %} <li class="scroll-to-section"><a href="{% url 'dashboard_home' %}">Women's</a></li>
+                            <li class="scroll-to-section"><a href="{% url 'dashboard_home' %}">Kid's</a></li> {% endcomment %}
+                            {% endfor %}
+                            {% comment %} <li class="submenu">
+                                <a href="javascript:;">Pages</a>
+                                <ul>
+                                    <li><a href="about">About Us</a></li>
+                                    <li><a href="products">Products</a></li>
+                                    <li><a href="single-product">Single Product</a></li>
+                                    <li><a href="contact">Contact Us</a></li>
+                                </ul>
+                            </li>
+                            <li class="submenu">
+                                <a href="javascript:;">Features</a>
+                                <ul>
+                                    <li><a href="#">Features Page 1</a></li>
+                                    <li><a href="#">Features Page 2</a></li>
+                                    <li><a href="#">Features Page 3</a></li>
+                                    <li><a rel="nofollow" href="https://templatemo.com/page/4" target="_blank">Template Page 4</a></li>
+                                </ul>
+                            </li> {% endcomment %}
+                            <li class="scroll-to-section">
+                                <a href="{% url 'cart_details' %}">Cart <span class="cart-count" style="color:red;">({{ cart_count }})</span></a>
+                            </li>
+                            <li class="scroll-to-section">
+                                <a href="{% url 'view_wishlist' %}"> Wishlist <span class="wishlist-count" style="color:red;">({{ wishlist_count }})</span></a>
+                            </li>
+                            {% if user.is_authenticated %}
+                            <li class="scroll-to-section"><a href="{% url 'loggout' %}">Logout</a></li>
+                            {% else %}
+                            <li class="scroll-to-section"><a href="{% url 'loggout' %}">SignIn/Signup</a></li>
+                            {% endif %}
+                        </ul>        
+                        <a class='menu-trigger'>
+                            <span>Menu</span>
+                        </a>
+                        <!-- ***** Menu End ***** -->
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="container" style="position:relative;top:25px;">
+        <h1>Your Shopping Cart</h1>
+        <br><br>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cart_item in cart_items %}
+                    <tr>
+                        <td>{{ cart_item.product.name }}</td>
+                        <td>
+                            <form method="post" action="{% url 'update_cart_item' cart_item.id %}">
+                                {% csrf_token %}
+                                <input type="number" name="quantity" value="{{ cart_item.quantity }}" id="quantityInput" class="quantity-input" min="1" max="{{ cart_item.product.quantity }}">
+                                <button type="submit" class="update-button">Update</button>
+                            </form> 
+                            {% comment %} <input type="number" name="quantity" value="{{ cart_item.quantity }}" class="quantity-input" data-cart-item-id="{{ cart_item.id }}"> {% endcomment %}
+                        </td>
+                        <td>${{ cart_item.product.selling_price }}</td>
+                        <td class="total-price">${{ cart_item.total_price }}</td>
+                        <td>
+                            <form method="post" action="{% url 'remove_cart_item' cart_item.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="update-button">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br><br>
+        <div>
+            <b>Total: ${{ total_price }}</b>
+            <br>
+            <a href="" class="btn btn-primary">Proceed to Checkout</a>
+        </div>
+    </div>
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="first-item">
+                        <div class="logo">
+                            <img src="{% static 'images/white-logo.png' %}" alt="hexashop ecommerce templatemo">
+                        </div>
+                        <ul>
+                            <li><a href="#">16501 SleekMart, Kochi, FL 33160, Kerala</a></li>
+                            <li><a href="#">sleekmart@company.com</a></li>
+                            <li><a href="#">010-020-0340</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <h4>Shopping &amp; Categories</h4>
+                    <ul>
+                        <li><a href="#">Men’s Shopping</a></li>
+                        <li><a href="#">Women’s Shopping</a></li>
+                        <li><a href="#">Kid's Shopping</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h4>Useful Links</h4>
+                    <ul>
+                        <li><a href="#">Homepage</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Help</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h4>Help &amp; Information</h4>
+                    <ul>
+                        <li><a href="#">Help</a></li>
+                        <li><a href="#">FAQ's</a></li>
+                        <li><a href="#">Shipping</a></li>
+                        <li><a href="#">Tracking ID</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-12">
+                    <div class="under-footer">
+                        <p>Copyright © 2022 sleekmart Co., Ltd. All Rights Reserved. 
+                        
+                        {% comment %} <br>Design: <a href="https://templatemo.com" target="_parent" title="free css templates">TemplateMo</a></p> {% endcomment %}
+                        <ul>
+                            <li><a href="#"><i class="fa fa-facebook"></i></a></li>
+                            <li><a href="#"><i class="fa fa-twitter"></i></a></li>
+                            <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
+                            <li><a href="#"><i class="fa fa-behance"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Plugins -->
+    <script src="{% static 'js/owl-carousel.js' %}"></script>
+    <script src="{% static 'js/accordions.js' %}"></script>
+    <script src="{% static 'js/datepicker.js' %}"></script>
+    <script src="{% static 'js/scrollreveal.min.js' %}"></script>
+    <script src="{% static 'js/waypoints.min.js' %}"></script>
+    <script src="{% static 'js/jquery.counterup.min.js' %}"></script>
+    <script src="{% static 'js/imgfix.min.js' %}"></script> 
+    <script src="{% static 'js/slick.js' %}"></script> 
+    <script src="{% static 'js/lightbox.js' %}"></script> 
+    <script src="{% static 'js/isotope.js' %}"></script> 
+    <script src="{% static 'js/quantity.js' %}"></script>
+   
+    <!-- Global Init -->
+    <script src="{% static 'js/custom.js' %}"></script>
+   
+    <script>
+
+        $(function() {
+            var selectedClass = "";
+            $("p").click(function(){
+            selectedClass = $(this).attr("data-rel");
+            $("#portfolio").fadeTo(50, 0.1);
+                $("#portfolio div").not("."+selectedClass).fadeOut();
+            setTimeout(function() {
+              $("."+selectedClass).fadeIn();
+              $("#portfolio").fadeTo(50, 1);
+            }, 500);
+                
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('entered')
+            var quantityInput = document.getElementById('quantityInput');
+            var maxQuantity = {{ cart_item.product.quantity }}; // Get the available product quantity
+            
+            quantityInput.addEventListener('input', function () {
+                var enteredQuantity = parseInt(quantityInput.value, 10);
+        
+                // Check if the entered quantity is greater than the available quantity
+                if (enteredQuantity > maxQuantity) {
+                    quantityInput.value = maxQuantity; // Reset the input value to the maximum
+                }
+            });
+        });
+    {% comment %} $(document).ready(function () {
+        $('.quantity-input').on('input', function () {
+            var cartItemId = $(this).data('cart-item-id');
+            var newQuantity = parseInt($(this).val(), 10);
+
+            // Make an AJAX request to update the quantity
+            $.ajax({
+                url: '{% url 'update_cart_item' 0 %}'.replace('0', cartItemId),
+                type: 'POST',
+                data: {
+                    'quantity': newQuantity,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    // Update the total price in the table
+                    var totalPriceCell = $('td.total-price[data-cart-item-id="' + cartItemId + '"]');
+                    totalPriceCell.text('$' + data.total_price);
+                }
+            });
+        });
+    }); {% endcomment %}
+
+
+    </script>
+
+</body>
+
+</html>
+

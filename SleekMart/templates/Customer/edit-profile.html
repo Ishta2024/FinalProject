@@ -1,0 +1,391 @@
+{% extends 'Customer/customer_base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+<style media="screen">
+    body {
+        background-color: #ffffff;
+    }
+
+    a:link {
+        text-decoration: none;
+    }
+
+    .note {
+        text-align: center;
+        height: 80px;
+        background: -webkit-linear-gradient(left, #0072ff, #8811c5);
+        color: #fff;
+        font-weight: bold;
+        line-height: 80px;
+    }
+
+    .form-content {
+        padding: 5%;
+        border: 1px solid #ced4da;
+        margin-bottom: 2%;
+    }
+
+    .form-control {
+        border-radius: 1.5rem;
+    }
+
+    .btnSubmit {
+        border: none;
+        border-radius: 1.5rem;
+        padding: 1%;
+        width: 20%;
+        cursor: pointer;
+        background: #005d94;
+        color: #fff;
+    }
+
+    .menu {
+        top: 50px;
+    }
+
+    /* Add some basic styling for error messages */
+    .error {
+        color: red;
+        font-size: 1.0rem;
+    }
+</style>
+
+<br><br><br><br>
+<form method="post" enctype="multipart/form-data" onsubmit="return validateRegistrationForm()">
+    {% csrf_token %}
+    <div class="container register-form">
+        <div class="form">
+            <div class="note">
+                <p>EDIT PROFILE</p>
+            </div>
+            <div class="form-content">
+                <div class="row">
+                    <div class="col-md-12">
+                      <div class="form-group">
+                        <label for="id_name">Name</label>
+                        <input type="text" id="id_name" name="name" value="{{ user.name }}"
+                            class="form-control" required>
+                        <span id="nameError" class="error"></span>
+                    </div>
+                        <div class="form-group">
+                            <label for="id_mobile">Mobile</label>
+                            <input type="tel" id="id_mobile" name="mobile" value="{{ user.mobile }}"
+                                class="form-control" required>
+                            <span id="mobileError" class="error"></span>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="id_email">Email</label>
+                          <input type="email" id="id_email" name="email" value="{{ user.email }}" class="form-control" required>
+                          <span id="emailError" class="error"></span>
+                      </div>
+                      
+                        <div class="form-group">
+                            <label for="id_profile_pic">Profile Picture</label>
+                            <input type="file" id="id_profile_pic" name="profile_pic" class="form-control-file" required>
+                            <span id="profilePicError" class="error"></span>
+                        </div>
+                        <div class="form-group">
+                          <label for="id_address">Address</label>
+                          <input type="text" id="id_address" name="address" value="{{ user.address }}" class="form-control" required>
+                          <span id="addressError" class="error"></span>
+                      </div>
+                      
+                    </div>
+                </div>
+                <div>
+                    <center><button type="submit" class="btnSubmit">Edit</button></center>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    function validateRegistrationForm() {
+    
+        var name = document.getElementById("id_name").value;
+        var mobileNumber = document.getElementById("id_mobile").value;
+        var email = document.getElementById("id_email").value;
+        
+    
+        var nameError = document.getElementById("nameError");
+        var mobileNumberError = document.getElementById("mobileError");
+        var emailError = document.getElementById("emailError");
+        
+        // Clear previous error messages
+        nameError.textContent = "";
+        mobileError.textContent = "";
+        emailError.textContent = "";
+        passwordError.textContent = "";
+        confirmPasswordError.textContent = "";
+    
+        var nameRegex = /^(?=[a-zA-Z])(?=(?:\D*\d){0,2}\D*$)(?=\w{4,20}$)(?=(?:[^a-z]*[a-z]){2,}[^a-z]*$)(?=.*[A-Z])/;
+        var mobileNumberRegex = /^\d{10}$/;
+        var emailRegex = /\S+@\S+\.\S+/;
+        
+    
+        if (!nameRegex.test(name)) {
+            nameError.textContent = getInvalidNameMessage(name);
+            return false;
+        } else {
+            nameError.textContent = "";
+        } 
+  
+        
+        if (!mobileNumberRegex.test(mobileNumber)) {
+            mobileNumberError.textContent = getInvalidMobileNumber(mobileNumber);
+            return false;
+        } else {
+            mobileNumberError.textContent = "";
+        }
+    
+        if (!emailRegex.test(email)) {
+            emailError.textContent = "Invalid email address";
+            return false;
+        } else {
+            emailError.textContent = "";
+        }
+        
+        
+        
+        return true;
+    }
+    
+  
+    function containsAlphabetSequence(str) {
+      return /abcdefghijklmnopqrstuvwxyz/i.test(str);
+  }
+  
+  function isAscendingOrDescendingSequence(str) {
+      const ascending = 'abcdefghijklmnopqrstuvwxyz';
+      const descending = 'zyxwvutsrqponmlkjihgfedcba';
+      return ascending.includes(str.toLowerCase()) || descending.includes(str.toLowerCase());
+  }
+  function isValidFullName(name) {
+      const parts = name.split(' ');
+      return parts.length >= 2 && parts.every(part => part.length >= 2);
+  }
+  
+  function getInvalidNameMessage(name) {
+      // Check for leading whitespace
+      if (/^\s/.test(name)) {
+          return "Leading whitespace is not allowed";
+      }
+      
+      // First letter should be a capital letter
+      else if (!/^[A-Z]/.test(name)) {
+          return "First letter should be a capital letter";
+      }
+      
+      // Check for alphabet sequences
+      else if (containsAlphabetSequence(name)) {
+          return "Alphabet sequences are not allowed";
+      }
+  
+      // Check for ascending or descending sequence
+      else if (isAscendingOrDescendingSequence(name)) {
+          return "Ascending or descending sequences are not allowed";
+      }
+      
+      // Check if the input is a valid full name
+      else if (!isValidFullName(name)) {
+          return "Please enter a valid name with at least two parts separated by a space";
+      }
+  
+      // Minimum 4 characters and maximum 20 characters
+      else if (name.replace(/\s/g, '').length < 4 || name.replace(/\s/g, '').length > 20) {
+          return "Username length should be between 4 and 20 characters";
+      }
+      
+      // At least one uppercase letter
+      else if (!/[A-Z]/.test(name)) {
+          return "At least one capital letter is required";
+      }
+  
+      // At least two lowercase letters
+      else if ((name.replace(/\s/g, '').match(/[a-z]/g) || []).length < 2) {
+          return "Use at least 2 lowercase letters";
+      }
+  
+      // No numbers allowed
+      else if (/\d/.test(name)) {
+          return "Numbers are not allowed in the name";
+      }
+  
+      // No consecutive uppercase letters
+      else if (/[A-Z]{2,}/.test(name)) {
+          return "No consecutive uppercase letters are allowed";
+      }
+      
+      // If all conditions pass, return an empty string indicating valid input
+      else {
+          return "";
+      }
+  }
+  
+  
+  
+    
+
+    
+  
+    var nameInput = document.getElementById("id_name");
+    var mobileInput = document.getElementById("id_mobile");
+    var emailInput = document.getElementById("id_email");
+    
+  
+    // Add input event listener to name input
+    nameInput.addEventListener("input", function() {
+      var name = nameInput.value;
+      var errorMessage = getInvalidNameMessage(name);
+      document.getElementById("nameError").textContent = errorMessage;
+    });
+  
+    // Add input event listener to mobile input
+  
+    
+  
+    mobileInput.addEventListener("input", function() {
+        const input = mobileInput.value;
+        let errorMessage = "";
+    
+        const sanitizedInput = input.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+    
+        if (sanitizedInput.length !== 0 && sanitizedInput.length !== 10) {
+            errorMessage = "Should be 10 digits";
+        } else if (sanitizedInput.length > 0 && !/^[6-9]/.test(sanitizedInput)) {
+            errorMessage = "Number should start with 6, 7, 8, or 9";
+        } else if (sanitizedInput.length === 10) {
+            if (/(\d)\1{9}/.test(sanitizedInput)) {
+                errorMessage = "Not a valid SIM number";
+            } else if (/(\d)\1{5,}/.test(sanitizedInput)) {
+                errorMessage = "Invalid number with repeating consecutive digits";
+            } else if (/(\d{2})\1{2,}/.test(sanitizedInput)) {
+                errorMessage = "Invalid number with repeating sequences";
+            }
+        }
+        
+    
+        var formattedInput = sanitizedInput.replace(/(\d{3})(\d{4})(\d{3})/, '$1-$2-$3');
+        mobileInput.value = formattedInput;
+    
+        document.getElementById("mobileError").textContent = errorMessage;
+    });
+    
+    // Add input event listener to email input
+    emailInput.addEventListener("input", function() {
+      var email = emailInput.value;
+      var errorMessage = "";
+  
+      if (!/^\S+@\S+\.\S+$/.test(email)) {
+          errorMessage = "Invalid email address";
+      } else if (email.length > 320) {
+          errorMessage = "Email address is too long";
+      } else if (email.includes("..")) {
+          errorMessage = "Consecutive periods are not allowed";
+      } else if (email.startsWith(".") || email.endsWith(".")) {
+          errorMessage = "Email address cannot start or end with a period";
+      } else if (/[A-Z]/.test(email)) {
+          errorMessage = "Capital letters are not allowed";
+      }
+      
+  
+      document.getElementById("emailError").textContent = errorMessage;
+  });
+
+  var profilePicInput = document.getElementById("id_profile_pic");
+  profilePicInput.addEventListener("change", function () {
+    validateProfilePicture();
+  });
+  function validateProfilePicture() {
+    var profilePicInput = document.getElementById("id_profile_pic");
+    var profilePicError = document.getElementById("profilePicError");
+
+    // Clear previous error message
+    profilePicError.textContent = "";
+
+    // Check if a file is selected
+    if (!profilePicInput.files || !profilePicInput.files[0]) {
+        profilePicError.textContent = "Please select a profile picture.";
+        return false;
+    }
+
+    var allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
+    var maxSizeInBytes = 2 * 1024 * 1024; // 2MB
+
+    var selectedFile = profilePicInput.files[0];
+
+    // Check file type
+    if (!allowedTypes.includes(selectedFile.type)) {
+        profilePicError.textContent = "Only JPG, JPEG, PNG, or GIF files are allowed.";
+        return false;
+    }
+
+    // Check file size
+    if (selectedFile.size > maxSizeInBytes) {
+        profilePicError.textContent = "File size exceeds the maximum allowed (2MB).";
+        return false;
+    }
+
+    // Validation passed
+    return true;
+}
+var addressInput = document.getElementById("id_address");
+addressInput.addEventListener("input", function () {
+    validateAddress();
+});
+function validateAddress() {
+    var addressInput = document.getElementById("id_address");
+    var addressError = document.getElementById("addressError");
+    var address = addressInput.value.trim(); // Remove leading/trailing whitespace
+
+    // Clear previous error message
+    addressError.textContent = "";
+
+    // Check if the address is empty
+    if (address.length === 0) {
+        addressError.textContent = "Address cannot be empty.";
+        return false;
+    }
+
+    // Check if the address is at least 5 characters long
+    if (address.length < 5) {
+        addressError.textContent = "Address should be at least 5 characters long.";
+        return false;
+    }
+
+    // Check if the address contains only alphanumeric characters and spaces
+    if (!/^[\w\s]+\(\w\),\s[\w\s]+ P\.O,\s\d{6}$/.test(address)) {
+        addressError.textContent = "Invalid address format. Example: Street (H), Area P.O, Pincode";
+        return false;
+    }
+
+    // Check if the address contains a valid postal code format (e.g., 12345 or 12345-6789)
+    //if (!/^\d{5}(?:-\d{4})?$/.test(address)) {
+     //   addressError.textContent = "Invalid postal code format (e.g., 12345 or 12345-6789).";
+      //  return false;
+    //}
+
+    // Check if the address doesn't contain certain restricted words
+    var restrictedWords = ["po box", "box", "p.o. box"];
+    var containsRestrictedWord = restrictedWords.some(word => address.toLowerCase().includes(word));
+    if (containsRestrictedWord) {
+        addressError.textContent = "Address should not contain restricted words like 'PO Box' or 'Box'.";
+        return false;
+    }
+
+    // You can add more validation rules here as needed
+
+    return true; // Address is valid
+}
+
+// Add input event listener to address input
+
+// Add input event listener to profile picture input
+
+  
+    // Add input event listener to password input
+   
+</script>
+{% endblock content %}

@@ -1,0 +1,424 @@
+{% load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- meta tags and CSS links here -->
+  <link rel="stylesheet" href="{% static 'css/register.css' %}">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+</head>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #34a3b4;
+}
+
+.login-content {
+   
+    width: 100%;
+    max-width: 500px;
+  background-color: #f2f2f2;
+  border-radius: 5px;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+}
+.login-form {
+  background-color: #f2f2f2;
+  padding: 40px 50px;
+  border-radius: 5px;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+}
+.login-form h2 {
+    margin-top: 0;
+}
+
+.form-group {
+    margin-bottom: 15px;
+
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+.form-group input:focus {
+  outline: none;
+  border-color: #34a3b4;
+}
+
+.error {
+    color: red;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background-color: #34a3b4;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #288495;
+}
+
+.signup-link {
+    margin-top: 25px;
+    text-align: center;
+}
+
+.signup-link a {
+    color: #090909;
+    text-decoration: none;
+}
+.close-button {
+  position: absolute;
+  top: 20px; /* Adjust as needed */
+  right: 20px; /* Adjust as needed */
+  color: #090909;
+  text-decoration: none;
+  font-size: 18px;
+  background-color: #34a3b4;
+}
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .login-container {
+        padding: 10px;
+    }
+
+    .login-content {
+      
+        padding: 10px;
+
+    }
+    .login-form{
+      padding:30px;
+    }
+    .close-button {
+      top: 10px; /* Adjust for smaller screens */
+      right: 10px; /* Adjust for smaller screens */
+}
+
+}
+</style>
+<body>
+  <div class="login-container">
+    <div class="login-content">
+        <div class="login-form">
+            <h2>Registration</h2>
+            <a href="{% url 'dashboard_home' %}"> <button class="close-button" onclick="closeRegistrationForm()"><i class="fas fa-times"></i></button></a>
+            {% if username_exists %}
+                <p class="error-message" style="color:red;">Username already exists. Please choose a different username.</p>
+            {% endif %}
+            <form action="#" method="post" on="return validateRegistrationForm()">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="name">Enter Your Name</label>
+                    <input type="text" id="name" name="name"  autocomplete="name" required>
+                    <span id="nameError" class="error"></span>
+                </div>
+                <div class="form-group">
+                    <label for="mobile">Mobile Number</label>
+                    <input type="tel" id="mobile" name="mobile" required>
+                    <span id="mobileError" class="error"></span>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email"  autocomplete="email" required>
+                    <span id="emailError" class="error"></span>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                    <span id="passwordError" class="error"></span>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                    <span id="confirmPasswordError" class="error"></span>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+                
+            </form>
+            <div class="signup-link">
+                <a href="{% url 'login_page' %}"> Already a user? Login</a>
+            </div>
+            
+        </div>
+    </div>
+</div>
+<script>
+  function validateRegistrationForm() {
+    
+      var name = document.getElementById("name").value;
+      var mobileNumber = document.getElementById("mobile").value;
+      var email = document.getElementById("email").value;
+      var password = document.getElementById("password").value;
+      var confirmPassword = document.getElementById("confirmPassword").value;
+  
+      var nameError = document.getElementById("nameError");
+      var mobileNumberError = document.getElementById("mobileError");
+      var emailError = document.getElementById("emailError");
+      var passwordError = document.getElementById("passwordError");
+      var confirmPasswordError = document.getElementById("confirmPasswordError");
+        console.log("hoho")
+      // Clear previous error messages
+      nameError.textContent = "";
+      mobileError.textContent = "";
+      emailError.textContent = "";
+      passwordError.textContent = "";
+      confirmPasswordError.textContent = "";
+  
+      var nameRegex = /^(?=[a-zA-Z])(?=(?:\D*\d){0,2}\D*$)(?=\w{4,20}$)(?=(?:[^a-z]*[a-z]){2,}[^a-z]*$)(?=.*[A-Z])/;
+      var mobileNumberRegex = /^\d{10}$/;
+      var emailRegex = /\S+@\S+\.\S+/;
+      var passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9!@#$%^&*()_+,.?]{8,}$/;
+  
+      if (!nameRegex.test(name)) {
+          nameError.textContent = getInvalidNameMessage(name);
+          return false;
+      } else {
+          nameError.textContent = "";
+      } 
+
+      
+      if (!mobileNumberRegex.test(mobileNumber)) {
+          mobileNumberError.textContent = getInvalidMobileNumber(mobileNumber);
+          return false;
+      } else {
+          mobileNumberError.textContent = "";
+      }
+  
+      if (!emailRegex.test(email)) {
+          emailError.textContent = "Invalid email address";
+          return false;
+      } else {
+          emailError.textContent = "";
+      }
+      
+      if (password.length < 8) {
+          passwordError.textContent = "Password must contain at least 8 characters";
+          return false;
+      } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+          passwordError.textContent = "Password must contain one uppercase letter, one lowercase letter, and one digit";
+          return false;
+      } else {
+          passwordError.textContent = "";
+      }
+  
+      if (password !== confirmPassword) {
+          confirmPasswordError.textContent = "Passwords do not match";
+          return false;
+      } else {
+        
+          confirmPasswordError.textContent = "";
+      }
+      
+      return true;
+  }
+  
+
+  function containsAlphabetSequence(str) {
+    return /abcdefghijklmnopqrstuvwxyz/i.test(str);
+}
+
+function isAscendingOrDescendingSequence(str) {
+    const ascending = 'abcdefghijklmnopqrstuvwxyz';
+    const descending = 'zyxwvutsrqponmlkjihgfedcba';
+    return ascending.includes(str.toLowerCase()) || descending.includes(str.toLowerCase());
+}
+function isValidFullName(name) {
+    const parts = name.split(' ');
+    return parts.length >= 2 && parts.every(part => part.length >= 2);
+}
+
+function getInvalidNameMessage(name) {
+    // Check for leading whitespace
+    if (/^\s/.test(name)) {
+        return "Leading whitespace is not allowed";
+    }
+    
+    // First letter should be a capital letter
+    else if (!/^[A-Z]/.test(name)) {
+        return "First letter should be a capital letter";
+    }
+    
+    // Check for alphabet sequences
+    else if (containsAlphabetSequence(name)) {
+        return "Alphabet sequences are not allowed";
+    }
+
+    // Check for ascending or descending sequence
+    else if (isAscendingOrDescendingSequence(name)) {
+        return "Ascending or descending sequences are not allowed";
+    }
+    
+    // Check if the input is a valid full name
+    else if (!isValidFullName(name)) {
+        return "Please enter a valid name with at least two parts separated by a space";
+    }
+
+    // Minimum 4 characters and maximum 20 characters
+    else if (name.replace(/\s/g, '').length < 4 || name.replace(/\s/g, '').length > 20) {
+        return "Username length should be between 4 and 20 characters";
+    }
+    
+    // At least one uppercase letter
+    else if (!/[A-Z]/.test(name)) {
+        return "At least one capital letter is required";
+    }
+
+    // At least two lowercase letters
+    else if ((name.replace(/\s/g, '').match(/[a-z]/g) || []).length < 2) {
+        return "Use at least 2 lowercase letters";
+    }
+
+    // No numbers allowed
+    else if (/\d/.test(name)) {
+        return "Numbers are not allowed in the name";
+    }
+
+    // No consecutive uppercase letters
+    else if (/[A-Z]{2,}/.test(name)) {
+        return "No consecutive uppercase letters are allowed";
+    }
+    
+    // If all conditions pass, return an empty string indicating valid input
+    else {
+        return "";
+    }
+}
+
+
+
+  
+  function getInvalidPasswordMessage(password) {
+      if (password.length < 8) {
+          return "Minimum 8 characters required";
+      } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+          return "Password must contain at least one uppercase letter, one lowercase letter, and one digit";
+      } else {
+          return "";
+      }
+  }
+  
+
+  var nameInput = document.getElementById("name");
+  var mobileInput = document.getElementById("mobile");
+  var emailInput = document.getElementById("email");
+  var passwordInput = document.getElementById("password");
+  var confirmPasswordInput = document.getElementById("confirmPassword");
+
+  // Add input event listener to name input
+  nameInput.addEventListener("input", function() {
+    var name = nameInput.value;
+    var errorMessage = getInvalidNameMessage(name);
+    document.getElementById("nameError").textContent = errorMessage;
+  });
+
+  // Add input event listener to mobile input
+
+  
+
+  mobileInput.addEventListener("input", function() {
+      const input = mobileInput.value;
+      let errorMessage = "";
+  
+      const sanitizedInput = input.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+  
+      if (sanitizedInput.length !== 0 && sanitizedInput.length !== 10) {
+          errorMessage = "Should be 10 digits";
+      } else if (sanitizedInput.length > 0 && !/^[6-9]/.test(sanitizedInput)) {
+          errorMessage = "Number should start with 6, 7, 8, or 9";
+      } else if (sanitizedInput.length === 10) {
+          if (/(\d)\1{9}/.test(sanitizedInput)) {
+              errorMessage = "Not a valid SIM number";
+          } else if (/(\d)\1{5,}/.test(sanitizedInput)) {
+              errorMessage = "Invalid number with repeating consecutive digits";
+          } else if (/(\d{2})\1{2,}/.test(sanitizedInput)) {
+              errorMessage = "Invalid number with repeating sequences";
+          }
+      }
+      
+  
+      var formattedInput = sanitizedInput.replace(/(\d{3})(\d{4})(\d{3})/, '$1-$2-$3');
+      mobileInput.value = formattedInput;
+  
+      document.getElementById("mobileError").textContent = errorMessage;
+  });
+  
+  // Add input event listener to email input
+  emailInput.addEventListener("input", function() {
+    var email = emailInput.value;
+    var errorMessage = "";
+
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+        errorMessage = "Invalid email address";
+    } else if (email.length > 320) {
+        errorMessage = "Email address is too long";
+    } else if (email.includes("..")) {
+        errorMessage = "Consecutive periods are not allowed";
+    } else if (email.startsWith(".") || email.endsWith(".")) {
+        errorMessage = "Email address cannot start or end with a period";
+    } else if (/[A-Z]/.test(email)) {
+        errorMessage = "Capital letters are not allowed";
+    }
+    
+
+    document.getElementById("emailError").textContent = errorMessage;
+});
+
+
+  // Add input event listener to password input
+  passwordInput.addEventListener("input", function() {
+    var password = passwordInput.value;
+    var errorMessage = getInvalidPasswordMessage(password);
+    document.getElementById("passwordError").textContent = errorMessage;
+  });
+
+  // Add input event listener to confirm password input
+  confirmPasswordInput.addEventListener("input", function() {
+    var confirmPassword = confirmPasswordInput.value;
+    var password = passwordInput.value;
+    var errorMessage = confirmPassword === password ? "" : "Passwords do not match";
+    document.getElementById("confirmPasswordError").textContent = errorMessage;
+  });
+  </script>
+  
+  
+  {% comment %} <script>
+    function closeLoginForm() {
+      // Hide the login form container
+      document.querySelector(".login-container").style.display = "none";
+    }
+  </script> {% endcomment %}
+
+</body>
+</html>
