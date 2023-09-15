@@ -157,7 +157,17 @@
 </header>
   <div class="container mt-5">
     <h2 class="mb-4">Your Wishlist</h2>
-
+    {% if added_to_wishlist %}
+    <div class="alert alert-success" role="alert">
+        Product added to wishlist!
+    </div>
+{% endif %}
+{% if removed_from_wishlist %}
+    <div class="alert alert-success" role="alert">
+        Product removed from wishlist!
+    </div>
+{% endif %}
+<div id="message-container"></div>
     {% if wishlist_products %}
       <div class="row">
         {% for product in wishlist_products %}
@@ -192,8 +202,10 @@
         },
         success: function (data) {
           // Product removed successfully, you can update the UI or display a message
-          console.log(data.message);
-          
+         // console.log(data.message);
+         // alert('Product Removed From Wishlist Successfully');
+         const messageContainer = document.getElementById('message-container');
+         messageContainer.innerHTML = '<div class="alert alert-success">Product Removed From Wishlist Successfully</div>';
           // Remove the product's card from the UI
           $(`[data-product-id=${productId}]`).closest('.card').remove();
         },

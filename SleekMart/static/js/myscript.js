@@ -10,7 +10,8 @@ $('.plus-wishlist').click(function(){
         },
         success:function(data)
         {
-            window.location.href = `http://localhost:8000/single_product/${id}`
+            console.log('Entered Plus')
+            window.location.href = '/wishlist/?added_to_wishlist=true';
         }
     })
 })
@@ -26,7 +27,8 @@ $('.minus-wishlist').click(function(){
         },
         success:function(data)
         {
-            window.location.href = `http://localhost:8000/single_product/${id}`
+            console.log('Entered Minus')
+            window.location.href = '/wishlist/?removed_from_wishlist=true';
 
         }
     })

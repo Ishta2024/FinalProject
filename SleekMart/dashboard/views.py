@@ -290,7 +290,8 @@ def remove_cart_item(request, cart_item_id):
 def view_wishlist(request):
     # Check if the user is authenticated
     if request.user.is_authenticated:
-        # Fetch the user's wishlist products
+        added_to_wishlist = request.GET.get('added_to_wishlist', False)
+        removed_from_wishlist = request.GET.get('removed_from_wishlist', False)
         user = request.user
         cart_count = CartItems.objects.filter(cart__user=user).count()
         wishlist_products = Wishlist.objects.filter(user=request.user)
@@ -305,7 +306,9 @@ def view_wishlist(request):
         'wishlist_products': wishlist_products,
         'categories':categories,
         'wishlist_count':wishlist_count,
-        'cart_count':cart_count
+        'cart_count':cart_count,
+        'added_to_wishlist': added_to_wishlist,
+        'removed_from_wishlist': removed_from_wishlist
     }
 
     return render(request, 'Customer/wishlist_products.html', context)
