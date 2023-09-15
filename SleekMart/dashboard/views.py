@@ -699,6 +699,7 @@ def delete_category(request, category_slug):
         subcategories_with_products = Subcategory.objects.filter(category=category, product__isnull=False)
         if subcategories_with_products.exists():
             messages.error(request, 'Category cannot be deleted as associated subcategories have products.')
+            return redirect('categories')
         else:
         # Handle deleting category logic here
             category.status = True  # Assuming True represents a hidden category
@@ -853,8 +854,11 @@ def login_page(request):
                 if seller.is_approved == 'approved':
                     login(request, user)
                     return redirect('sellerindex')
+                elif seller.is_approved == 'declined':
+                    messages.error(request, "Your seller Account is Rejected.")
+                    return redirect('login_page')
                 else:
-                    messages.error(request, "Your seller account is not approved yet.")
+                    messages.error(request, "Your Seller Account Is Not Yet Approved.")
                     return redirect('login_page')
             elif user.role == 'admin':
                 return redirect('index')  # Redirect admins to their dashboard page
