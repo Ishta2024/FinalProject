@@ -133,7 +133,7 @@ def each_product(request, product_id):
         # Fetch the user's wishlist products' IDs and count
         cart_count = CartItems.objects.filter(cart__user=user).count()
         wishlist = WishlistItems.objects.filter(wishlist__user_id=user_id).values_list('products__id', flat=True)
-        wishlist_count = WishlistItems.objects.filter(wishlist__user=request.user).count()
+        wishlist_count = WishlistItems.objects.filter(wishlist__user=user).count()
     context = {
         'categories':categories,
         'product': product,
@@ -226,7 +226,7 @@ def cart_details(request):
            user = request.user
         # Fetch the user's wishlist products' IDs and count
            wishlist = WishlistItems.objects.filter(wishlist__user_id=user_id).values_list('products__id', flat=True)
-           wishlist_count = WishlistItems.objects.filter(wishlist__user=request.user).count()
+           wishlist_count = WishlistItems.objects.filter(wishlist__user=user).count()
            cart_count = CartItems.objects.filter(cart__user=user).count()
            cart = AddCart.objects.get(user=user)
            cart_items = CartItems.objects.filter(cart=cart)
@@ -294,8 +294,8 @@ def view_wishlist(request):
         removed_from_wishlist = request.GET.get('removed_from_wishlist', False)
         user = request.user
         cart_count = CartItems.objects.filter(cart__user=user).count()
-        wishlist_products = WishlistItems.objects.filter(wishlist__user=request.user)
-        wishlist_count = WishlistItems.objects.filter(wishlist__user=request.user).count()
+        wishlist_products = WishlistItems.objects.filter(wishlist__user=user)
+        wishlist_count = WishlistItems.objects.filter(wishlist__user=user).count()
         categories=Category.objects.filter(status=False)
         
     else:

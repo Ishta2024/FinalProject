@@ -38,7 +38,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         ('admin', 'Admin'),
         ('delivery_agent', 'Delivery Agent'),
     )
-    email = models.EmailField(unique=True, null=True, blank=True)
+    email = models.EmailField(unique=True)
     name = models.CharField(max_length=100,null=True, blank=True)
     mobile = models.CharField(max_length=15, blank=True, null=True)
     profile_pic = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
@@ -140,7 +140,7 @@ class AddWishlist(models.Model):
     # products = models.ForeignKey(Product, on_delete=models.CASCADE, default=None)
     
     def __str__(self):
-       return f"{self.user.name}'s Wishlist"
+       return self.user.name
     
 class WishlistItems(models.Model):
     wishlist = models.ForeignKey(AddWishlist, on_delete=models.CASCADE)
