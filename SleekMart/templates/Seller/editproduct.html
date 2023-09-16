@@ -162,10 +162,10 @@
                                 <input type="text" name= "name" value = "{{ product.name }}" placeholder="Type here" class="form-control" id="product_title">
                             </div>
                             <div class="row gx-3">
-                                <div class="col-md-4  mb-3">
+                                {% comment %} <div class="col-md-4  mb-3">
                                     <label for="product_sku" class="form-label">SLUG</label>
                                     <input type="text" name= "slug" value = "{{ product.slug }}" placeholder="Type here" class="form-control" id="product_sku">
-                                </div>
+                                </div> {% endcomment %}
                                 <div class="col-md-4  mb-3">
                                     <label for="product_color" class="form-label">Quantity</label>
                                     <input type="text" name= "quantity" value = "{{ product.quantity }}" placeholder="Type here" class="form-control" id="product_color">

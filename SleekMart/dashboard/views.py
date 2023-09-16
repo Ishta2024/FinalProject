@@ -489,7 +489,7 @@ def editproduct(request, product_id):
 
     if request.method == 'POST':
         # Retrieve the updated data from the request and update the product fields
-        product.slug = request.POST.get('slug')
+        
         product.name = request.POST.get('name')
         product.description = request.POST.get('description')
         product.quantity = request.POST.get('quantity')
@@ -1036,7 +1036,7 @@ def edit_profile(request):
     if request.method == "POST":
         name = request.POST.get('name')
         mobile = request.POST.get('mobile')
-        email = request.POST.get('email')
+        # email = request.POST.get('email')
         address = request.POST.get('address')
         
         # Check if a profile picture was uploaded
@@ -1047,7 +1047,7 @@ def edit_profile(request):
         user_profile.name = name
         user_profile.mobile = mobile
         user_profile.address = address
-        user_profile.email = email  # Update the email field of the CustomUser object
+        # user_profile.email = email  # Update the email field of the CustomUser object
 
         user_profile.save()
 
