@@ -133,13 +133,20 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
-class Wishlist(models.Model):
+class AddWishlist(models.Model):
 
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    products = models.ForeignKey(Product, on_delete=models.CASCADE, default=None)
+    wishlist_date = models.DateTimeField(auto_now_add=True)
+    # products = models.ForeignKey(Product, on_delete=models.CASCADE, default=None)
     
     def __str__(self):
        return f"{self.user.name}'s Wishlist"
+    
+class WishlistItems(models.Model):
+    wishlist = models.ForeignKey(AddWishlist, on_delete=models.CASCADE)
+    products = models.ForeignKey(Product, on_delete=models.CASCADE)
+    def __str__(self):
+       return self.products.name
 
 class Rating(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)

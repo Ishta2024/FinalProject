@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
-from .models import Customer, CustomUser, Seller, Wishlist,AddCart, CartItems
+from .models import Customer, CustomUser, Seller, AddWishlist,WishlistItems,AddCart, CartItems
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from .models import Category, Product, Subcategory, Rating
@@ -56,8 +56,8 @@ def products(request, category_id):
         user = request.user
         user_id = request.user.id
         cart_count = CartItems.objects.filter(cart__user=user).count()
-        wishlist = Wishlist.objects.filter(user_id=user_id).values_list('products__id', flat=True)
-        wishlist_count = Wishlist.objects.filter(user=request.user).count()
+        wishlist = WishlistItems.objects.filter(wishlist__user_id=user_id).values_list('products__id', flat=True)
+        wishlist_count = WishlistItems.objects.filter(wishlist__user=request.user).count()
     context = {
         'category':category,
         'subcategories': subcategories,
@@ -103,8 +103,8 @@ def single_product(request, subcategory_id):
         # Fetch the user's wishlist products' IDs and count
         cart_count = CartItems.objects.filter(cart__user=user).count()
         # Fetch the user's wishlist products' IDs and count
-        wishlist = Wishlist.objects.filter(user_id=user_id).values_list('products__id', flat=True)
-        wishlist_count = Wishlist.objects.filter(user=request.user).count()
+        wishlist = WishlistItems.objects.filter(wishlist__user_id=user_id).values_list('products__id', flat=True)
+        wishlist_count = WishlistItems.objects.filter(wishlist__user=request.user).count()
 
     context = {
         'categories': categories,
@@ -132,8 +132,8 @@ def each_product(request, product_id):
         user=request.user
         # Fetch the user's wishlist products' IDs and count
         cart_count = CartItems.objects.filter(cart__user=user).count()
-        wishlist = Wishlist.objects.filter(user_id=user_id).values_list('products__id', flat=True)
-        wishlist_count = Wishlist.objects.filter(user=request.user).count()
+        wishlist = WishlistItems.objects.filter(wishlist__user_id=user_id).values_list('products__id', flat=True)
+        wishlist_count = WishlistItems.objects.filter(wishlist__user=request.user).count()
     context = {
         'categories':categories,
         'product': product,
@@ -150,15 +150,15 @@ def plus_wishlist(request):
         prod_id = request.GET.get('prod_id')
         product = Product.objects.get(id=prod_id)  # Retrieve the product
         user = request.user
-
+        wishlist, created = AddWishlist.objects.get_or_create(user=user)
         # Check if the product already exists in the wishlist
         if user.is_authenticated:
             # Check if the product is already in the user's wishlist
-            if Wishlist.objects.filter(user=user, products=product).exists():
+            if WishlistItems.objects.filter(wishlist=wishlist, products=product).exists():
                 message = 'Product is already in the wishlist.'
             else:
                 # Create the wishlist item
-                Wishlist.objects.create(user=user, products=product)
+                WishlistItems.objects.create(wishlist=wishlist, products=product)
                 message = 'Product added to wishlist successfully.'
         else:
             message = 'You must be logged in to add products to your wishlist.'
@@ -175,10 +175,10 @@ def minus_wishlist(request):
         product = get_object_or_404(Product, id=prod_id)
         user = request.user
         try:
-            wishlist = Wishlist.objects.get(user=user, products=product)
+            wishlist = WishlistItems.objects.get(wishlist__user=user, products=product)
             wishlist.delete()
             message = 'Product removed from wishlist successfully.'
-        except Wishlist.DoesNotExist:
+        except WishlistItems.DoesNotExist:
             message = 'Product was not in the wishlist.'
 
         data = {
@@ -225,8 +225,8 @@ def cart_details(request):
            user_id = request.user.id
            user = request.user
         # Fetch the user's wishlist products' IDs and count
-           wishlist = Wishlist.objects.filter(user_id=user_id).values_list('products__id', flat=True)
-           wishlist_count = Wishlist.objects.filter(user=request.user).count()
+           wishlist = WishlistItems.objects.filter(wishlist__user_id=user_id).values_list('products__id', flat=True)
+           wishlist_count = WishlistItems.objects.filter(wishlist__user=request.user).count()
            cart_count = CartItems.objects.filter(cart__user=user).count()
            cart = AddCart.objects.get(user=user)
            cart_items = CartItems.objects.filter(cart=cart)
@@ -294,10 +294,10 @@ def view_wishlist(request):
         removed_from_wishlist = request.GET.get('removed_from_wishlist', False)
         user = request.user
         cart_count = CartItems.objects.filter(cart__user=user).count()
-        wishlist_products = Wishlist.objects.filter(user=request.user)
-        wishlist_count = Wishlist.objects.filter(user=request.user).count()
+        wishlist_products = WishlistItems.objects.filter(wishlist__user=request.user)
+        wishlist_count = WishlistItems.objects.filter(wishlist__user=request.user).count()
         categories=Category.objects.filter(status=False)
-        print(wishlist_products)
+        
     else:
         # If the user is not authenticated, set wishlist_products to an empty queryset
         wishlist_products = []
@@ -321,12 +321,12 @@ def remove_from_wishlist(request, product_id):
 
     try:
         # Check if the product exists in the user's wishlist
-        wishlist_item = Wishlist.objects.get(user=request.user, products_id=product_id)
+        wishlist_item = WishlistItems.objects.get(wishlist__user=request.user, products_id=product_id)
         # Remove the product from the wishlist
         wishlist_item.delete()
         response_data = {'message': 'Product removed from wishlist successfully'}
         return JsonResponse(response_data)
-    except Wishlist.DoesNotExist:
+    except WishlistItems.DoesNotExist:
         response_data = {'message': 'Product not found in wishlist'}
         return JsonResponse(response_data, status=404)
 
