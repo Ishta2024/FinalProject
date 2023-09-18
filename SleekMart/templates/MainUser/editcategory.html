@@ -326,15 +326,15 @@
                 return false
             } else if (nameValue.length < 3) {
                 nameError.textContent = "Name should be at least 3 characters long.";
-            } else if (!/^[a-zA-Z\s]+$/.test(nameValue)) {
-                nameError.textContent = "Name should only contain letters and spaces.";
-            } else if (!/^[A-Z][a-zA-Z\s]*$/.test(nameValue)) {
+            } else if (!/^[a-zA-Z\s&]+$/.test(nameValue)) {
+                nameError.textContent = "Name should only contain letters and spaces.";;
+            } else if (!/^[A-Z&][a-zA-Z\s&]*$/.test(nameValue)) {
                 nameError.textContent = "Name should start with a capital letter.";
             } else if (!/^[^0-9]+$/.test(nameValue)) {
                 nameError.textContent = "Name should not contain numbers.";
             } 
             // Check for consecutive identical letters but allow at least 3 consecutive identical letters
-            else if (!/^(?!.*(\w)\1{2,})[A-Z][a-zA-Z\s]*$/.test(nameValue)) {
+            else if (!/^(?!.*(\w)\1{2,})[A-Z&][a-zA-Z\s&]*$/.test(nameValue)) {
                 nameError.textContent = "Name should not contain more than 2 consecutive identical letters.";
                 return false;
             }
@@ -376,14 +376,14 @@
             if (descriptionValue === "") {
                 descriptionError.textContent = "Description is required.";
             }
-            else if (!/^[A-Z][a-zA-Z\s]*$/.test(descriptionValue)) {
-                descriptionError.textContent = "Description should start with a capital letter.";
+            else if (!/^[A-Z][A-Za-z\s,.'&-]*(\s?[.]\s?[A-Z][A-Za-z\s,.'&-]*)*$/g.test(descriptionValue)) {
+                descriptionError.textContent = "Description should start with a capital letter, contain only letters, spaces, commas, ampersands, hyphens, apostrophes, and each sentence should start with a capital letter and end with a period.";
             }
             else if (/^[0-9]+$/.test(descriptionValue)) {
                 descriptionError.textContent = "Description cannot consist of numbers only.";
             }
-            else if (!/^(?!.*(\w)\1{2,})[A-Z][a-zA-Z\s]*$/.test(descriptionValue)) {
-                descriptionError.textContent = "Description should not contain more than 2 consecutive identical letters.";
+            else if (/(\.)\1{4,}|(,)\2{4,}|(%)\3{4,}/.test(descriptionValue)) {
+                descriptionError.textContent = "Description should not contain consecutive repeated characters";
                 return false;
             }
 

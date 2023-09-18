@@ -1,13 +1,9 @@
 {% load static %}
+{% block content %}
+
 <!DOCTYPE html>
-<html lang="en">
-
-  <head>
-
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
+<html>
+<head>
     <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap" rel="stylesheet">
 
     <title>SleekMart - Product Detail Page</title>
@@ -27,218 +23,206 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{% static 'js/popper.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
-
-    
-<!--
-   
-TemplateMo 571 Hexashop
-
-https://templatemo.com/tm-571-hexashop
-
--->
-<style>
-    /* Add some basic styling to the table */
-    .quantity-input {
-        width: 90px; /* Adjust the width as needed */
-        padding: 5px;
-        text-align: center;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        outline: none;
-    }
-
-    /* Style the update button */
-    .update-button {
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        padding: 5px 10px;
-        cursor: pointer;
-    }
-
-    .update-button:hover {
-        background-color: #45a049;
-    }
-    .table {
-        width: 100%;
-        border-collapse: collapse;
-        border-spacing: 0;
-    }
-
-    .table th,
-    .table td {
-        padding: 10px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-    }
-
-    .table th {
-        background-color: #f2f2f2;
-    }
-
-    .table tbody tr:nth-child(even) {
-        background-color: #f2f2f2;
-    }
-
-    .table tbody tr:hover {
-        background-color: #ddd;
-    }
-
-    /* Style the buttons */
-    .table button {
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        padding: 5px 10px;
-        cursor: pointer;
-    }
-
-    .table button:hover {
-        background-color: #45a049;
-    }
-    .page-heading {
-        margin-top: 80px;
-        margin-bottom: 30px;
-        background-image: url('{{ product.subcategory.image.url }}');
-        background-position: center center;
-        background-size: cover;
-        background-repeat: no-repeat;
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <style>
+        .quantity-input {
+            width: 90px; /* Adjust the width as needed */
+            padding: 5px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            outline: none;
+          }
+          
+          /* Style the update button */
+          .update-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+           
+          }
+          
+          .update-button:hover {
+            background-color: #45a049;
+          }
+          .table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+          }
+          
+          .table th,
+          .table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+          }
+          
+          .table th {
+            background-color: #f2f2f2;
+          }
+          
+          .table tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+          }
+          
+          .table tbody tr:hover {
+            background-color: #ddd;
+          }
+          
+          /* Style the buttons */
+          .table button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+          }
+          
+          .table button:hover {
+            background-color: #45a049;
+          }
+        .page-heading {
+            margin-top: 80px;
+            margin-bottom: 30px;
+            background-image: url('{{ category.image.url }}');
+            background-position: center center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            
+           
+        }
+        .header-area.header-sticky {
+            min-height: 80px;
+            background-color: #34a3b4;
+          }
+          #product .right-content ul.stars {
+            position: relative;
+            right: -210px;
+            top: -45px;
+          }
+        /* Define styles for the products heading container */
+        .products-heading {
+            background-color: #34a3b4;
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 30px;
+        }
         
-       
-    }
-    .header-area.header-sticky {
-        min-height: 80px;
-        background-color: #34a3b4;
-      }
-      #product .right-content ul.stars {
-        position: relative;
-        right: -210px;
-        top: -45px;
-      }
-    /* Define styles for the products heading container */
-    .products-heading {
-        background-color: #34a3b4;
-        padding: 20px 0;
-        text-align: center;
-        margin-bottom: 30px;
-    }
+        /* Define styles for the section title */
+        .section-title {
+            color: #333;
+            font-size: 30px;
+            margin: 0;
+            text-transform: uppercase;
+            background-color: #fff;
+            border: 2px solid #007bff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            display: inline-block;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+            animation: floatAnimation 3s ease-in-out infinite, colorChange 4s alternate infinite; /* Apply both animations */
+        }
+        
+        /* Keyframes for the floating animation */
+        @keyframes floatAnimation {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px); /* Adjust the vertical float distance */
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+        
+        /* Keyframes for changing text color */
+        @keyframes colorChange {
+            0% {
+                color: #007bff; /* Initial color */
+            }
+            100% {
+                color: #ff0000; /* New color (you can adjust this) */
+            }
+        }
+        
     
-    /* Define styles for the section title */
-    .section-title {
-        color: #333;
-        font-size: 30px;
-        margin: 0;
-        text-transform: uppercase;
-        background-color: #fff;
-        border: 2px solid #007bff;
-        padding: 10px 20px;
-        border-radius: 4px;
-        display: inline-block;
-        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
-        animation: floatAnimation 3s ease-in-out infinite, colorChange 4s alternate infinite; /* Apply both animations */
-    }
-    
-    /* Keyframes for the floating animation */
-    @keyframes floatAnimation {
-        0% {
-            transform: translateY(0);
-        }
-        50% {
-            transform: translateY(-10px); /* Adjust the vertical float distance */
-        }
-        100% {
-            transform: translateY(0);
-        }
-    }
-    
-    /* Keyframes for changing text color */
-    @keyframes colorChange {
-        0% {
-            color: #007bff; /* Initial color */
-        }
-        100% {
-            color: #ff0000; /* New color (you can adjust this) */
-        }
-    }
-    
+    </style>
+</head>
 
-</style>
-    </head>
-    
-    <body>
-    
-    <!-- ***** Preloader Start ***** -->
-    <div id="preloader">
-        <div class="jumper">
-            <div></div>
-            <div></div>
-            <div></div>
-        </div>
-    </div>  
-    <!-- ***** Preloader End ***** -->
-    
-    
-    <!-- ***** Header Area Start ***** -->
-    <header class="header-area header-sticky">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <nav class="main-nav">
-                        <!-- ***** Logo Start ***** -->
-                        <a href="{% url 'dashboard_home' %}" class="logo">
-                            <h5 style="color:black;position:relative;top:35px;left:-124px;">Sleek Mart </h5>
-                        </a>
-                        <!-- ***** Logo End ***** -->
-                        <!-- ***** Menu Start ***** -->
-                        <ul class="nav">
-                            <li class="scroll-to-section"><a href="{% url 'dashboard_home' %}" class="active">Home</a></li>
-                            {% for category in categories %}
-                            <li class="scroll-to-section"><a href="{% url 'products' category.id %}">{{ category.name }}</a></li>
-                            {% comment %} <li class="scroll-to-section"><a href="{% url 'dashboard_home' %}">Women's</a></li>
-                            <li class="scroll-to-section"><a href="{% url 'dashboard_home' %}">Kid's</a></li> {% endcomment %}
-                            {% endfor %}
-                            {% comment %} <li class="submenu">
-                                <a href="javascript:;">Pages</a>
-                                <ul>
-                                    <li><a href="about">About Us</a></li>
-                                    <li><a href="products">Products</a></li>
-                                    <li><a href="single-product">Single Product</a></li>
-                                    <li><a href="contact">Contact Us</a></li>
-                                </ul>
-                            </li>
-                            <li class="submenu">
-                                <a href="javascript:;">Features</a>
-                                <ul>
-                                    <li><a href="#">Features Page 1</a></li>
-                                    <li><a href="#">Features Page 2</a></li>
-                                    <li><a href="#">Features Page 3</a></li>
-                                    <li><a rel="nofollow" href="https://templatemo.com/page/4" target="_blank">Template Page 4</a></li>
-                                </ul>
-                            </li> {% endcomment %}
-                            <li class="scroll-to-section">
-                                <a href="{% url 'cart_details' %}">Cart <span class="cart-count" style="color:red;">({{ cart_count }})</span></a>
-                            </li>
-                            <li class="scroll-to-section">
-                                <a href="{% url 'view_wishlist' %}"> Wishlist <span class="wishlist-count" style="color:red;">({{ wishlist_count }})</span></a>
-                            </li>
-                            {% if user.is_authenticated %}
-                            <li class="scroll-to-section"><a href="{% url 'loggout' %}">Logout</a></li>
-                            {% else %}
-                            <li class="scroll-to-section"><a href="{% url 'loggout' %}">SignIn/Signup</a></li>
-                            {% endif %}
-                        </ul>        
-                        <a class='menu-trigger'>
-                            <span>Menu</span>
-                        </a>
-                        <!-- ***** Menu End ***** -->
-                    </nav>
-                </div>
+<body>
+
+
+<header class="header-area header-sticky">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav class="main-nav">
+                    <!-- ***** Logo Start ***** -->
+                    <a href="{% url 'dashboard_home' %}" class="logo">
+                        <h5 style="color:black;position:absolute;top:35px;">Sleek Mart </h5>
+                    </a>
+                    <!-- ***** Logo End ***** -->
+                    <!-- ***** Menu Start ***** -->
+                    <ul class="nav">
+                        <li class="scroll-to-section"><a href="{% url 'dashboard_home' %}" class="active">Home</a></li>
+                        {% for category in categories %}
+                        <li class="scroll-to-section"><a href="{% url 'products' category.id %}">{{ category.name }}</a></li>
+                        {% comment %} <li class="scroll-to-section"><a href="{% url 'dashboard_home' %}">Women's</a></li>
+                        <li class="scroll-to-section"><a href="{% url 'dashboard_home' %}">Kid's</a></li> {% endcomment %}
+                        {% endfor %}
+                        {% comment %} <li class="submenu">
+                            <a href="javascript:;">Pages</a>
+                            <ul>
+                                <li><a href="about">About Us</a></li>
+                                <li><a href="products">Products</a></li>
+                                <li><a href="single-product">Single Product</a></li>
+                                <li><a href="contact">Contact Us</a></li>
+                            </ul>
+                        </li>
+                        <li class="submenu">
+                            <a href="javascript:;">Features</a>
+                            <ul>
+                                <li><a href="#">Features Page 1</a></li>
+                                <li><a href="#">Features Page 2</a></li>
+                                <li><a href="#">Features Page 3</a></li>
+                                <li><a rel="nofollow" href="https://templatemo.com/page/4" target="_blank">Template Page 4</a></li>
+                            </ul>
+                        </li> {% endcomment %}
+                        <li class="scroll-to-section">
+                          <a href="{% url 'cart_details' %}">Cart <span class="cart-count" style="color:red;">({{ cart_count }})</span></a>
+                      </li>
+                        <li class="scroll-to-section">
+                            <a href="{% url 'view_wishlist' %}"> Wishlist <span class="wishlist-count" style="color:red;">({{ wishlist_count }})</span></a>
+                        </li>
+                        {% if user.is_authenticated %}
+                        <li class="scroll-to-section"><a href="{% url 'loggout' %}">Logout</a></li>
+                        {% else %}
+                        <li class="scroll-to-section"><a href="{% url 'loggout' %}">SignIn/Signup</a></li>
+                        {% endif %}
+                    </ul>        
+                    <a class='menu-trigger'>
+                        <span>Menu</span>
+                    </a>
+                    <!-- ***** Menu End ***** -->
+                </nav>
             </div>
         </div>
-    </header>
+    </div>
+</header>
     <div class="container" style="position:relative;top:25px;">
         <h1>Your Shopping Cart</h1>
         <br><br>
+        {% if cart_empty %}
+                <h6>Your cart is empty.</h6>
+                <div class="alert alert-info">
+                    Your Cart is empty. <a href="{% url 'dashboard_home' %}" class="alert-link">Start shopping now</a>!
+                  </div>
+                {% else %}
         <table class="table">
             <thead>
                 <tr>
@@ -250,9 +234,10 @@ https://templatemo.com/tm-571-hexashop
                 </tr>
             </thead>
             <tbody>
+                
                 {% for cart_item in cart_items %}
                     <tr>
-                        <td>{{ cart_item.product.name }}</td>
+                        <td><a href="{% url 'each_product' cart_item.product.id %}">{{ cart_item.product.name }}</a></td>
                         <td>
                              <form method="post" action="{% url 'update_cart_item' cart_item.id %}">
                                 {% csrf_token %}
@@ -272,15 +257,21 @@ https://templatemo.com/tm-571-hexashop
                         </td>
                     </tr>
                 {% endfor %}
+                
             </tbody>
         </table>
+        {% endif %}
         <br><br>
+        {% if cart_empty is False %}
         <div>
             <b>Total: ${{ total_price }}</b>
             <br>
             <a href="" class="btn btn-primary">Proceed to Checkout</a>
+           
         </div>
+        {% endif %}
     </div>
+    
     <footer>
         <div class="container">
             <div class="row">
@@ -440,7 +431,7 @@ https://templatemo.com/tm-571-hexashop
 
 
     </script>
-
+{% endblock %}
 </body>
 
 </html>

@@ -224,7 +224,7 @@
                         <div class="card-body">
                             <div class="mb-4">
                                 <label for="product_name" class="form-label">Name</label>
-                                <input type="text" name = "name" placeholder="Type here" id="product_name" value="{{ subcategory.name }}" class="form-control" id="product_name" />
+                                <input type="text" name = "name" placeholder="Type here" id="product_name" value="{{ subcategory.name }}" class="form-control" id="product_name" required/>
                                 <span id="nameError" class="error"></span>
                             </div>
                             <div class="mb-4">
@@ -234,7 +234,7 @@
                             </div>
                             <div class="mb-4">
                                 <label for="subcategory_category" class="form-label">Category</label>
-                                <select name="category" class="form-select" id="subcategory_category">
+                                <select name="category" class="form-select" id="subcategory_category" required>
                                     <option value="" disabled selected>Select a category</option>
                                     {% for category in categories %}
                                         <option value="{{ category.id }}">{{ category.name }}</option>
@@ -254,7 +254,7 @@
                         <div class="card-body">
                             <div class="input-upload">
                                 <img src="{% static 'assets/imgs/theme/upload.svg' %}" alt="">
-                                <input class="form-control" type="file" name="image" accept=".jpeg, .jpg, .png">
+                                <input class="form-control" type="file" name="image" accept=".jpeg, .jpg, .png" required>
                             </div>
                         </div>
                     </div> <!-- card end// -->
@@ -363,17 +363,20 @@
                 if (descriptionValue === "") {
                     descriptionError.textContent = "Description is required.";
                 }
-                else if (!/^[A-Z][a-zA-Z\s]*$/.test(descriptionValue)) {
-                    descriptionError.textContent = "Description should start with a capital letter.";
+                else if (!/^[A-Z][A-Za-z\s,.'&-]*(\s?[.]\s?[A-Z][A-Za-z\s,.'&-]*)*$/g.test(descriptionValue)) {
+                    descriptionError.textContent = "Description should start with a capital letter, contain only letters, spaces, commas, ampersands, hyphens, apostrophes, and each sentence should start with a capital letter and end with a period.";
                 }
                 else if (/^[0-9]+$/.test(descriptionValue)) {
                     descriptionError.textContent = "Description cannot consist of numbers only.";
                 }
-                else if (!/^(?!.*(\w)\1{2,})[A-Z][a-zA-Z\s]*$/.test(descriptionValue)) {
+                else if (!/^(?!.*(\w)\1{2,})[A-Z][a-zA-Z\s,.'-]*$/.test(descriptionValue))  {
                     descriptionError.textContent = "Description should not contain more than 2 consecutive identical letters.";
                     return false;
                 }
-    
+                else if (/(\.)\1{4,}|(,)\2{4,}|(%)\3{4,}/.test(descriptionValue)) {
+                    descriptionError.textContent = "Description should not contain consecutive repeated characters";
+                    return false;
+                }
                 else if (isAscendingOrDescendingSequence(descriptionValue)) {
                     descriptionError.textContent = "Ascending or descending sequences are not allowed";
                 } 
@@ -386,6 +389,7 @@
                 } 
                   
             }
+            
             function isAscendingOrDescendingSequence(str) {
                 const ascending = 'abcdefghijklmnopqrstuvwxyz';
                 const descending = 'zyxwvutsrqponmlkjihgfedcba';

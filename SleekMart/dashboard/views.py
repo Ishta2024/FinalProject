@@ -22,6 +22,7 @@ def dashboard_home(request):
     categories = Category.objects.filter(status=False)
     category_data = []
     cart_count = 0  # Default to 0
+    categories_with_subcategories = Category.objects.filter(subcategory__isnull=False, status=False)
 
     if request.user.is_authenticated:
         user = request.user
@@ -40,6 +41,7 @@ def dashboard_home(request):
         'category_data': category_data,
         'categories': categories,
         'cart_count': cart_count,
+        'categories_with_subcategories' : categories_with_subcategories
     }
     
     return render(request, 'dashboard_home.html', context)
@@ -69,7 +71,29 @@ def products(request, category_id):
     }
     return render(request,'products.html', context)
 def about(request):
-    return render(request,'about.html')
+    categories = Category.objects.filter(status=False)
+    # category = get_object_or_404(Category, id=category_id)
+    # subcategories = Subcategory.objects.filter(category=category,status=False)
+    # products = Product.objects.filter(subcategory__in=subcategories, status=False)
+    cart_count = 0  # Default to 0
+    wishlist_count = 0
+    wishlist = None
+    if request.user.is_authenticated:
+        user = request.user
+        user_id = request.user.id
+        cart_count = CartItems.objects.filter(cart__user=user).count()
+        wishlist = WishlistItems.objects.filter(wishlist__user_id=user_id).values_list('products__id', flat=True)
+        wishlist_count = WishlistItems.objects.filter(wishlist__user=request.user).count()
+    context = {
+        # 'category':category,
+        # 'subcategories': subcategories,
+        # 'products': products,
+        'categories':categories,
+        'cart_count' : cart_count,
+        'wishlist': wishlist,
+        'wishlist_count': wishlist_count
+    }
+    return render(request,'about.html',context)
 def contact(request):
     return render(request,'contact.html')
 
@@ -220,6 +244,9 @@ def add_to_cart(request, product_id):
 @login_required
 def cart_details(request):
     categories=Category.objects.filter(status=False)
+    cart_items = []
+    cart_empty = False
+    total_price = 0
     # product = get_object_or_404(Product, id=product_id)
     if request.user.is_authenticated:
            user_id = request.user.id
@@ -228,9 +255,15 @@ def cart_details(request):
            wishlist = WishlistItems.objects.filter(wishlist__user_id=user_id).values_list('products__id', flat=True)
            wishlist_count = WishlistItems.objects.filter(wishlist__user=user).count()
            cart_count = CartItems.objects.filter(cart__user=user).count()
-           cart = AddCart.objects.get(user=user)
-           cart_items = CartItems.objects.filter(cart=cart)
-           total_price = sum(item.total_price for item in cart_items)
+        #    cart = AddCart.objects.get(user=user)
+        #    cart_items = CartItems.objects.filter(cart=cart)
+        #    total_price = sum(item.total_price for item in cart_items)
+           if AddCart.objects.filter(user=user).exists():
+             cart = AddCart.objects.get(user=user)
+             cart_items = CartItems.objects.filter(cart=cart)
+             total_price = sum(item.total_price for item in cart_items)
+           else:
+             cart_empty = True
     context = {
         'categories':categories,
         # 'product': product,
@@ -239,6 +272,7 @@ def cart_details(request):
         'cart_count': cart_count,
         'cart_items': cart_items,
         'total_price': total_price,
+        'cart_empty': cart_empty,
     }
     return render(request, 'Customer/cart.html', context)
 
@@ -284,8 +318,9 @@ def remove_cart_item(request, cart_item_id):
     if request.method == 'POST':
         # Delete the cart item
         cart_item.delete()
-        
-    return redirect('cart_details')
+        return redirect('cart_details')
+    
+    return render(request, 'Customer/cart.html')
 @login_required
 def view_wishlist(request):
     # Check if the user is authenticated
