@@ -1042,6 +1042,10 @@
             }, function(){
                 $(this).children('.dropdown-menu').slideUp(200);
             });
+            
+                // Disable caching
+                $.ajaxSetup({ cache: false });
+
         });
     
         // Prevent the default link behavior
@@ -1049,8 +1053,17 @@
             e.preventDefault();
         });
         
-       
         
+        window.onpageshow = function(event) {
+            // Check if the page is loaded from the cache
+            if (event.persisted) {
+                // Page is loaded from cache (back button was used)
+                window.location.reload(); // Refresh the page
+            }
+        };
+        
+            
+ 
   
     </script>
 

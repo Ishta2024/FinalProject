@@ -67,9 +67,9 @@
                     <div class="submenu">
                         {% comment %} <a href="page-orders-1.html">Order list 1</a>
                         <a href="page-orders-2.html">Order list 2</a> {% endcomment %}
-                        <a href="page-orders-detail.html">Order detail</a>
-                        <a href="page-orders-tracking.html">Order tracking</a>
-<a href="page-invoice.html">Invoice</a>
+                        <a href="">Order detail</a>
+                        <a href="">Order tracking</a>
+<a href="">Invoice</a>
                     </div>
                 </li>
                 <li class="menu-item has-submenu">
@@ -77,9 +77,9 @@
                         <span class="text">Sellers</span>
                     </a>
                     <div class="submenu">
-                        <a href="page-sellers-cards.html">Sellers cards</a>
+                     
                         <a href="{% url 'sellerslist' %}">Sellers list</a>
-                        <a href="page-seller-detail.html">Seller profile</a>
+                      
                     </div>
                 </li>
                 {% comment %} <li class="menu-item has-submenu">
@@ -109,20 +109,10 @@
                     </a>
                     <div class="submenu">
                         <a href="{% url 'view_customer' %}">User Details</a>
-                        <a href="page-account-login.html">User login</a>
-                        <a href="page-account-register.html">User registration</a>
-                        <a href="page-error-404.html">Error 404</a>
+                        
                     </div>
                 </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="page-reviews.html"> <i class="icon material-icons md-comment"></i>
-                        <span class="text">Reviews</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="page-brands.html"> <i class="icon material-icons md-stars"></i>
-                        <span class="text">Brands</span> </a>
-                </li>
+               
                 {% comment %} <li class="menu-item">
                     <a class="menu-link" disabled href="index.html#"> <i class="icon material-icons md-pie_chart"></i>
                         <span class="text">Statistics</span>
@@ -132,7 +122,7 @@
             <hr>
             <ul class="menu-aside">
                 <li class="menu-item has-submenu">
-                    <a class="menu-link" href="index.html#"> <i class="icon material-icons md-settings"></i>
+                    <a class="menu-link" href=""> <i class="icon material-icons md-settings"></i>
                         <span class="text">Settings</span>
                     </a>
                     <div class="submenu">
@@ -225,8 +215,14 @@
                     <div class="row">
                         <div class="col-xl col-lg flex-grow-0" style="flex-basis:230px">
                             <div class="img-thumbnail shadow w-100 bg-white position-relative text-center" style="height:190px; width:200px; margin-top:-120px">
-                                <img src="{{ seller.user.profile_pic.url }}" class="center-xy img-fluid" alt="Logo Brand">
+                                {% if seller.user.profile_pic %}
+                                    <img src="{{ seller.user.profile_pic.url }}" class="center-xy img-fluid" alt="Logo Brand">
+                                {% else %}
+                                    <!-- Show default image if the profile pic doesn't exist -->
+                                    <img src="{% static 'images/propic.jpg' %}" alt="default profile pic" class="img-rounded img-responsive" />
+                                {% endif %}
                             </div>
+                            
                         </div> <!--  col.// -->
                         <div class="col-xl col-lg">
                             <h3>{{ seller.user.name }}</h3>
@@ -337,6 +333,19 @@
     <!-- Main Script -->
     <script src="{% static 'assets/js/main.js' %}" type="text/javascript"></script>
     <script src="{% static 'assets/js/custom-chart.js' %}" type="text/javascript"></script>
+    <script>
+        $(document).ready(function() {
+          // Disable caching
+          $.ajaxSetup({ cache: false });
+      });
+      window.onpageshow = function(event) {
+          // Check if the page is loaded from the cache
+          if (event.persisted) {
+              // Page is loaded from cache (back button was used)
+              window.location.reload(); // Refresh the page
+          }
+      };
+    </script>
 </body>
 
 </html>

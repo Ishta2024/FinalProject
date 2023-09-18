@@ -291,9 +291,16 @@
         $("#category-select").change(function () {
             $("#category-filter-form").submit();
         });
+        $.ajaxSetup({ cache: false });
     });
     
-        
+    window.onpageshow = function(event) {
+        // Check if the page is loaded from the cache
+        if (event.persisted) {
+            // Page is loaded from cache (back button was used)
+            window.location.reload(); // Refresh the page
+        }
+    };
             // Add input event listener to the name input
             var nameInput = document.getElementById("product_name");
             var nameError = document.getElementById("nameError");

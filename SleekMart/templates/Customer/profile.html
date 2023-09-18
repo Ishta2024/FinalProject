@@ -106,7 +106,7 @@
     /* Additional styles */
     .btn-primary {
       background-color: #f4511e;
-      border-color: #f4511e;
+      border-color: #34a3b4;
     }
   
     .btn-primary:hover {
@@ -199,5 +199,17 @@
   <a href="{% url 'edit_profile' %}"><button class="btn btn-primary btn-lg"><span>Edit Profile</span></button></a>
 </div>
 <br><br><br><br><br><br>
-
+<script>
+$(document).ready(function() {
+  $.ajaxSetup({ cache: false });
+      
+  window.onpageshow = function(event) {
+      // Check if the page is loaded from the cache
+      if (event.persisted) {
+          // Page is loaded from cache (back button was used)
+          window.location.reload(); // Refresh the page
+      }
+  };
+});  
+</script>
 {% endblock content %}

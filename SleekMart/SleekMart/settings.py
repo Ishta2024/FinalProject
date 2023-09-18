@@ -199,7 +199,7 @@ DEFAULT_FROM_EMAIL = 'mailtoshowvalidationok@gmail.com'
 # SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET='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'
 
 LOGIN_REDIRECT_URL = 'dashboard_home'
-lOGOUT_REDIRECT_URL = '/'
+lOGOUT_REDIRECT_URL = 'login_page'
 
 LOGIN_URL = 'login_page'
 

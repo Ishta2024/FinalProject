@@ -140,7 +140,7 @@
                 </ul>
             </div>
         </header>
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
         {% csrf_token %}
         <section class="content-main">
             <div class="row">
@@ -166,11 +166,11 @@
                                 </div>
                                 <div class="mb-4">
                                     <label for="product_name" class="form-label">Seller Email</label>
-                                    <input type="text" name='email' value="{{ user.email }}" placeholder="Type here" class="form-control" id="product_name">
+                                    <input type="text" name='email' value="{{ user.email }}" placeholder="Type here" class="form-control" id="product_email">
                                 </div>
                                 <div class="mb-4">
                                     <label for="product_name" class="form-label">Seller Mobile</label>
-                                    <input type="text" name='mobile' value="{{ user.mobile }}" placeholder="Type here" class="form-control" id="product_name">
+                                    <input type="text" name='mobile' value="{{ user.mobile }}" placeholder="Type here" class="form-control" id="product_mobile">
                                 </div>
                                 <div class="mb-4">
                                     <label class="form-label">Address</label>
@@ -255,6 +255,66 @@
     <script src="{% static 'assets/js/vendors/jquery.fullscreen.min.js' %}"></script>
     <!-- Main Script -->
     <script src="{% static 'assets/js/main.js' %}" type="text/javascript"></script>
+    <script>
+        function validateForm() {
+            var name = document.getElementById("product_name").value;
+            var email = document.getElementById("product_email").value;
+            var mobile = document.getElementById("product_mobile").value;
+            var address = document.getElementById("product_address").value;
+            var sellerProof = document.querySelector('input[name="seller_proof"]');
+            var profilePic = document.querySelector('input[name="profile_pic"]');
+            var businessName = document.querySelector('input[name="business_name"]').value;
+            var businessAddress = document.querySelector('input[name="business_address"]').value;
+            var businessWebsite = document.querySelector('input[name="business_website"]').value;
+    
+            // Validation logic for each field
+            if (name.trim() === "") {
+                alert("Seller Name is required.");
+                return false;
+            }
+    
+            // Add more validation logic for other fields (email, mobile, address, etc.)
+    
+            if (sellerProof.files.length === 0) {
+                alert("Seller Proof is required.");
+                return false;
+            }
+    
+            if (profilePic.files.length === 0) {
+                alert("Profile Pic is required.");
+                return false;
+            }
+    
+            if (businessName.trim() === "") {
+                alert("Business Name is required.");
+                return false;
+            }
+    
+            if (businessAddress.trim() === "") {
+                alert("Business Address is required.");
+                return false;
+            }
+    
+            // You can add more validation for other fields (businessWebsite, etc.)
+    
+            // If all validation passes, the form will be submitted
+            return true;
+        }
+        $(document).ready(function () {
+           
+            $.ajaxSetup({ cache: false });
+        });
+    
+             
+          window.onpageshow = function(event) {
+              // Check if the page is loaded from the cache
+              if (event.persisted) {
+                  // Page is loaded from cache (back button was used)
+                  window.location.reload(); // Refresh the page
+              }
+          };
+
+    </script>
 </body>
 
 </html>

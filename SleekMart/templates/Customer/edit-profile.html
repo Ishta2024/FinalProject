@@ -51,7 +51,7 @@
 </style>
 
 <br><br><br><br>
-<form method="post" enctype="multipart/form-data" onsubmit="return validateRegistrationForm()">
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="container register-form">
         <div class="form">
@@ -130,6 +130,7 @@
             return false;
         } else {
             nameError.textContent = "";
+            return true
         } 
   
         
@@ -138,6 +139,7 @@
             return false;
         } else {
             mobileNumberError.textContent = "";
+            return true
         }
     
         if (!emailRegex.test(email)) {
@@ -145,9 +147,14 @@
             return false;
         } else {
             emailError.textContent = "";
+            return true
         }
         
-        
+        if (validationFailed) {
+            // Display error messages
+            return false;  // Prevent form submission
+        }
+    
         
         return true;
     }
@@ -224,11 +231,7 @@
       }
   }
   
-  
-  
-    
-
-    
+ 
   
     var nameInput = document.getElementById("id_name");
     var mobileInput = document.getElementById("id_mobile");
@@ -244,7 +247,7 @@
   
     // Add input event listener to mobile input
   
-    
+
   
     mobileInput.addEventListener("input", function() {
         const input = mobileInput.value;
@@ -376,16 +379,26 @@ function validateAddress() {
     }
 
     // You can add more validation rules here as needed
-
-    return true; // Address is valid
+    
+   
 }
-
+ 
 // Add input event listener to address input
 
 // Add input event listener to profile picture input
 
   
     // Add input event listener to password input
-   
+    $(document).ready(function() {
+        $.ajaxSetup({ cache: false });
+            
+        window.onpageshow = function(event) {
+            // Check if the page is loaded from the cache
+            if (event.persisted) {
+                // Page is loaded from cache (back button was used)
+                window.location.reload(); // Refresh the page
+            }
+        };
+    });  
 </script>
 {% endblock content %}

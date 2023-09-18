@@ -50,6 +50,18 @@ https://templatemo.com/tm-571-hexashop
         background-size: cover;
         background-repeat: no-repeat;
     }
+    .header-area .main-nav .nav {
+        float: right;
+        margin-top: 30px;
+        margin-right: -20px;
+        background-color: transparent;
+        -webkit-transition: all 0.3s ease 0s;
+        -moz-transition: all 0.3s ease 0s;
+        -o-transition: all 0.3s ease 0s;
+        transition: all 0.3s ease 0s;
+        position: relative;
+        z-index: 999;
+      }
     .main-border-button {
         position:absolute;
         right:35px;
@@ -387,7 +399,20 @@ https://templatemo.com/tm-571-hexashop
                 var newTotalPrice = sellingPrice * quantity;
                 $('#totalPrice_' + productId).text('$' + newTotalPrice.toFixed(2));
             }
-        });
+
+          
+            
+                $.ajaxSetup({ cache: false });
+        
+                window.onpageshow = function(event) {
+                    // Check if the page is loaded from the cache
+                    if (event.persisted) {
+                        // Page is loaded from cache (back button was used)
+                        window.location.reload(); // Refresh the page
+                    }
+                };
+            });
+
     </script>
 
   </body>

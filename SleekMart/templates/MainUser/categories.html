@@ -494,7 +494,17 @@
         {
             return true
         }
-    
+        $(document).ready(function() {
+            // Disable caching
+            $.ajaxSetup({ cache: false });
+        });
+        window.onpageshow = function(event) {
+            // Check if the page is loaded from the cache
+            if (event.persisted) {
+                // Page is loaded from cache (back button was used)
+                window.location.reload(); // Refresh the page
+            }
+        };
     </script>   
 </body>
 

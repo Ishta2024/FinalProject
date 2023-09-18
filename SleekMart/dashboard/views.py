@@ -168,7 +168,7 @@ def each_product(request, product_id):
    
     return render(request, 'eachproduct.html', context)
 
-
+@login_required
 def plus_wishlist(request):
     if request.method == 'GET':
         prod_id = request.GET.get('prod_id')
@@ -192,7 +192,7 @@ def plus_wishlist(request):
         }
         return JsonResponse(data)
 
-    
+@login_required    
 def minus_wishlist(request):
     if request.method == 'GET':
         prod_id = request.GET.get('prod_id')
@@ -275,7 +275,7 @@ def cart_details(request):
         'cart_empty': cart_empty,
     }
     return render(request, 'Customer/cart.html', context)
-
+@login_required
 def update_cart_item(request, cart_item_id):
     cart_item = get_object_or_404(CartItems, pk=cart_item_id)
     
@@ -311,7 +311,7 @@ def update_cart_item(request, cart_item_id):
 #         return JsonResponse({'total_price': total_price})
 
 #     return JsonResponse({'error': 'Invalid request method'}, status=400)
-
+@login_required
 def remove_cart_item(request, cart_item_id):
     cart_item = get_object_or_404(CartItems, pk=cart_item_id)
     
@@ -347,6 +347,7 @@ def view_wishlist(request):
     }
 
     return render(request, 'Customer/wishlist_products.html', context)
+@login_required
 @require_POST
 def remove_from_wishlist(request, product_id):
     # Ensure the user is authenticated before removing from the wishlist
@@ -1063,11 +1064,23 @@ def custnotification_page(request):
     return render(request, 'Customer/notification.html')
 @login_required
 def profile(request):
-    return render(request, 'Customer/profile.html')
+    
+    cart_count = 0
+    if request.user.is_authenticated:
+        user = request.user
+        cart_count = CartItems.objects.filter(cart__user=user).count()
+    context = {
+        'cart_count' : cart_count
+    }
+    return render(request, 'Customer/profile.html', context)
 @login_required
 def edit_profile(request):
     user_profile = CustomUser.objects.get(pk=request.user.pk)  # Get the CustomUser object
-
+    cart_count = 0
+    if request.user.is_authenticated:
+        user = request.user
+        cart_count = CartItems.objects.filter(cart__user=user).count()
+    
     if request.method == "POST":
         name = request.POST.get('name')
         mobile = request.POST.get('mobile')
@@ -1088,8 +1101,12 @@ def edit_profile(request):
 
         messages.success(request, 'Profile updated successfully.')
         return redirect('profile')  # Redirect to the profile page
+    context = {
+        'cart_count' : cart_count,
+        'user_profile': user_profile
+    }
 
-    return render(request, 'Customer/edit-profile.html', {'user_profile': user_profile})  
+    return render(request, 'Customer/edit-profile.html', context)  
 @login_required
 def view_customer(request):
     customers = CustomUser.objects.filter(role='customer')  # Fetch all customer profiles from the database
