@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
-from .models import Customer, CustomUser, Seller, AddWishlist,WishlistItems,AddCart, CartItems
+from .models import Customer, CustomUser, Seller, AddWishlist,WishlistItems,AddCart, CartItems, Order, OrderItem
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from .models import Category, Product, Subcategory, Rating
@@ -321,6 +321,142 @@ def remove_cart_item(request, cart_item_id):
         return redirect('cart_details')
     
     return render(request, 'Customer/cart.html')
+
+@login_required
+def checkout(request):
+    # Get the user's cart items
+    cart_items = CartItems.objects.filter(cart__user=request.user)
+
+    # Calculate the total price for the order
+    total_price = sum(cart_item.total_price for cart_item in cart_items)
+
+    # Create a new order
+    order = Order.objects.create(user=request.user, total_price=total_price)
+
+    # Create order items based on the cart items
+    for cart_item in cart_items:
+        order_item = OrderItem.objects.create(
+            order=order,
+            product=cart_item.product,
+            quantity=cart_item.quantity,
+            price=cart_item.product.selling_price
+        )
+
+    # Update the cart items to associate them with this order
+    cart_items.update(order=order, order_item=order_item)
+
+    # Clear the user's cart
+    # cart_items.delete()
+
+    return redirect('checkout_complete', order_id=order.id)
+
+@login_required  # Ensure the user is logged in to access this view
+def checkout_complete(request, order_id):
+    try:
+        order = Order.objects.get(id=order_id, user=request.user)
+        order_items = order.items.all()  # Retrieve order items associated with the order
+    except Order.DoesNotExist:
+        # Handle the case where the order doesn't exist or doesn't belong to the user
+        return render(request, 'error.html', {'error_message': 'Order not found.'})
+
+    # Pass order and order items to the template for display
+    return render(request, 'Customer/checkout_complete.html', {'order': order, 'order_items': order_items})
+
+from decimal import Decimal
+@login_required 
+def order_placed_successfully(request, order_id):
+    try:
+        order = Order.objects.get(id=order_id, user=request.user)
+        order_items = order.items.all()  # Retrieve order items associated with the order
+    except Order.DoesNotExist:
+        # Handle the case where the order doesn't exist or doesn't belong to the user
+        return render(request, 'error.html', {'error_message': 'Order not found.'})
+    new_total_price = Decimal(0)
+   
+    print('entered')
+    cart_items = CartItems.objects.filter(cart__user=request.user)
+    if request.method == 'POST':
+        print('hlo')
+        for item in order_items:
+            # Retrieve the updated quantity and price from the request
+            updated_quantity = request.POST.get(f'quantity{item.id}',item.quantity)
+            print(updated_quantity)
+            if item.order_confirmation == OrderItem.PENDING:
+                item.order_confirmation = OrderItem.CONFIRMED
+            # Update the order item with the new quantity and price
+            item.quantity = updated_quantity
+            print(item.quantity)
+            item.order_confirmation = OrderItem.CONFIRMED  # Update order confirmation status
+            item.save()
+            
+            new_total_price += Decimal(updated_quantity) * Decimal(item.price)
+
+            # new_total_quantity += updated_quantity
+
+            order.total_price = new_total_price
+            order.save()
+            cart_items.delete()
+    # Pass order and order items to the template for display
+    return render(request, 'Customer/order_placed.html', {'order': order, 'order_items': order_items})
+
+def cancel_order(request,order_id):
+    order = Order.objects.get(id=order_id, user=request.user)
+    print(order)
+    order_items = order.items.all()
+    print(order_items)
+    for item in order_items:
+      print(item)
+      item.order_confirmation = OrderItem.CANCELED
+      print(item.order_confirmation)
+      item.save()
+    return redirect('cart_details')
+    
+def cancel_order_confirmation(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'Customer/cancel_order_confirmation.html', {'order': order})
+
+@login_required
+def create_order(request):
+    # Get the user's cart items
+    cart_items = CartItems.objects.filter(cart__user=request.user)
+    
+    # Create a new order
+    order = Order.objects.create(user=request.user)
+    
+    # Create order items based on the cart items
+    for cart_item in cart_items:
+        order_item = OrderItem.objects.create(
+            order=order,
+            product=cart_item.product,
+            quantity=cart_item.quantity,
+            price=cart_item.product.selling_price
+        )
+    
+    # Update the cart items to associate them with this order
+    cart_items.update(order=order, order_item=order_item)
+    
+    # Update the order total price based on order items
+    order.total_price = sum(order_item.price * order_item.quantity for order_item in order.items.all())
+    order.save()
+    
+    # Clear the user's cart
+    cart_items.delete()
+    
+    return JsonResponse({'order_id': order.id})
+
+# View to display a list of orders for a user
+@login_required
+def order_list(request):
+    orders = Order.objects.filter(user=request.user)
+    return render(request, 'order_list.html', {'orders': orders})
+
+# View to display details of a specific order
+@login_required
+def order_detail(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    return render(request, 'order_detail.html', {'order': order})
+
+
 @login_required
 def view_wishlist(request):
     # Check if the user is authenticated

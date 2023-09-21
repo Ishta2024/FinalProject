@@ -130,6 +130,22 @@ class Product(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
+    def reduce_quantity(self, quantity_to_reduce):
+        """
+        Reduce the product quantity.
+        """
+        # Ensure quantity_to_reduce is an integer
+        quantity_to_reduce = int(quantity_to_reduce)
+
+        # Ensure self.quantity is an integer
+        self.quantity = int(self.quantity)
+
+        if quantity_to_reduce <= self.quantity:
+            self.quantity -= quantity_to_reduce
+            self.save()
+            return True
+        return False
+
     def __str__(self):
         return self.name
 
@@ -158,9 +174,51 @@ class Rating(models.Model):
         return f'{self.user.name} rated {self.product.name} {self.get_rating_display()}'
     
 
+class Order(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    order_date = models.DateTimeField(auto_now_add=True)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+
+    def __str__(self):
+        return f"Order #{self.id} by {self.user.email}"
+    
+
+class OrderItem(models.Model):
+    CONFIRMED = 'confirmed'
+    CANCELED = 'canceled'
+    PENDING = 'pending'
+
+    ORDER_CONFIRMATION_CHOICES = [
+        (CONFIRMED, 'Confirmed'),
+        (CANCELED, 'Canceled'),
+        (PENDING, 'Pending'),
+    ]
+
+    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    order_confirmation = models.CharField(
+        max_length=20,
+        choices=ORDER_CONFIRMATION_CHOICES,
+        default=PENDING,
+    )
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.order_confirmation == OrderItem.CONFIRMED:
+            self.product.reduce_quantity(self.quantity)
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product.name} in Order #{self.order.id}"
+    
 class AddCart(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE) 
     cart_date = models.DateTimeField(auto_now_add=True)
+    order = models.OneToOneField(Order, null=True, blank=True, on_delete=models.SET_NULL)
+
+    def __str__(self):
+        return self.user.email
 
 class CartItems(models.Model):
     cart = models.ForeignKey(AddCart, on_delete=models.CASCADE)
@@ -168,9 +226,12 @@ class CartItems(models.Model):
     quantity = models.IntegerField()
     cart_item_date = models.DateTimeField(auto_now_add=True)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    order = models.ForeignKey(Order, null=True, blank=True, on_delete=models.SET_NULL)
+    order_item = models.ForeignKey(OrderItem, null=True, blank=True, on_delete=models.SET_NULL)
 
     def save(self, *args, **kwargs):
         # Calculate the total price based on the quantity and the price of the associated product
         if self.product:
             self.total_price = self.quantity * self.product.selling_price
         super().save(*args, **kwargs)
+    

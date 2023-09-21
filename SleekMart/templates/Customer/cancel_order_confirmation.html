@@ -1,0 +1,4 @@
+<h2>Confirm Cancellation of Order #{{ order.id }}</h2>
+<p>Are you sure you want to cancel this order?</p>
+<a href="{% url 'cancel_order' order.id %}">Yes, Cancel Order</a>
+<a href="#">No, Go Back</a>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Order Summary</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        p {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        li {
+            margin-bottom: 5px;
+        }
+        a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #428bca;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+        a:hover {
+            background-color: #357ebd;
+        }
+        .quantity-button {
+            padding: 5px 10px;
+            margin: 0 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+       
+        .quantity-input {
+            width: 40px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <form method="post" action="{% url 'order_placed_successfully' order.id %}">
+    <div class="container">
+        <h1>Order Details</h1>
+        <p>You Are Closer To Your Order!</p>
+        <p>Order ID: {{ order.id }}</p>
+        <p>Total Price: $<span id="totalPrice">{{ order.total_price }}</span></p>
+
+        <h2>Order Items</h2>
+       
+        {% csrf_token %}
+        <ul>
+            {% for item in order_items %}
+                <li>
+                    <span id="quantity{{ item.id }}">{{ item.quantity }}</span> x {{ item.product.name }} - ${{ item.price }} each
+                    <div class="quantity buttons_added">
+                        <input type="button" value="-" class="minus" data-field="quantityInput{{ item.id }}" onclick="updateQuantity({{ item.id }}, {{ item.price }}, -1)">
+                        <input type="number" min="1" max="{{ item.product.quantity }}" name="quantity{{ item.id }}" value="{{ item.quantity }}" id="quantityInput{{ item.id }}" title="Qty" class="input-text qty text quantity-input" size="4" pattern="" inputmode="" oninput="validateQuantity(this)">
+                        <input type="button" value="+" class="plus" data-field="quantityInput{{ item.id }}" onclick="updateQuantity({{ item.id }}, {{ item.price }}, 1)">
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+        <a href="{% url 'cancel_order_confirmation' order.id %}">Cancel Your Order</a>
+
+
+        <button type="submit">Confirm Your Order</button>
+    </div>
+</form>
+    <script>
+        {% comment %} function updateQuantity(itemId, itemPrice, change) {
+            var quantityElement = document.getElementById('quantityInput' + itemId);
+            var newQuantity = parseInt(quantityElement.value, 10) + change;
+            newQuantity = Math.max(newQuantity, 1);
+            newQuantity = Math.min(newQuantity, parseInt(quantityElement.max, 10));
+
+            var priceElement = document.getElementById('totalPrice');
+            var currentTotalPrice = parseFloat(priceElement.innerText);
+            var newTotalPrice = currentTotalPrice + (change * itemPrice);
+            newTotalPrice = Math.max(newTotalPrice, parseFloat(itemPrice));
+
+            quantityElement.value = newQuantity;
+            priceElement.innerText = newTotalPrice.toFixed(2);
+        }
+
+        function validateQuantity(input) {
+            var value = parseInt(input.value, 10);
+            if (isNaN(value) || value < 1) {
+                input.value = 1;
+            }
+            var max = parseInt(input.max, 10);
+            if (!isNaN(max) && value > max) {
+                input.value = max;
+            }
+        } {% endcomment %}
+        function updateQuantity(itemId, itemPrice, change) {
+            var quantityElement = document.getElementById('quantityInput' + itemId);
+            var maxQuantity = parseInt(quantityElement.max, 10);
+            var currentQuantity = parseInt(quantityElement.value, 10);
+        
+            // Calculate the new quantity
+            var newQuantity = currentQuantity + change;
+            newQuantity = Math.max(newQuantity, 1);
+            newQuantity = Math.min(newQuantity, maxQuantity);
+        
+            var quantityDisplayElement = document.getElementById('quantity' + itemId);
+            var priceElement = document.getElementById('totalPrice');
+        
+            // Calculate the new total price only if the new quantity is within the allowed range
+            if (newQuantity <= maxQuantity) {
+                // Calculate the new total price based on the change in quantity
+                var newTotalPrice = newQuantity * parseFloat(itemPrice);
+        
+                // Update the displayed quantity and total price
+                quantityDisplayElement.innerText = newQuantity;
+                quantityElement.value = newQuantity;
+                priceElement.innerText = newTotalPrice.toFixed(2);
+            }
+        }
+        
+        
+    </script>
+</body>
+</html>
