@@ -389,6 +389,16 @@
 .dropdown-submenu:hover .dropdown-menu {
     display: block;
 }
+.product-item {
+    cursor: pointer;
+    padding: 10px;
+    margin: 5px 0;
+    background-color: #f0f0f0;
+}
+
+.product-item:hover {
+    background-color: #e0e0e0;
+}
 
       </style>
     </head>
@@ -424,17 +434,24 @@
                 </li>
             </ul>
             <div class="col-lg-6 col-md-6 col-sm-12" style="margin-top: 10px;">
-                <form class="search-form" action="/search" method="GET" style="display: flex;">
+                <form class="search-form" action="#" method="GET" style="display: flex;">
                     <div class="input-group" style="flex: 1;">
-                        <input type="text" class="form-control" name="q" placeholder="Search for products..." style="width: 100%;">
+                        <input type="text" class="form-control" id="search-input" placeholder="Search by product name..." style="width: 100%;">
                     </div>
                     <div class="input-group-append">
-                        <button class="btn btn-primary" type="submit" style="background-color: black; color: white; border-radius: 0;">
+                        <button class="btn btn-primary" type="button" style="background-color: black; color: white; border-radius: 0;">
                             <i class="fa fa-search"></i>
                         </button>
                     </div>
                 </form>
+                <div id="search-results" class="dropdown-content">
+                    {% for product in products %}
+                    <div class="product-item" data-product="{{ product.id }}">{{ product.name }}</div>
+                    {% endfor %}
+                </div>
+                
             </div>
+            
             <div class="col-lg-2 col-md-2 col-sm-12 text-right" style="margin-top: 10px;">
                 <a href="{% url 'cart_details' %}" class="btn btn-primary" style="background-color: black; color: white; text-decoration: none;">
                     <i class="fa fa-shopping-cart"></i> <span class="cart-count" style="color:white;">Cart({{ cart_count }})</span>
@@ -1052,7 +1069,110 @@
         $('.dropdown-toggle').click(function(e) {
             e.preventDefault();
         });
-        
+
+        document.getElementById('search-input').addEventListener('input', function() {
+                const searchQuery = this.value;
+                console.log('Enyered')
+                if (searchQuery.length >= 1) {
+                    // Send an AJAX request to fetch matching products
+                    console.log(searchQuery.length)
+                    const xhr = new XMLHttpRequest();
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === XMLHttpRequest.DONE) {
+                            console.log('Hlo')
+                            if (xhr.status === 200) {
+                                console.log('ok')
+                                const products = JSON.parse(xhr.responseText);
+                                console.log(products)
+                                displaySearchResults(products);
+                            }
+                        }
+                    };
+            
+                    xhr.open('GET', `/search_products/?q=${encodeURIComponent(searchQuery)}`, true);
+
+                    xhr.send();
+                } else {
+                    // Clear the dropdown if the input is empty
+                    document.getElementById('search-results').innerHTML = '';
+                }
+            });
+            
+            {% comment %} function displaySearchResults(productsResponse) {
+                console.log('Entered Response')
+                const searchResultsDropdown = document.getElementById('search-results');
+                console.log(searchResultsDropdown);
+                searchResultsDropdown.innerHTML = '';
+            
+                const products = productsResponse.products;
+                console.log(products);
+
+                if (products.length === 0) {
+                    const noResultsItem = document.createElement('div');
+                    noResultsItem.innerText = 'No matching products found.';
+                    searchResultsDropdown.appendChild(noResultsItem);
+                } else {
+                    products.forEach(function (productName) {
+                        const productItem = document.createElement('div');
+                        productItem.innerText = productName;
+                        searchResultsDropdown.appendChild(productItem);
+                    });
+                }
+                searchResultsDropdown.style.display = 'block';
+            } {% endcomment %}
+            // Update your displaySearchResults function to add event listeners to each product item
+            function displaySearchResults(productsResponse) {
+                const searchResultsDropdown = document.getElementById('search-results');
+                searchResultsDropdown.innerHTML = '';  // Clear previous content
+            
+                const products = JSON.parse(productsResponse.products);
+            
+                if (products.length === 0) {
+                    const noResultsItem = document.createElement('div');
+                    noResultsItem.innerText = 'No matching products found.';
+                    searchResultsDropdown.appendChild(noResultsItem);
+                } else {
+                    const productList = document.createElement('ul');
+                    productList.classList.add('product-list');
+            
+                    products.forEach(function (product) {
+                        const productItem = document.createElement('li');
+                        productItem.innerText = product.fields.name;
+                        productItem.classList.add('product-item');
+                        productItem.setAttribute('data-product', product.pk);
+            
+                        productItem.addEventListener('click', function() {
+                            const productId = product.pk;
+                            redirectToEachProduct(productId);
+                        });
+            
+                        productList.appendChild(productItem);
+                    });
+            
+                    searchResultsDropdown.appendChild(productList);
+                    searchResultsDropdown.style.display = 'block';  // Make the dropdown visible
+                }
+            }
+            
+            function redirectToEachProduct(productId) {
+                // Redirect to each_product view with the selected product ID
+                window.location.href = `/each_product/${productId}/`;
+            }
+            
+            
+            
+            
+
+// Function to display the selected product on the page
+{% comment %} function displaySelectedProduct(productId) {
+    if (productId) {
+        console.log('Redirecting to product ID:', productId);
+        // Redirect to each_product view with the selected product ID
+        window.location.href = `/each_product/${productId}/`;
+    } else {
+        console.error('Product ID is null or undefined.');
+    }
+} {% endcomment %}
         
         window.onpageshow = function(event) {
             // Check if the page is loaded from the cache

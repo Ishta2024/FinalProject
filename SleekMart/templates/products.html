@@ -139,6 +139,7 @@
                       </li>
                         <li class="scroll-to-section">
                             <a href="{% url 'view_wishlist' %}"> Wishlist <span class="wishlist-count" style="color:red;">({{ wishlist_count }})</span></a>
+                            <a href="{% url 'order_history' %}"> Order History </a>
                         </li>
                         {% if user.is_authenticated %}
                         <li class="scroll-to-section"><a href="{% url 'loggout' %}">Logout</a></li>

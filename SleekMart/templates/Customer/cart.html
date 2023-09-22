@@ -149,7 +149,12 @@
                 color: #ff0000; /* New color (you can adjust this) */
             }
         }
-        
+        /* CSS to style the disabled row */
+.disabled-row {
+    opacity: 0.5; /* Adjust opacity to visually indicate the row is disabled */
+    pointer-events: none; /* Disable pointer events on the row */
+}
+
     
     </style>
 </head>
@@ -236,8 +241,12 @@
             <tbody>
                 
                 {% for cart_item in cart_items %}
-                    <tr>
-                        <td><a href="{% url 'each_product' cart_item.product.id %}">{{ cart_item.product.name }}</a></td>
+                    <tr {% if cart_item.product.quantity == 0 %}class="disabled-row"{% endif %}>
+                        <td><a href="{% url 'each_product' cart_item.product.id %}">{{ cart_item.product.name }}
+                            {% if cart_item.product.quantity == 0 %}
+                                    (Out of Stock)
+                            {% endif %}
+                        </a></td>
                         <td>
                              <form method="post" action="{% url 'update_cart_item' cart_item.id %}">
                                 {% csrf_token %}

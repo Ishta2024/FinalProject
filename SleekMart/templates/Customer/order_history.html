@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Order History</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333; /* Text color */
+        }
+
+        h1 {
+            color: #4CAF50; /* Green */
+        }
+
+        h2 {
+            margin-top: 20px;
+            color: #2196F3; /* Blue */
+        }
+
+        .order-details {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-out;
+            border: 2px solid #ddd;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        .order-details p {
+            margin: 5px 0;
+        }
+
+        .order-items {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .order-items li {
+            border: 2px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            animation: slideIn 1s ease-out;
+            background-color: #f9f9f9;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-10px); opacity: 0; }
+            to   { transform: translateY(0); opacity: 1; }
+        }
+
+        .order-items li p {
+            margin: 0;
+        }
+        .order-items li .review-button {
+            background-color: #4CAF50; /* Green */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .order-items li .review-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Your Order History</h1>
+
+    {% for order in orders %}
+        <div class="order-details">
+            <h2>Order Details</h2>
+            <p>Order ID: {{ order.id }}</p>
+            <p>Total Amount: ${{ order.total_price }}</p>
+            <p>Placed Date: {{ order.order_date }}</p>
+            <p>Sold to: {{ order.user.name }}</p> 
+
+            <h2>Order Items</h2>
+            <ul class="order-items">
+                {% for item in order.items.all %}
+                    <li>
+                        <p>Product: {{ item.product.name }}</p>
+                        <p>Quantity: {{ item.quantity }}</p>
+                        <p>Price: ${{ item.price }}</p>
+                        <p>Supplier: {{ item.product.seller.business_name }}</p>
+                        <a href="{% url 'each_product' product_id=item.product.id %}" class="review-button">Add Review</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <hr>
+    {% endfor %}
+</body>
+</html>

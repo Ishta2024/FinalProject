@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Results</title>
+</head>
+<body>
+
+<h1>Search Results for "{{ search_term }}"</h1>
+
+<!-- Display search results -->
+<div class="container mt-2 mb-3">
+    <div class="row">
+        {% for product in products %}
+        <div class="col-lg-4 my-4">
+            <div class="card shadow" style="width: 20rem; height: 23rem;">
+                <img src="{{ product.product_image.url }}" class="card-img-top" alt="..." height="230px">
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <hr>
+                    {% if request.user.is_authenticated %}
+                    <button data-product="{{ product.id }}" data-action="add" class="btn add-btn update-cart" style="background-color: #8c5d4f; color: white;">Add To Cart</button>
+                    <a href="/product_view/{{ product.id }}/" class="btn btn-outline-success">View</a>
+                    {% else %}
+                    <button class="btn" style="background-color: #8c5d4f; color: white;">Login to add the item</button>
+                    {% endif %}
+                    <h4 style="display: inline-block; float: right;">₹{{ product.selling_price }}</h4>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Display a message if no search results -->
+{% if products|length == 0 %}
+    <p>No products found for "{{ search_term }}".</p>
+{% endif %}
+<div id="selected-product-section" style="margin-top: 20px;">
+    <!-- Product details will be displayed here -->
+</div>
+</body>
+</html>

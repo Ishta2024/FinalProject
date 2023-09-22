@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
-from .models import Customer, CustomUser, Seller, AddWishlist,WishlistItems,AddCart, CartItems, Order, OrderItem
+from .models import Customer, CustomUser, Seller, AddWishlist,WishlistItems,AddCart, CartItems, Order, OrderItem, Review, ReviewRating
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from .models import Category, Product, Subcategory, Rating
@@ -97,20 +97,17 @@ def about(request):
 def contact(request):
     return render(request,'contact.html')
 
-def search_categories(request):
+def search(request):
+  
+    search_term = request.GET.get('q', '')
+    products = Product.objects.filter(name__icontains=search_term)
+    return render(request, "Customer/search.html", {'search_term': search_term, 'products': products})
+from django.core import serializers
+def search_products(request):
     search_query = request.GET.get('q', '')
-
-    if search_query:
-        # Use a case-insensitive filter to find matching categories
-        categories = Category.objects.filter(name__icontains=search_query)
-
-        # Create a list of dictionaries containing category information
-        results = [{'name': category.name, 'description': category.description, 'slug': category.slug, 'image_url': category.image.url} for category in categories]
-
-        return JsonResponse({'results': results})
-    else:
-        return JsonResponse({'results': []})
-
+    products = Product.objects.filter(name__icontains=search_query)
+    serialized_products = serializers.serialize('json', products, fields=('id', 'name'))
+    return JsonResponse({'products': serialized_products}, safe=False)
 
 def single_product(request, subcategory_id):
     categories = Category.objects.filter(status=False)
@@ -151,6 +148,7 @@ def each_product(request, product_id):
     wishlist_count = 0
     cart_count = 0  # Initialize wishlist_count to 0
     wishlist = []
+    user_has_ordered_product = False
     if request.user.is_authenticated:
         user_id = request.user.id
         user=request.user
@@ -158,12 +156,14 @@ def each_product(request, product_id):
         cart_count = CartItems.objects.filter(cart__user=user).count()
         wishlist = WishlistItems.objects.filter(wishlist__user_id=user_id).values_list('products__id', flat=True)
         wishlist_count = WishlistItems.objects.filter(wishlist__user=user).count()
+        user_has_ordered_product = OrderItem.objects.filter(order__user=user, product=product).exists()
     context = {
         'categories':categories,
         'product': product,
         'wishlist': wishlist,
         'wishlist_count': wishlist_count, 
-        'cart_count':cart_count
+        'cart_count':cart_count,
+        'user_has_ordered_product': user_has_ordered_product
     }
    
     return render(request, 'eachproduct.html', context)
@@ -325,7 +325,8 @@ def remove_cart_item(request, cart_item_id):
 @login_required
 def checkout(request):
     # Get the user's cart items
-    cart_items = CartItems.objects.filter(cart__user=request.user)
+    cart_items = CartItems.objects.filter(cart__user=request.user, product__quantity__gt=0)
+
 
     # Calculate the total price for the order
     total_price = sum(cart_item.total_price for cart_item in cart_items)
@@ -335,7 +336,8 @@ def checkout(request):
 
     # Create order items based on the cart items
     for cart_item in cart_items:
-        order_item = OrderItem.objects.create(
+    
+            order_item = OrderItem.objects.create(
             order=order,
             product=cart_item.product,
             quantity=cart_item.quantity,
@@ -398,6 +400,10 @@ def order_placed_successfully(request, order_id):
             cart_items.delete()
     # Pass order and order items to the template for display
     return render(request, 'Customer/order_placed.html', {'order': order, 'order_items': order_items})
+@login_required
+def order_history(request):
+    orders = Order.objects.filter(user=request.user)
+    return render(request, 'Customer/order_history.html', {'orders': orders})
 
 def cancel_order(request,order_id):
     order = Order.objects.get(id=order_id, user=request.user)
@@ -414,6 +420,23 @@ def cancel_order(request,order_id):
 def cancel_order_confirmation(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     return render(request, 'Customer/cancel_order_confirmation.html', {'order': order})
+
+def add_review(request, product_id):
+    product = get_object_or_404(Product, pk=product_id)
+    user=request.user
+    if request.method == 'POST':
+        comment = request.POST.get('review', '')
+        # rating_value = int(request.POST.get('rating', 0))
+
+        # Create the review
+        review = Review.objects.create(product=product, user=user)
+
+        # Create the review rating
+        review_rating=ReviewRating.objects.create(review=review,comment=comment)
+
+        return redirect('each_product', product_id=product_id)
+
+    return render(request, 'eachproduct.html', {'product': product})
 
 @login_required
 def create_order(request):

@@ -257,7 +257,26 @@
                     </div>
                 </form>
                 </div>
+                {% if user_has_ordered_product %}
+                <form method="post" action="{% url 'add_review' product.id %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="review">Your Review</label>
+                        <textarea class="form-control" id="review" name="review" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </form>
+                {% endif %}
             </div>
+            <h2>Product Reviews</h2>
+            <ul class="product-reviews">
+                {% for review in product.reviews.all %}
+                    <li>
+                        <p><strong>{{ review.user.name }}</strong></p>
+                        <p>{{ review.rating.comment }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
             </div>
         </div>
     </section>

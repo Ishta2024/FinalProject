@@ -40,7 +40,10 @@ urlpatterns = [
     path('rate_product/', views.rate_product, name='rate_product'),
     path('wishlist/', views.view_wishlist, name='view_wishlist'),
     path('minus_wishlist', views.minus_wishlist, name='minus_wishlist'),
-    path('search-categories/', views.search_categories, name='search_categories'),
+
+
+    path('search/', views.search, name='search'),
+    path('search_products/', views.search_products, name='search_products'),
 
     
     path('checkout/', views.checkout, name='checkout'),
@@ -51,9 +54,9 @@ urlpatterns = [
     path('order_placed_successfully/<int:order_id>/', views.order_placed_successfully, name='order_placed_successfully'),
     path('cancel_order_confirmation/<int:order_id>/', views.cancel_order_confirmation, name='cancel_order_confirmation'),
     path('cancel_order/<int:order_id>/', views.cancel_order, name='cancel_order'),
-    
+    path('order_history', views.order_history, name='order_history'),
 
-
+    path('add_review/<int:product_id>/', views.add_review, name='add_review'),
     path('contact' , views.contact, name='contact'),
     path('about' , views.about, name='about'),
     path('login_page/',  views.login_page, name='login_page'),

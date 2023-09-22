@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
-
+from django.conf import settings
 # class UserProfile(models.Model):
 #     user = models.OneToOneField(User, on_delete=models.CASCADE)
 #     name = models.CharField(max_length=100)
@@ -235,3 +235,18 @@ class CartItems(models.Model):
             self.total_price = self.quantity * self.product.selling_price
         super().save(*args, **kwargs)
     
+class Review(models.Model):
+    product = models.ForeignKey(Product, related_name='reviews', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Review for {self.product.name} by {self.user.name}"
+    
+class ReviewRating(models.Model):
+    review = models.OneToOneField(Review, related_name='rating', on_delete=models.CASCADE)
+    rating = models.PositiveIntegerField(default=0)  # Rating out of 5
+    comment = models.TextField()
+
+    def __str__(self):
+        return f"Rating for Review ID {self.review.id}"
