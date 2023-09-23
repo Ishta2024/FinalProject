@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 # from .models import UserProfile
 from .models import CustomUser, Seller, Customer
-from .models import Category,Product, Subcategory,AddWishlist,WishlistItems,Rating,AddCart,CartItems,OrderItem, Order,Review,ReviewRating
+from .models import Category,Product, Subcategory,AddWishlist,WishlistItems,AddCart,CartItems,OrderItem, Order,Review,ReviewRating
 
 # class UserProfileAdmin(admin.ModelAdmin):
 #     list_display = ('user', 'name', 'mobile', 'profile_pic', 'address')
@@ -49,9 +49,9 @@ class CustomUserAdmin(BaseUserAdmin):
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Seller)
 admin.site.register(Customer)
-admin.site.register(Rating)
 admin.site.register(Order)
 admin.site.register(OrderItem)
 admin.site.register(AddCart)
+admin.site.register(CartItems)
 admin.site.register(Review)
 admin.site.register(ReviewRating)

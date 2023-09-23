@@ -1,0 +1,27 @@
+<!-- order_summary.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Add your CSS and other head elements here -->
+</head>
+<body>
+    <div class="container">
+        <form method="post" action="{% url 'order_placed_successfully' order.id %}">
+            {% csrf_token %}
+        <h1>Order Details</h1>
+        <!-- Display order and order item details here -->
+        <p>Order ID: {{ order.id }}</p>
+        <p>Total Price: ${{ order.total_price }}</p>
+        <!-- Display order items and their quantities -->
+        <ul>
+            <li>
+                <span>Quantity: {{ order_item.quantity }}</span> x {{ order_item.product.name }} - ${{ order_item.price }} each
+            </li>
+            <!-- Add more order items if needed -->
+        </ul>
+        <a href="{% url 'cancel_order_confirmation' order.id %}">Cancel Your Order</a>
+        <button type="submit">Confirm Your Order</button>
+    </form>
+    </div>
+</body>
+</html>

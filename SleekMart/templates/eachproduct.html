@@ -69,7 +69,20 @@
             box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
             animation: floatAnimation 3s ease-in-out infinite, colorChange 4s alternate infinite; /* Apply both animations */
         }
+        .stars {
+            display: inline-block;
+            font-size: 1.2em; /* Adjust the font size of the stars */
+        }
         
+        .star-rating {
+            width: 0; /* Initially no stars are filled */
+            white-space: nowrap;
+            overflow: hidden;
+            background: linear-gradient(90deg, gold, gold);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
         /* Keyframes for the floating animation */
         @keyframes floatAnimation {
             0% {
@@ -192,15 +205,16 @@
                     <h4>{{ product.name }}{% if product.quantity == 0 %} (Out of Stock){% endif %}</h4>
                     <span class="price">$ {{ product.selling_price }}</span>
                     
-                    <span class="price">Rate The Product</span>
-                    <ul class="stars" id="star-rating">
-                        <li><i class="fa fa-star" data-rating="1"></i></li>
-                        <li><i class="fa fa-star" data-rating="2"></i></li>
-                        <li><i class="fa fa-star" data-rating="3"></i></li>
-                        <li><i class="fa fa-star" data-rating="4"></i></li>
-                        <li><i class="fa fa-star" data-rating="5"></i></li>
-                    </ul>
-                
+                    <span class="price">Average Rating:</span>
+                    {% if average_rating_percentage is not None and average_rating_percentage > 0 %}
+                    <div class="stars" style="min-width: 20px;">
+                    <div class="star-rating" style="width: {{ average_rating_percentage }}%;">
+                     ★★★★★
+                     </div>
+                    </div>
+                   {% else %}
+                   <p>No Ratings For This Product</p>
+                {% endif %}
                     <span>{{ product.description }}</span>
                     <div class="quote">
                         {% comment %} <i class="fa fa-quote-left"></i><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiuski smod.</p> {% endcomment %}
@@ -257,7 +271,7 @@
                     </div>
                 </form>
                 </div>
-                {% if user_has_ordered_product %}
+                {% comment %} {% if user_has_ordered_product %}
                 <form method="post" action="{% url 'add_review' product.id %}">
                     {% csrf_token %}
                     <div class="form-group">
@@ -266,16 +280,25 @@
                     </div>
                     <button type="submit" class="btn btn-primary">Submit Review</button>
                 </form>
-                {% endif %}
+                {% endif %} {% endcomment %}
             </div>
             <h2>Product Reviews</h2>
             <ul class="product-reviews">
+                {% if product.reviews.exists %}
                 {% for review in product.reviews.all %}
                     <li>
                         <p><strong>{{ review.user.name }}</strong></p>
                         <p>{{ review.rating.comment }}</p>
+                        {% if review.rating.rating > 0 %}
+                        <p>{{ review.rating.rating }}</p>
+                        {% endif %}
                     </li>
                 {% endfor %}
+                {% else %}
+                <li>
+                    <p>No reviews available for this product.</p>
+                </li>
+            {% endif %}
             </ul>
             </div>
         </div>

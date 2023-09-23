@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
 from django.conf import settings
+from django.db.models import Avg
 # class UserProfile(models.Model):
 #     user = models.OneToOneField(User, on_delete=models.CASCADE)
 #     name = models.CharField(max_length=100)
@@ -145,6 +146,10 @@ class Product(models.Model):
             self.save()
             return True
         return False
+    def calculate_average_rating(self):
+        # Calculate the average rating for the product
+        average_rating = self.reviews.aggregate(Avg('rating__rating'))['rating__rating__avg']
+        return average_rating or 0.0
 
     def __str__(self):
         return self.name
@@ -164,15 +169,7 @@ class WishlistItems(models.Model):
     def __str__(self):
        return self.products.name
 
-class Rating(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)  # Assuming you have a Product model
-    rating = models.IntegerField(choices=[(1, '1 star'), (2, '2 stars'), (3, '3 stars'), (4, '4 stars'), (5, '5 stars')])
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f'{self.user.name} rated {self.product.name} {self.get_rating_display()}'
-    
+   
 
 class Order(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -245,7 +242,7 @@ class Review(models.Model):
     
 class ReviewRating(models.Model):
     review = models.OneToOneField(Review, related_name='rating', on_delete=models.CASCADE)
-    rating = models.PositiveIntegerField(default=0)  # Rating out of 5
+    rating = models.DecimalField(max_digits=3, decimal_places=1, default=0.0)
     comment = models.TextField()
 
     def __str__(self):

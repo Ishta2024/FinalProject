@@ -5,7 +5,7 @@ from django.contrib import messages
 from .models import Customer, CustomUser, Seller, AddWishlist,WishlistItems,AddCart, CartItems, Order, OrderItem, Review, ReviewRating
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from .models import Category, Product, Subcategory, Rating
+from .models import Category, Product, Subcategory
 from django.urls import reverse
 from django.core.mail import send_mail
 from django.urls import reverse_lazy
@@ -149,9 +149,14 @@ def each_product(request, product_id):
     cart_count = 0  # Initialize wishlist_count to 0
     wishlist = []
     user_has_ordered_product = False
+    average_rating_percentage = Decimal(0)
+    average_rating = Decimal(0)
     if request.user.is_authenticated:
         user_id = request.user.id
         user=request.user
+        average_rating = Decimal(product.calculate_average_rating()) 
+        average_rating_percentage = Decimal((average_rating / Decimal('5.0'))) * Decimal('100')
+
         # Fetch the user's wishlist products' IDs and count
         cart_count = CartItems.objects.filter(cart__user=user).count()
         wishlist = WishlistItems.objects.filter(wishlist__user_id=user_id).values_list('products__id', flat=True)
@@ -163,10 +168,13 @@ def each_product(request, product_id):
         'wishlist': wishlist,
         'wishlist_count': wishlist_count, 
         'cart_count':cart_count,
-        'user_has_ordered_product': user_has_ordered_product
+        'user_has_ordered_product': user_has_ordered_product,
+        'average_rating' :average_rating,
+        'average_rating_percentage': average_rating_percentage
     }
    
     return render(request, 'eachproduct.html', context)
+
 
 @login_required
 def plus_wishlist(request):
@@ -400,10 +408,16 @@ def order_placed_successfully(request, order_id):
             cart_items.delete()
     # Pass order and order items to the template for display
     return render(request, 'Customer/order_placed.html', {'order': order, 'order_items': order_items})
+# @login_required
+# def order_history(request):
+#     orders = Order.objects.filter(user=request.user)
+#     confirmed_orders = Order.objects.filter(order_confirmation='confirmed')
+#     return render(request, 'Customer/order_history.html', {'orders': orders,'confirmed_orders': confirmed_orders})
 @login_required
 def order_history(request):
     orders = Order.objects.filter(user=request.user)
     return render(request, 'Customer/order_history.html', {'orders': orders})
+
 
 def cancel_order(request,order_id):
     order = Order.objects.get(id=order_id, user=request.user)
@@ -424,19 +438,27 @@ def cancel_order_confirmation(request, order_id):
 def add_review(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     user=request.user
+        # Fetch the user's wishlist products' IDs and count
+   
     if request.method == 'POST':
         comment = request.POST.get('review', '')
-        # rating_value = int(request.POST.get('rating', 0))
+        rating = request.POST.get('rating')
+
+        # Validate rating (you can adjust this based on your needs)
+        if float(rating) < 0 or float(rating) > 5:
+            messages.error(request, 'Invalid rating. Please provide a rating between 0 and 5.')
+            return redirect('each_product', product_id=product_id)
 
         # Create the review
         review = Review.objects.create(product=product, user=user)
 
         # Create the review rating
-        review_rating=ReviewRating.objects.create(review=review,comment=comment)
+        review_rating = ReviewRating.objects.create(review=review, comment=comment, rating=rating)
 
+        # Redirect to the product detail page
         return redirect('each_product', product_id=product_id)
 
-    return render(request, 'eachproduct.html', {'product': product})
+    return render(request, 'Customer/add_review.html', {'product': product})
 
 @login_required
 def create_order(request):
@@ -525,42 +547,42 @@ def remove_from_wishlist(request, product_id):
         response_data = {'message': 'Product not found in wishlist'}
         return JsonResponse(response_data, status=404)
 
-@csrf_protect
-def rate_product(request):
-    if request.method == 'POST':
-        rating_value = request.POST.get('rating')
-        product_id = request.POST.get('product_id')
+# @csrf_protect
+# def rate_product(request):
+#     if request.method == 'POST':
+#         rating_value = request.POST.get('rating')
+#         product_id = request.POST.get('product_id')
 
-        # Check if the user is authenticated
-        if not request.user.is_authenticated:
-            return JsonResponse({'error': 'You must be logged in to rate products.'}, status=403)
+#         # Check if the user is authenticated
+#         if not request.user.is_authenticated:
+#             return JsonResponse({'error': 'You must be logged in to rate products.'}, status=403)
 
-        # Check if the rating value is valid (1 to 5)
-        try:
-            rating_value = int(rating_value)
-            if rating_value < 1 or rating_value > 5:
-                raise ValueError('Invalid rating value')
-        except ValueError:
-            return JsonResponse({'error': 'Invalid rating value'}, status=400)
+#         # Check if the rating value is valid (1 to 5)
+#         try:
+#             rating_value = int(rating_value)
+#             if rating_value < 1 or rating_value > 5:
+#                 raise ValueError('Invalid rating value')
+#         except ValueError:
+#             return JsonResponse({'error': 'Invalid rating value'}, status=400)
 
-        # Check if the product exists
-        try:
-            product = Product.objects.get(id=product_id)
-        except Product.DoesNotExist:
-            return JsonResponse({'error': 'Product not found'}, status=404)
+#         # Check if the product exists
+#         try:
+#             product = Product.objects.get(id=product_id)
+#         except Product.DoesNotExist:
+#             return JsonResponse({'error': 'Product not found'}, status=404)
 
-        # Check if the user has already rated this product
-        existing_rating = Rating.objects.filter(user=request.user, product=product).first()
-        if existing_rating:
-            return JsonResponse({'error': 'You have already rated this product.'}, status=403)
+#         # Check if the user has already rated this product
+#         existing_rating = Rating.objects.filter(user=request.user, product=product).first()
+#         if existing_rating:
+#             return JsonResponse({'error': 'You have already rated this product.'}, status=403)
 
-        # Create a new rating entry
-        new_rating = Rating(user=request.user, product=product, rating=rating_value)
-        new_rating.save()
+#         # Create a new rating entry
+#         new_rating = Rating(user=request.user, product=product, rating=rating_value)
+#         new_rating.save()
 
-        return JsonResponse({'message': 'Rating saved successfully'})
+#         return JsonResponse({'message': 'Rating saved successfully'})
     
-    return JsonResponse({'error': 'Invalid request method'}, status=405)
+#     return JsonResponse({'error': 'Invalid request method'}, status=405)
     
 @login_required
 def index(request):
