@@ -5,7 +5,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
+            background-color: #f5f5f5;
             color: #333;
             margin: 0;
             padding: 0;
@@ -16,14 +16,16 @@
         }
         .container {
             max-width: 600px;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
-            text-align: center;
+            text-align: left;
+            margin: 20px;
         }
         h1, h2 {
             color: #333;
+            margin-bottom: 10px;
         }
         p {
             font-size: 18px;
@@ -33,9 +35,21 @@
             list-style: none;
             padding: 0;
             margin: 0;
+            text-align: left;
         }
         li {
-            margin-bottom: 5px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .product-details {
+            flex: 1;
+        }
+        .product-details span {
+            margin-right: 10px;
         }
         a {
             display: inline-block;
@@ -51,47 +65,129 @@
             background-color: #357ebd;
         }
         .quantity-button {
-            padding: 5px 10px;
+            padding: 8px 16px;
             margin: 0 5px;
             font-size: 16px;
             cursor: pointer;
         }
-       
         .quantity-input {
             width: 40px;
             text-align: center;
         }
+        button[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 5px;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+        }
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .quantity.buttons_added {
+            display: flex;
+            align-items: center;
+        }
+        
+        .quantity-button {
+            background-color: #428bca;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 5px;
+            font-size: 18px;
+        }
+        
+        .quantity-button:hover {
+            background-color: #357ebd;
+        }
+        
+        .quantity-input {
+            width: 60px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 0 5px;
+            padding: 10px;
+            font-size: 18px;
+        }
+        
+
+        .quantity.buttons_added {
+            display: flex;
+            align-items: center;
+        }
+        
+        .quantity-button {
+            background-color: #428bca;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 5px;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .quantity-button:hover {
+            background-color: #357ebd;
+        }
+        
+        .quantity-input {
+            width: 60px;
+            text-align: center;
+            border: 2px solid #428bca;
+            border-radius: 5px;
+            margin: 0 5px;
+            padding: 10px;
+            font-size: 18px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .quantity-input:focus {
+            border-color: #357ebd;
+        }
+        
+                
     </style>
 </head>
 <body>
     <form method="post" action="{% url 'order_placed_successfully' order.id %}">
-    <div class="container">
-        <h1>Order Details</h1>
-        <p>You Are Closer To Your Order!</p>
-        <p>Order ID: {{ order.id }}</p>
-        <p>Total Price: $<span id="totalPrice">{{ order.total_price }}</span></p>
+        <div class="container">
+            <h1>Your Order Summary</h1>
+            <p>You're almost there! Please review your order details.</p>
+            <p>Order ID: {{ order.id }}</p>
+            <p>Total Price: $<span id="totalPrice">{{ order.total_price }}</span></p>
 
-        <h2>Order Items</h2>
-       
-        {% csrf_token %}
-        <ul>
-            {% for item in order_items %}
-                <li>
-                    <span id="quantity{{ item.id }}">{{ item.quantity }}</span> x {{ item.product.name }} - ${{ item.price }} each
-                    <div class="quantity buttons_added">
-                        <input type="button" value="-" class="minus" data-field="quantityInput{{ item.id }}" onclick="updateQuantity({{ item.id }}, {{ item.price }}, -1)">
-                        <input type="number" min="1" max="{{ item.product.quantity }}" name="quantity{{ item.id }}" value="{{ item.quantity }}" id="quantityInput{{ item.id }}" title="Qty" class="input-text qty text quantity-input" size="4" pattern="" inputmode="" oninput="validateQuantity(this)">
-                        <input type="button" value="+" class="plus" data-field="quantityInput{{ item.id }}" onclick="updateQuantity({{ item.id }}, {{ item.price }}, 1)">
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
-        <a href="{% url 'cancel_order_confirmation' order.id %}">Cancel Your Order</a>
-
-
-        <button type="submit">Confirm Your Order</button>
-    </div>
-</form>
+            <h2>Order Items</h2>
+           
+            {% csrf_token %}
+            <ul>
+                {% for item in order_items %}
+                    <li>
+                        <div class="product-details">
+                            <span id="quantity{{ item.id }}">{{ item.quantity }}</span> x {{ item.product.name }} - ${{ item.price }} each
+                        </div>
+                        <div class="quantity buttons_added">
+                            <input type="button" value="-" class="minus quantity-button" data-field="quantityInput{{ item.id }}" onclick="updateQuantity({{ item.id }}, {{ item.price }}, -1)">
+                            <input type="number" min="1" max="{{ item.product.quantity }}" name="quantity{{ item.id }}" value="{{ item.quantity }}" id="quantityInput{{ item.id }}" title="Qty" class="input-text qty text quantity-input" size="4" pattern="" inputmode="" oninput="validateQuantity(this)">
+                            <input type="button" value="+" class="plus quantity-button" data-field="quantityInput{{ item.id }}" onclick="updateQuantity({{ item.id }}, {{ item.price }}, 1)">
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+            <a href="{% url 'cancel_order_confirmation' order.id %}">Cancel Your Order</a>
+            <button type="submit">Confirm Your Order</button>
+        </div>
+    </form>
     <script>
         {% comment %} function updateQuantity(itemId, itemPrice, change) {
             var quantityElement = document.getElementById('quantityInput' + itemId);

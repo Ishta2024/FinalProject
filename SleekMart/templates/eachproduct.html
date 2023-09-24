@@ -20,6 +20,8 @@
 
     <link rel="stylesheet" href="{% static 'css/lightbox.css' %}">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{% static 'js/popper.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
@@ -105,7 +107,64 @@
                 color: #ff0000; /* New color (you can adjust this) */
             }
         }
+        .main-border-button1 {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #e74c3c;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
         
+        .main-border-button1:hover {
+            background-color: #c0392b;
+        }
+        .wishlist-button {
+            display: inline-block;
+            padding: 15px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            text-align: center;
+            text-decoration: none;
+            margin-right: -60px;
+            transition: background-color 0.3s ease;
+            position: relative; /* Add this to enable top adjustment */
+            top: 55px; /* Adjust this value to move the button down */
+        }
+        
+        
+        .minus-wishlist {
+            background-color: #FF5252;
+        }
+        
+        .plus-wishlist {
+            background-color: #4CAF50;
+        }
+        
+        .wishlist-button i {
+            margin-right: 10px;
+        }
+        
+        .wishlist-button:hover {
+            background-color: #FF0000;
+            transform: translateY(-3px);
+        }
+        
+        .wishlist-button:active {
+            transform: translateY(1px); /* Change translateY to push down */
+        }
+        
+        
+        
+
     
     </style>
 </head>
@@ -213,8 +272,8 @@
                      </div>
                     </div>
                    {% else %}
-                   <p>No Ratings For This Product</p>
-                {% endif %}
+                   <p style="position:absolute;top:85px;right:25px;">No Ratings For This Product</p>
+                   {% endif %}
                     <span>{{ product.description }}</span>
                     <div class="quote">
                         {% comment %} <i class="fa fa-quote-left"></i><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiuski smod.</p> {% endcomment %}
@@ -231,42 +290,53 @@
                         </div>
                         <div class="right-content">
                             <div class="quantity buttons_added">
+                                {% if product.quantity == 0 %}
+                                <input type="button" value="-" class="minus" data-field="quantityInput_{{ product.id }}" disabled>
+                                <input type="number" min="0" max="{{ product.quantity }}" name="quantity" value="0" id="quantityInput_{{ product.id }}" title="Qty" class="input-text qty text" size="4" pattern="" inputmode="" readonly>
+                                <input type="button" value="+" class="plus" data-field="quantityInput_{{ product.id }}" disabled>
+                                {% else %}
                                 <input type="button" value="-" class="minus" data-field="quantityInput_{{ product.id }}">
                                 <input type="number"  min="1" max="{{ product.quantity }}" name="quantity" value="1" id="quantityInput_{{ product.id }}" title="Qty" class="input-text qty text" size="4" pattern="" inputmode="" oninput="validateQuantity(this)">
                                 <input type="button" value="+" class="plus" data-field="quantityInput_{{ product.id }}">
+                                {% endif %}
                             </div>
                         </div>
                        
                         
                     </div>
                     <div class="total">
-                        <h4>Total: $<span id="totalPrice_{{ product.id }}" data-selling-price="{{ product.selling_price }}">{{ product.selling_price }}</span></h4>
+                        
+                        <h4>Total: <span style="font-size:25px;" id="totalPrice_{{ product.id }}" data-selling-price="{{ product.selling_price }}">$ {{ product.selling_price }}</span></h4>
                         <div class="main-border-button">
-                            {% if product.quantity == 0 %}
-                            {% if product.id in wishlist %}
+                        {% if product.quantity == 0 %}
+                        {% if product.id in wishlist %}
                         
                         {% comment %} <div class="main-border-button"><a href="#">Add To Wishlist</a></div> {% endcomment %}
-                        <a pid="{{ product.id }}" class="minus-wishlist btn btn-danger shadow px-5 py-2 ms-4">
-                            <i class="fas fa-heart fa-lg" ></i>
-                        </a><br><br>
-                        {% else %}
-                        <a pid="{{ product.id }}" class="plus-wishlist btn btn-success shadow px-5 py-2 ms-4">
-                            <i class="fas fa-heart fa-lg" ></i>
+                        <a pid="{{ product.id }}" class="wishlist-button minus-wishlist">
+                            <i class="fas fa-heart"></i> Remove From Wishlist
                         </a>
+                    
+                        {% else %}
+                    
+                        <a pid="{{ product.id }}" class="wishlist-button plus-wishlist">
+                            <i class="fas fa-heart"></i> Add to Wishlist
+                        </a>
+                        
+                        
                         {% endif %}
-                            <button type="submit" class="main-border-button" disabled>Add To Cart (Out of Stock)</button>
-                            {% else %}
-                             <a href="" class="add-to-cart-btn" id="addToCartBtn">Add To Cart</a></div> 
-                             {% endif %}
+                        <button type="submit" class="main-border-button1" style="position:absolute; width:195px; top:590px; right:215px; background-color: #e74c3c; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);" disabled>Add To Cart (Out of Stock)</button>
+                        {% else %}
+                        <a href="" class="add-to-cart-btn" id="addToCartBtn" >Add To Cart</a></div> 
+                        {% endif %}
 
                         </div>
-                        </div>
+                    </div>
                     <br><br>
                     <div class="total">
                         {% if product.quantity == 0 %}
-                        <button type="submit" class="main-border-button" disabled>Buy Now (Out of Stock)</button>
+                        <button type="submit" class="main-border-button1" disabled>Buy Now (Out of Stock)</button>
                         {% else %}
-                        <div class="main-border-button"><a href="#">Buy Now</a></div>
+                        <div class="main-border-button" ><a href="#">Buy Now</a></div>
                         {% endif %}
                     </div>
                 </form>
