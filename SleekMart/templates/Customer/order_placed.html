@@ -1,19 +1,86 @@
-
-
 <!DOCTYPE html>
 <html>
 <head>
     <title>Order Placed Successfully</title>
-
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        h2 {
+            font-size: 24px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        .order-summary {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .order-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .order-item img {
+            max-width: 80px;
+            margin-right: 20px;
+            border-radius: 5px;
+        }
+        .order-item-details {
+            flex-grow: 1;
+        }
+        .order-item-details h3 {
+            font-size: 20px;
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+        .order-item-details p {
+            margin: 0;
+            font-size: 18px;
+            color: #777;
+        }
+        .order-item-quantity {
+            font-size: 18px;
+            margin-right: 10px;
+        }
+    </style>
 </head>
 <body>
-    <div>
+    <div class="container">
         <h1>Order Placed Successfully</h1>
         <p>Your order with Order ID: {{ order.id }} has been placed successfully!</p>
-
-       
         <h2>Order Summary</h2>
- 
+
+        {% for item in order_items %}
+            <div class="order-summary">
+                <div class="order-item">
+                    <img src="{{ item.product.product_image.url }}" alt="{{ item.product.name }}">
+                    <div class="order-item-details">
+                        <h3>{{ item.product.name }}</h3>
+                        <p>Price: ${{ item.price }}</p>
+                    </div>
+                    <div class="order-item-quantity">
+                        <p>Quantity: {{ item.quantity }}</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
     </div>
 </body>
 </html>

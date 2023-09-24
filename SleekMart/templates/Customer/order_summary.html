@@ -9,7 +9,7 @@
         <form method="post" action="{% url 'order_placed_successfully' order.id %}">
             {% csrf_token %}
         <h1>Order Details</h1>
-        <!-- Display order and order item details here -->
+        {% comment %} <img src="{{ order_item.product.product_image.url }}" alt="{{ order_item.product.name }}" style="max-width: 300px;"> {% endcomment %}
         <p>Order ID: {{ order.id }}</p>
         <p>Total Price: ${{ order.total_price }}</p>
         <!-- Display order items and their quantities -->

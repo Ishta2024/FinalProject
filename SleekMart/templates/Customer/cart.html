@@ -231,6 +231,7 @@
         <table class="table">
             <thead>
                 <tr>
+                    {% comment %} <th>Image</th> {% endcomment %}
                     <th>Product</th>
                     <th>Quantity</th>
                     <th>Price</th>
@@ -242,22 +243,31 @@
                 
                 {% for cart_item in cart_items %}
                     <tr {% if cart_item.product.quantity == 0 %}class="disabled-row"{% endif %}>
+                        {% comment %} <td><img src="{{ cart_item.product.product_image.url }}" alt="{{ product.name }}" style="max-width: 200px;"></td> {% endcomment %}
                         <td><a href="{% url 'each_product' cart_item.product.id %}">{{ cart_item.product.name }}
                             {% if cart_item.product.quantity == 0 %}
                                     (Out of Stock)
                             {% endif %}
                         </a></td>
+                       
                         <td>
-                             <form method="post" action="{% url 'update_cart_item' cart_item.id %}">
+                             {% comment %} <form method="post" action="{% url 'update_cart_item' cart_item.id %}">
                                 {% csrf_token %}
                                 <input type="number" name="quantity" value="{{ cart_item.quantity }}" id="quantityInput" class="quantity-input" min="1" max="{{ cart_item.product.quantity }}">
                                 <button type="submit" class="update-button">Update</button>
-                            </form>  
+                            </form>   {% endcomment %}
                             {% comment %} <input type="number" name="quantity" value="{{ cart_item.quantity }}" class="quantity-input" data-cart-item-id="{{ cart_item.id }}"> {% endcomment %}
+                            <div class="quantity buttons_added">
+                                <input type="button" value="-" class="minus quantity-button" data-field="quantityInput{{ cart_item.id }}" onclick="updateQuantity('{{ cart_item.id }}', {{ cart_item.product.selling_price }}, -1)">
+                                <input type="number" min="1" max="{{ cart_item.product.quantity }}" name="quantity{{ cart_item.id }}" value="{{ cart_item.quantity }}" id="quantityInput{{ cart_item.id }}" title="Qty" class="input-text qty text quantity-input" size="4" pattern="" inputmode="" oninput="validateQuantity(this)">
+                                <input type="button" value="+" class="plus quantity-button" data-field="quantityInput{{ cart_item.id }}" onclick="updateQuantity('{{ cart_item.id }}', {{ cart_item.product.selling_price }}, 1)">
+                            </div>
+                            
+                            
                             
                         </td>
                         <td>${{ cart_item.product.selling_price }}</td>
-                        <td class="total-price">${{ cart_item.total_price }}</td>
+                        <td class="total-price"><span id="totalPrice{{ cart_item.id }}">${{ cart_item.total_price }}</span></td>
                         <td>
                             <form method="post" action="{% url 'remove_cart_item' cart_item.id %}">
                                 {% csrf_token %}
@@ -273,7 +283,9 @@
         <br><br>
         {% if cart_empty is False %}
         <div>
-            <b>Total: ${{ total_price }}</b>
+            <b>Total: <span id="total_price">{{ total_price }}</span></b>
+
+
             <br>
             <a href="{% url 'checkout' %}" class="btn btn-primary">Proceed to Checkout</a>
            
@@ -370,7 +382,87 @@
                 
             });
         });
-         $('[id^="quantityInput_"]').on('input', function () {
+        function updateQuantity(itemId, itemPrice, change) {
+            console.log('Updating quantity for item:', itemId);
+        
+            var quantityElement = document.getElementById('quantityInput' + itemId);
+            var maxQuantity = parseInt(quantityElement.max, 10);
+            var currentQuantity = parseInt(quantityElement.value, 10);
+            
+            console.log('itemPrice:', itemPrice);
+            console.log('currentQuantity:', currentQuantity);
+            console.log('change:', change);
+            // Calculate the new quantity
+            var newQuantity = currentQuantity + change;
+            console.log('newQuantity:', newQuantity);
+            newQuantity = Math.max(newQuantity, 1);
+            newQuantity = Math.min(newQuantity, maxQuantity);
+        
+            // Update the displayed quantity and total price
+            quantityElement.value = newQuantity;
+        
+            var priceElement = document.getElementById('totalPrice' + itemId);
+            console.log('itemPrice:', itemPrice);
+            var itemTotalPrice = newQuantity * parseFloat(itemPrice);
+        
+            priceElement.innerText = '$' + itemTotalPrice.toFixed(2);
+        
+            // Get the CSRF token
+            var csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+        
+            // Update the CSRF token in the AJAX headers
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            });
+        
+            // Send the AJAX request to update the quantity
+            $.ajax({
+                type: "POST",
+                url: "/update_cart_item/" + itemId + "/",  // Update with your actual URL
+                data: {
+                    quantity: newQuantity
+                },
+                success: function(data) {
+                    // Handle success if needed
+                    console.log('Cart item quantity updated successfully.');
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error("AJAX request failed: " + textStatus, errorThrown);
+                }
+            });
+        
+            // Recalculate and update the overall total price
+            var overallTotalPrice = 0;
+        
+            // Iterate through all cart items to calculate the sum of total prices
+            {% for cart_item in cart_items %}
+                var itemTotalPrice = parseFloat(document.getElementById('totalPrice{{ cart_item.id }}').innerText.replace('$', ''));
+                overallTotalPrice += itemTotalPrice;
+            {% endfor %}
+        
+            // Update the overall total price in the HTML
+            var total_priceElement = document.getElementById('total_price');
+            total_priceElement.innerText = '$' + overallTotalPrice.toFixed(2);
+        }
+        
+        
+        function validateQuantity(input) {
+            var value = parseInt(input.value, 10);
+            var max = parseInt(input.max, 10);
+        
+            if (isNaN(value) || value < 1) {
+                input.value = 1;
+            } else if (!isNaN(max) && value > max) {
+                input.value = max;
+            }
+        }
+        
+        
+        
+        
+         {% comment %} $('[id^="quantityInput_"]').on('input', function () {
             updateTotalPrice($(this));
         });
         
@@ -415,7 +507,7 @@
                     quantityInput.value = maxQuantity; // Reset the input value to the maximum
                 }
             });
-        });
+        }); {% endcomment %}
     {% comment %} $(document).ready(function () {
         $('.quantity-input').on('input', function () {
             var cartItemId = $(this).data('cart-item-id');

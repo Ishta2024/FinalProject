@@ -14,6 +14,7 @@ from django.contrib.auth.views import LoginView, PasswordResetView, PasswordChan
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_protect
+from django.db.models import F
 
 
 # Create your views here.
@@ -220,34 +221,43 @@ def minus_wishlist(request):
 
 @login_required
 def add_to_cart(request, product_id):
-     
-    print('entered')
-    
     if request.method == 'POST':
-        print('entered')
-
-        
         # Get the product and quantity from the form
         product = Product.objects.get(pk=product_id)
         quantity = int(request.POST.get('selected_quantity', 1))
-        
+
         # Get or create the user's cart
         user = request.user
         cart, created = AddCart.objects.get_or_create(user=user)
 
         # Check if the product is already in the cart, if so, update the quantity
         existing_item = CartItems.objects.filter(cart=cart, product=product).first()
+        
+        # Get the maximum allowed quantity for the product
+        max_quantity = product.quantity
+
+        # Check if the quantity exceeds the maximum allowed
         if existing_item:
-            existing_item.quantity += quantity
+            new_quantity = existing_item.quantity + quantity
+        else:
+            new_quantity = quantity
+
+        # If the new quantity exceeds the maximum, set it to the maximum allowed
+        if new_quantity > max_quantity:
+            new_quantity = max_quantity
+
+        if existing_item:
+            existing_item.quantity = new_quantity
             existing_item.save()
         else:
             # Create a new cart item
-            CartItems.objects.create(cart=cart, product=product, quantity=quantity)
+            CartItems.objects.create(cart=cart, product=product, quantity=new_quantity)
 
         return redirect('cart_details')  # Redirect to the cart page or wherever you want
     else:
         product = Product.objects.get(pk=product_id)
         return render(request, 'each_product.html', {'product': product})
+
 
 @login_required
 def cart_details(request):
@@ -283,42 +293,77 @@ def cart_details(request):
         'cart_empty': cart_empty,
     }
     return render(request, 'Customer/cart.html', context)
-@login_required
-def update_cart_item(request, cart_item_id):
-    cart_item = get_object_or_404(CartItems, pk=cart_item_id)
-    
-    if request.method == 'POST':
-        new_quantity = int(request.POST.get('quantity', 1))
-        
-        # Update the quantity of the cart item
-        if new_quantity > 0:
-            cart_item.quantity = new_quantity
-            cart_item.save()
-        else:
-            # Handle invalid quantity (e.g., remove the item from the cart)
-            cart_item.delete()
-        
-    return redirect('cart_details')
-# def update_cart_item(request, cart_item_id):
+# from django.views.decorators.csrf import csrf_exempt
+# @csrf_exempt  # Only for testing, do proper CSRF handling in production
+# def update_cart_item_quantity(request):
 #     if request.method == 'POST':
+#         item_id = request.POST.get('item_id')
+#         new_quantity = request.POST.get('new_quantity')
+
 #         try:
-#             cart_item = CartItems.objects.get(id=cart_item_id)
-#         except CartItems.DoesNotExist:
-#             return JsonResponse({'error': 'Cart item not found'}, status=400)
+#             print('got')
+#             cart_item = CartItems.objects.get(id=item_id)
+#             print(cart_item)
+#             cart_item.quantity = new_quantity
+#             print(cart_item.quantity)
+#             cart_item.save()
+            
+#             # Debugging: Print the values and types
+#             print('item_id:', item_id)
+#             print('new_quantity:', new_quantity)
+#             print('selling_price:', cart_item.product.selling_price)
 
-#         new_quantity = int(request.POST.get('quantity', 1))
-#         if new_quantity < 1:
-#             return JsonResponse({'error': 'Invalid quantity'}, status=400)
+#             # Calculate the new total price and convert it to a valid JSON format
+#             itemTotalPrice = cart_item.product.selling_price * int(new_quantity)
+#             itemTotalPrice = round(itemTotalPrice, 2)  # Round to 2 decimal places
 
-#         cart_item.quantity = new_quantity
-#         cart_item.save()
+#             # Send the updated itemTotalPrice as a valid JSON response
+#             response_data = {
+#                 'itemTotalPrice': str(itemTotalPrice)  # Convert to string for JSON
+#             }
+#             return JsonResponse(response_data)
 
-#         # Calculate the updated total price
-#         total_price = cart_item.product.selling_price * cart_item.quantity
-
-#         return JsonResponse({'total_price': total_price})
+#         except Exception as e:
+#             print("An error occurred while updating quantity:", str(e))
+#             return JsonResponse({'error': str(e)}, status=500)
 
 #     return JsonResponse({'error': 'Invalid request method'}, status=400)
+# @login_required
+# def update_cart_item(request, cart_item_id):
+#     cart_item = get_object_or_404(CartItems, pk=cart_item_id)
+    
+#     if request.method == 'POST':
+#         new_quantity = int(request.POST.get('quantity', 1))
+        
+#         # Update the quantity of the cart item
+#         if new_quantity > 0:
+#             cart_item.quantity = new_quantity
+#             cart_item.save()
+#         else:
+#             # Handle invalid quantity (e.g., remove the item from the cart)
+#             cart_item.delete()
+        
+#     return redirect('cart_details')
+def update_cart_item(request, cart_item_id):
+    if request.method == 'POST':
+        try:
+            cart_item = CartItems.objects.get(id=cart_item_id)
+        except CartItems.DoesNotExist:
+            return JsonResponse({'error': 'Cart item not found'}, status=400)
+
+        new_quantity = int(request.POST.get('quantity', 1))
+        if new_quantity < 1:
+            return JsonResponse({'error': 'Invalid quantity'}, status=400)
+
+        cart_item.quantity = new_quantity
+        cart_item.save()
+
+        # Calculate the updated total price
+        total_price = cart_item.product.selling_price * cart_item.quantity
+
+        return JsonResponse({'total_price': total_price})
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
 @login_required
 def remove_cart_item(request, cart_item_id):
     cart_item = get_object_or_404(CartItems, pk=cart_item_id)
@@ -418,7 +463,25 @@ def order_history(request):
     orders = Order.objects.filter(user=request.user)
     return render(request, 'Customer/order_history.html', {'orders': orders})
 
+def remove_from_order(request, order_id, item_id):
+    order = get_object_or_404(Order, id=order_id)
+    item = get_object_or_404(OrderItem, id=item_id)
 
+    # Check if the item is associated with the given order
+    if item.order == order:
+        # Get the item's total price
+        item_total_price = item.price * item.quantity
+
+        # Delete the item
+        item.delete()
+
+        # Update the order's total price by subtracting the item's total price
+        order.total_price = F('total_price') - item_total_price
+        order.save()
+
+        return JsonResponse({'message': 'Item removed from order.'}, status=200)
+    else:
+        return JsonResponse({'error': 'Item not associated with the given order.'}, status=400)
 def cancel_order(request,order_id):
     order = Order.objects.get(id=order_id, user=request.user)
     print(order)
@@ -600,7 +663,12 @@ def sellerindex(request):
     category_count = categories.count() 
     seller = Seller.objects.get(user=request.user)
     product_count = Product.objects.filter(seller=seller, status=False).count()
-    context = {'category_count': category_count, 'product_count': product_count}
+    
+    confirmed_orders = Order.objects.filter(
+        items__order_confirmation=OrderItem.CONFIRMED,
+        items__product__seller=seller
+    ).distinct()
+    context = {'category_count': category_count, 'product_count': product_count,'confirmed_orders': confirmed_orders}
     return render(request, 'Seller/sellerindex.html', context)
 @login_required
 def sellerprofile(request):
