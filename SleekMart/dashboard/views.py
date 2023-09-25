@@ -404,6 +404,33 @@ def checkout(request):
     # cart_items.delete()
 
     return redirect('checkout_complete', order_id=order.id)
+def buy_now(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    if request.method == 'POST':
+        quantity = int(request.POST.get('quantity', 1))
+        price = product.selling_price
+        total_price = Decimal(quantity) * Decimal(price)
+
+        user = request.user
+        order, created = Order.objects.get_or_create(user=user)
+
+        order_item = OrderItem.objects.create(
+            order=order,
+            product=product,
+            quantity=quantity,
+            price=price,
+            # Remove the 'total_price' argument
+            order_confirmation=OrderItem.CONFIRMED
+        )
+
+        order.total_price += total_price
+        order.save()
+
+        # Optionally, you can redirect to a purchase success page
+        return redirect('checkout_complete', order_id=order.id)
+
+    return render(request, 'Customer/buy_now.html', {'product': product})
 
 @login_required  # Ensure the user is logged in to access this view
 def checkout_complete(request, order_id):

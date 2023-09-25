@@ -332,13 +332,16 @@
                         </div>
                     </div>
                     <br><br>
+                    
                     <div class="total">
+                       
                         {% if product.quantity == 0 %}
                         <button type="submit" class="main-border-button1" disabled>Buy Now (Out of Stock)</button>
                         {% else %}
-                        <div class="main-border-button" ><a href="#">Buy Now</a></div>
+                        <div class="main-border-button" ><a href="{% url 'buy_now' product.id %}">Buy Now</a></div>
                         {% endif %}
                     </div>
+                
                 </form>
                 </div>
                 {% comment %} {% if user_has_ordered_product %}
