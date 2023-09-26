@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Order Summary</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .order-items {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .order-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .order-item img {
+            max-width: 100px; /* Adjust the max-width as needed */
+            margin-right: 10px;
+        }
+        
+        .product-details {
+            flex-grow: 1;
+        }
+        
+        .quantity {
+            margin-right: 10px;
+        }
+        
+        .confirm-button {
+            display: block;
+            margin-top: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            padding: 40px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            text-align: left;
+            margin: 20px;
+        }
+        h1, h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            text-align: left;
+        }
+        li {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .product-details {
+            flex: 1;
+        }
+        .product-details span {
+            margin-right: 10px;
+        }
+        a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #428bca;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+        a:hover {
+            background-color: #357ebd;
+        }
+        .quantity-button {
+            padding: 8px 16px;
+            margin: 0 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .quantity-input {
+            width: 40px;
+            text-align: center;
+        }
+        button[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 5px;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+        }
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .quantity.buttons_added {
+            display: flex;
+            align-items: center;
+        }
+        
+        .quantity-button {
+            background-color: #428bca;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 5px;
+            font-size: 18px;
+        }
+        
+        .quantity-button:hover {
+            background-color: #357ebd;
+        }
+        
+        .quantity-input {
+            width: 60px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 0 5px;
+            padding: 10px;
+            font-size: 18px;
+        }
+        
+
+        .quantity.buttons_added {
+            display: flex;
+            align-items: center;
+        }
+        
+        .quantity-button {
+            background-color: #428bca;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 5px;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .quantity-button:hover {
+            background-color: #357ebd;
+        }
+        
+        .quantity-input {
+            width: 60px;
+            text-align: center;
+            border: 2px solid #428bca;
+            border-radius: 5px;
+            margin: 0 5px;
+            padding: 10px;
+            font-size: 18px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .quantity-input:focus {
+            border-color: #357ebd;
+        }
+    </style>
+</head>
+<body>
+    <form method="post" action="{% url 'single_confirm_order' product.id %}">
+        <div class="container">
+            <h1>Your Order Summary</h1>
+            <p>You're almost there! Please review your order details.</p>
+            <h2>Order Item</h2>
+            <ul class="order-items">
+                <li class="order-item">
+                    <img src="{{ product.product_image.url }}" alt="{{ product.name }}">
+                    <div class="product-details">
+                        <span class="quantity">1</span> x {{ product.name }} - ${{ product.selling_price }} each
+                    </div>
+                    <input type="button" value="-" class="minus quantity-button" onclick="updateQuantity(-1)">
+                    <input type="number" min="1" max="5" id="quantityInput" name ="quantityinput" title="Qty" class="input-text qty text quantity-input" size="4" pattern="" inputmode="" oninput="validateQuantity(this)">
+
+                    <input type="button" value="+" class="plus quantity-button" onclick="updateQuantity(1)">
+
+                    {% comment %} <div class="quantity buttons_added">
+                        <input type="button" value="Remove" class="remove-button" onclick="removeItem({{ order.id }}, {{ item.id }}, {{ item.price }})">
+                    </div> {% endcomment %}
+                    
+                </li>
+            </ul>
+            <div id="message" style="color: red;"></div>
+            <p>Total Price: $<span id="totalPrice">{{ product.selling_price }}</span></p>
+            {% csrf_token %}
+            {% comment %} <a id="cancelLink" href="{% url 'single_cancel_order' order.id %}?total_price={{ product.selling_price }}" class="cancel-link" onclick="cancelOrder()">Cancel Your Order</a> {% endcomment %}
+
+
+            <button type="submit" class="confirm-button">Confirm Your Order</button>
+        </div>
+    </form>
+
+    <script>
+        document.getElementById('quantityInput').value = 1;
+    
+        function validateQuantity(input) {
+            var value = parseInt(input.value, 10);
+            var maxQuantity = 5;
+            var messageDiv = document.getElementById('message');
+    
+            if (isNaN(value) || value < 1) {
+                input.value = 1;
+            } else if (value > maxQuantity) {
+                input.value = maxQuantity;
+                messageDiv.innerText = 'No more than 5 are allowed.';
+            } else {
+                messageDiv.innerText = '';
+            }
+            updateTotalPrice();
+            // Update the total price based on the new quantity
+            var sellingPrice = parseFloat("{{ product.selling_price }}");
+            var newTotalPrice = sellingPrice * value;
+            document.getElementById('totalPrice').innerText = newTotalPrice.toFixed(2);
+            if (value > maxQuantity) {
+                input.value = maxQuantity;
+            }
+        }
+    
+        function updateQuantity(change) {
+            var quantityElement = document.getElementById('quantityInput');
+            var currentQuantity = parseInt(quantityElement.value, 10);
+    
+            // Calculate the new quantity
+            var newQuantity = currentQuantity + change;
+            newQuantity = Math.max(newQuantity, 1);
+            newQuantity = Math.min(newQuantity, 5); // Set a max quantity of 5
+    
+            // Update the displayed quantity and total price
+            quantityElement.value = newQuantity;
+            validateQuantity(quantityElement);
+        }
+        function updateTotalPrice() {
+            var quantity = parseInt(document.getElementById('quantityInput').value, 10);
+            var sellingPrice = parseFloat("{{ product.selling_price }}");
+            var newTotalPrice = quantity * sellingPrice;
+            document.getElementById('totalPrice').innerText = newTotalPrice.toFixed(2);
+        
+            // Store the total price in local storage
+            localStorage.setItem('totalPrice', newTotalPrice.toFixed(2));
+            
+        }
+        
+        // Update total price when the page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            var storedTotalPrice = localStorage.getItem('totalPrice');
+            if (storedTotalPrice) {
+                document.getElementById('totalPrice').innerText = storedTotalPrice;
+            }
+        });
+        function cancelOrder() {
+            // Clear the total price from local storage
+            localStorage.removeItem('totalPrice');
+        }
+    </script>
+    
+    <!-- Add this <div> where the message will be displayed -->
+    
+    
+    
+    
+</body>
+</html>

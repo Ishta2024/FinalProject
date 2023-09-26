@@ -407,31 +407,78 @@ def checkout(request):
 def buy_now(request, product_id):
     product = get_object_or_404(Product, id=product_id)
 
-    if request.method == 'POST':
-        quantity = int(request.POST.get('quantity', 1))
-        price = product.selling_price
-        total_price = Decimal(quantity) * Decimal(price)
+    # Fixed quantity for Buy Now
+    # quantity = int(1)
+    # price = product.selling_price
+    # total_price = Decimal(quantity) * Decimal(price)
+    # print(total_price)
 
-        user = request.user
-        order, created = Order.objects.get_or_create(user=user)
+    # user = request.user
+    # order, created = Order.objects.get_or_create(user=user)
 
+    # order_item = OrderItem.objects.create(
+    #     order=order,
+    #     product=product,
+    #     quantity=quantity,
+    #     price=price,
+    
+    # )
+
+    # order.total_price = Decimal(str(total_price))
+    # print(order.total_price)
+    # order.save()
+    
+    # Redirect to a purchase success page
+    return render(request, 'Customer/single_checkout.html',{'product':product}) 
+from django.views import View
+class ConfirmOrderView(View):
+    def post(self, request, *args, **kwargs):
+        print('got')
+        print(request.POST)
+
+        product_id = kwargs.get('product_id')
+        quantity = int(request.POST.get('quantityinput', 1))  # Use the correct name (quantityInput) from your HTML
+
+        print(quantity)
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            messages.error(request, "Product not found.")
+            return redirect('dashboard_home')
+
+        # Calculate total price
+        total_price = product.selling_price * quantity
+
+        # Create the order
+        order = Order.objects.create(
+            user=request.user,  # Assuming you have authentication and a logged-in user
+            total_price=total_price,
+            # Add other fields as needed
+        )
+
+        # Create the order item
         order_item = OrderItem.objects.create(
             order=order,
             product=product,
             quantity=quantity,
-            price=price,
-            # Remove the 'total_price' argument
-            order_confirmation=OrderItem.CONFIRMED
+            price=product.selling_price,
+            order_confirmation=OrderItem.CONFIRMED,
         )
 
-        order.total_price += total_price
-        order.save()
+        order_item.save()  # Save the order item to trigger quantity reduction in the product
+        
+        # messages.success(request, f"Order for {product.name} has been confirmed.")
 
-        # Optionally, you can redirect to a purchase success page
-        return redirect('checkout_complete', order_id=order.id)
+        return redirect('order_details', order_item_id=order_item.id)
+    
+class OrderDetailsView(View):
+    template_name = 'Customer/order_details.html'  # Replace with your actual template name
 
-    return render(request, 'Customer/buy_now.html', {'product': product})
-
+    def get(self, request, *args, **kwargs):
+        order_item_id = kwargs.get('order_item_id')
+        order_item = OrderItem.objects.get(id=order_item_id)  # Assuming you can retrieve the order item using its ID
+        return render(request, self.template_name, {'order_item': order_item})
+  # Redirect to the product listing page or appropriate page
 @login_required  # Ensure the user is logged in to access this view
 def checkout_complete(request, order_id):
     try:
@@ -509,6 +556,13 @@ def remove_from_order(request, order_id, item_id):
         return JsonResponse({'message': 'Item removed from order.'}, status=200)
     else:
         return JsonResponse({'error': 'Item not associated with the given order.'}, status=400)
+def single_cancel_order(request, order_id):
+    # Retrieve the order
+    order = get_object_or_404(Order, id=order_id)
+    
+    # Retrieve the total price from the query parameter
+    total_price = request.GET.get('total_price', None)
+    return render(request, 'Customer/single_cancel_order.html', {'order': order}) 
 def cancel_order(request,order_id):
     order = Order.objects.get(id=order_id, user=request.user)
     print(order)
