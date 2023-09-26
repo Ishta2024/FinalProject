@@ -152,7 +152,7 @@
             <div class="col-search">
                 <form class="searchform">
                     <div class="input-group">
-                        <input list="search_terms" type="text" class="form-control" placeholder="Search term">
+                        <input list="search_terms" type="text" class="form-control" placeholder="Search term" id="top">
                         <button class="btn btn-light bg" type="button"> <i class="material-icons md-search"></i></button>
                     </div>
                     <datalist id="search_terms">
@@ -350,11 +350,11 @@
     
         // Add input event listener to the slug input
         
-        var slugInput = document.getElementById("product_slug");
+        {% comment %} var slugInput = document.getElementById("product_slug");
         var slugError = document.getElementById("slugError");
         slugInput.addEventListener("input", function () {
             validateSlug();
-        });
+        }); {% endcomment %}
     
         // Add input event listener to the description textarea
         var descriptionInput = document.querySelector("textarea[name='description']");
@@ -414,7 +414,7 @@
             const descending = 'zyxwvutsrqponmlkjihgfedcba';
             return ascending.includes(str.toLowerCase()) || descending.includes(str.toLowerCase());
         }
-        function validateSlug() {
+        {% comment %} function validateSlug() {
             var nameValue = nameInput.value.trim();
             var slugValue = nameValue.toLowerCase().replace(/\s+/g, '-');
             slugInput.value = slugValue;
@@ -427,7 +427,7 @@
             } else if (!/^[a-z_\-]+$/.test(slugValue)) {
                   slugError.textContent = "Slug should only contain lowercase letters, underscores, and hyphens.";
             }
-        }
+        } {% endcomment %}
     
         function validateDescription() {
             var descriptionValue = descriptionInput.value.trim();
