@@ -928,7 +928,7 @@ def categories(request):
         slug = request.POST['slug']
         name = request.POST['name']
         image = request.FILES['image']
-        description = request.POST['description']
+        description = request.POST['catdescription']
 
         existing_category = Category.objects.filter(slug=slug).first()
         if existing_category:

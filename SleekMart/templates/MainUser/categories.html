@@ -223,7 +223,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-3">
-                            <form method="post" enctype="multipart/form-data" id="yourForm">
+                            <form method="post" enctype="multipart/form-data" >
                                 {% csrf_token %}
                                 <div class="mb-4">
                                     <label for="product_name" class="form-label">Name</label>
@@ -237,7 +237,7 @@
                                 </div>
                                 <div class="mb-4">
                                     <label class="form-label">Description</label>
-                                    <textarea placeholder="Type here" name="description" class="form-control" required></textarea>
+                                    <input type="text" placeholder="Type here" name="catdescription" class="form-control" required></textarea>
                                     <span id="descriptionError" class="error"></span>
                                 </div>
                                 <div class="card-body">
