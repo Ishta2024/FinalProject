@@ -510,8 +510,8 @@
                                     <!-- Display order details -->
                                     <td></td>
                                     <td class="align-middle">{{ order.id }}</td>
-                                    <td class="align-middle">{{ order.user.name }}</td>
-                                    <td class="align-middle">{{ order.order_date }}</td>
+                                    <td class="align-middle">{{ order.order.user.name }}</td>
+                                    <td class="align-middle">{{ order.order.order_date }}</td>
                                     <td class="align-middle">{{ order.total_price }}</td>
                                     {% comment %} <td class="align-middle">{{ order.items.first.product.seller.user.name }}</td> {% endcomment %}
                                     <!-- Add more order details as needed -->

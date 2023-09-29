@@ -15,6 +15,10 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_protect
 from django.db.models import F
+import razorpay
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponseBadRequest
 
 
 # Create your views here.
@@ -377,33 +381,11 @@ def remove_cart_item(request, cart_item_id):
 
 @login_required
 def checkout(request):
-    # Get the user's cart items
-    cart_items = CartItems.objects.filter(cart__user=request.user, product__quantity__gt=0)
-
-
-    # Calculate the total price for the order
-    total_price = sum(cart_item.total_price for cart_item in cart_items)
-
-    # Create a new order
-    order = Order.objects.create(user=request.user, total_price=total_price)
-
-    # Create order items based on the cart items
-    for cart_item in cart_items:
     
-            order_item = OrderItem.objects.create(
-            order=order,
-            product=cart_item.product,
-            quantity=cart_item.quantity,
-            price=cart_item.product.selling_price
-        )
+    cart_items = CartItems.objects.filter(cart__user=request.user, product__quantity__gt=0)
+    print(cart_items)
+    return redirect('checkout_complete')
 
-    # Update the cart items to associate them with this order
-    cart_items.update(order=order, order_item=order_item)
-
-    # Clear the user's cart
-    # cart_items.delete()
-
-    return redirect('checkout_complete', order_id=order.id)
 def buy_now(request, product_id):
     product = get_object_or_404(Product, id=product_id)
 
@@ -430,6 +412,7 @@ def buy_now(request, product_id):
     
     # Redirect to a purchase success page
     return render(request, 'Customer/single_checkout.html',{'product':product}) 
+
 from django.views import View
 class ConfirmOrderView(View):
     def post(self, request, *args, **kwargs):
@@ -446,30 +429,7 @@ class ConfirmOrderView(View):
             messages.error(request, "Product not found.")
             return redirect('dashboard_home')
 
-        # Calculate total price
-        total_price = product.selling_price * quantity
-
-        # Create the order
-        order = Order.objects.create(
-            user=request.user,  # Assuming you have authentication and a logged-in user
-            total_price=total_price,
-            # Add other fields as needed
-        )
-
-        # Create the order item
-        order_item = OrderItem.objects.create(
-            order=order,
-            product=product,
-            quantity=quantity,
-            price=product.selling_price,
-            order_confirmation=OrderItem.CONFIRMED,
-        )
-
-        order_item.save()  # Save the order item to trigger quantity reduction in the product
-        
-        # messages.success(request, f"Order for {product.name} has been confirmed.")
-
-        return redirect('order_details', order_item_id=order_item.id)
+        return redirect('order_details')
     
 class OrderDetailsView(View):
     template_name = 'Customer/order_details.html'  # Replace with your actual template name
@@ -479,17 +439,153 @@ class OrderDetailsView(View):
         order_item = OrderItem.objects.get(id=order_item_id)  # Assuming you can retrieve the order item using its ID
         return render(request, self.template_name, {'order_item': order_item})
   # Redirect to the product listing page or appropriate page
-@login_required  # Ensure the user is logged in to access this view
-def checkout_complete(request, order_id):
-    try:
-        order = Order.objects.get(id=order_id, user=request.user)
-        order_items = order.items.all()  # Retrieve order items associated with the order
-    except Order.DoesNotExist:
-        # Handle the case where the order doesn't exist or doesn't belong to the user
-        return render(request, 'error.html', {'error_message': 'Order not found.'})
 
-    # Pass order and order items to the template for display
-    return render(request, 'Customer/checkout_complete.html', {'order': order, 'order_items': order_items})
+
+
+
+#payment
+
+
+razorpay_client = razorpay.Client(
+    auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
+
+def checkout_complete(request):
+    user = request.user
+    cart = get_object_or_404(AddCart, user=user)
+    cart_items = CartItems.objects.filter(cart=cart)
+    if not cart_items:
+        return render(request, 'Customer/checkout_complete.html')
+    total_price = Decimal(sum(cart_item.product.selling_price * cart_item.quantity for cart_item in cart_items))
+    
+    currency = 'INR'
+
+    # Set the 'amount' variable to 'total_price'
+    amount = int(total_price*100)
+    # amount=20000
+
+    # Create a Razorpay Order
+    razorpay_order = razorpay_client.order.create(dict(
+        amount=amount,
+        currency=currency,
+        payment_capture='0'
+    ))
+
+    # Order id of the newly created order
+    razorpay_order_id = razorpay_order['id']
+    callback_url = '/paymenthandler/'
+
+    order = Order.objects.create(
+        user=request.user,
+        total_price=total_price,
+        razorpay_order_id=razorpay_order_id,
+        payment_status=Order.PaymentStatusChoices.PENDING,
+    )
+
+    # Add the products to the order
+    for cart_item in cart_items:
+        product = cart_item.product
+        price = product.selling_price
+        quantity = cart_item.quantity
+        total_item_price = price * quantity
+
+        # Create an OrderItem for this product
+        order_item = OrderItem.objects.create(
+            order=order,
+            product=product,
+            seller=product.seller,  # Set the seller of the product as the seller of the order item
+            quantity=quantity,
+            price=price,
+            total_price=total_item_price,
+        )
+
+    # Save the order to generate an order ID
+    order.save()
+
+    # Create a context dictionary with all the variables you want to pass to the template
+    context = {
+        'order_items': cart_items,
+        'total_price': total_price,
+        'razorpay_order_id': razorpay_order_id,
+        'razorpay_merchant_key': settings.RAZOR_KEY_ID,
+        'razorpay_amount': amount,  # Set to 'total_price'
+        'currency': currency,
+        'callback_url': callback_url,
+    }
+
+    return render(request, 'Customer/checkout_complete.html', context=context)
+
+@csrf_exempt
+def paymenthandler(request):
+    if request.method == "POST":
+        payment_id = request.POST.get('razorpay_payment_id', '')
+        razorpay_order_id = request.POST.get('razorpay_order_id', '')
+        signature = request.POST.get('razorpay_signature', '')
+
+        # Verify the payment signature.
+        params_dict = {
+            'razorpay_order_id': razorpay_order_id,
+            'razorpay_payment_id': payment_id,
+            'razorpay_signature': signature
+        }
+        result = razorpay_client.utility.verify_payment_signature(params_dict)
+
+        if not result:
+            # Signature verification failed.
+            return render(request, 'paymentfail.html')
+
+        # Signature verification succeeded.
+        # Retrieve the order from the database
+        try:
+            order = Order.objects.get(razorpay_order_id=razorpay_order_id)
+        except Order.DoesNotExist:
+            return HttpResponseBadRequest("Order not found")
+
+        if order.payment_status == Order.PaymentStatusChoices.SUCCESSFUL:
+            # Payment is already marked as successful, ignore this request.
+            return HttpResponse("Payment is already successful")
+
+        if order.payment_status != Order.PaymentStatusChoices.PENDING:
+            # Order is not in a pending state, do not proceed with stock update.
+            return HttpResponseBadRequest("Invalid order status")
+
+        # Capture the payment amount
+        amount = int(order.total_price * 100)  # Convert Decimal to paise
+        razorpay_client.payment.capture(payment_id, amount)
+
+        # Update the order with payment ID and change status to "Successful"
+        order.payment_id = payment_id
+        order.payment_status = Order.PaymentStatusChoices.SUCCESSFUL
+        order.save()
+        
+        add_cart, created = AddCart.objects.get_or_create(user=request.user)
+
+        # Associate the order with the AddCart
+        add_cart.order = order
+        add_cart.save()
+        # Remove the products from the cart and update stock
+        try:
+            cart = AddCart.objects.get(order=order)
+        except AddCart.DoesNotExist:
+            return HttpResponseBadRequest("Cart not found for the order")
+
+        # Retrieve the cart items associated with the cart
+        cart_items = CartItems.objects.filter(cart=cart)
+        for cart_item in cart_items:
+            product = cart_item.product
+            if product.selling_price >= cart_item.quantity:
+                # Decrease the product stock and update ProductSummary
+                product.selling_price -= cart_item.quantity
+                product.save()
+                # Remove the item from the cart
+                cart_item.delete()
+            else:
+                # Handle insufficient stock, you can redirect or show an error message
+                return HttpResponseBadRequest("Insufficient stock for some items")
+
+        # Redirect to a payment success page
+        return redirect('dashboard_home')
+
+    return HttpResponseBadRequest("Invalid request method")
 
 from decimal import Decimal
 @login_required 
@@ -537,25 +633,23 @@ def order_history(request):
     orders = Order.objects.filter(user=request.user)
     return render(request, 'Customer/order_history.html', {'orders': orders})
 
-def remove_from_order(request, order_id, item_id):
-    order = get_object_or_404(Order, id=order_id)
-    item = get_object_or_404(OrderItem, id=item_id)
+def remove_from_order(request, item_id, cart_item_id):
+    # Get the cart item
+    cart_item = get_object_or_404(CartItems, id=cart_item_id)
+    product = cart_item.product
+    print(product)
+    # Get the item's total price
+    item_total_price = cart_item.quantity * product.selling_price
+    cart_item.delete()
+    # Delete the cart item
+    # order = cart_item.order
+    # order.total_price -= item_total_price  # Subtract the item's price
+    # order.save()
 
-    # Check if the item is associated with the given order
-    if item.order == order:
-        # Get the item's total price
-        item_total_price = item.price * item.quantity
+    # Delete the cart item
+    
 
-        # Delete the item
-        item.delete()
-
-        # Update the order's total price by subtracting the item's total price
-        order.total_price = F('total_price') - item_total_price
-        order.save()
-
-        return JsonResponse({'message': 'Item removed from order.'}, status=200)
-    else:
-        return JsonResponse({'error': 'Item not associated with the given order.'}, status=400)
+    return JsonResponse({'message': 'Item removed from order.'}, status=200)
 def single_cancel_order(request, order_id):
     # Retrieve the order
     order = get_object_or_404(Order, id=order_id)
@@ -743,12 +837,17 @@ def sellerindex(request):
     categories = Category.objects.filter(status=False)
     category_count = categories.count() 
     seller = Seller.objects.get(user=request.user)
+    print(seller)
     product_count = Product.objects.filter(seller=seller, status=False).count()
     
-    confirmed_orders = Order.objects.filter(
-        items__order_confirmation=OrderItem.CONFIRMED,
-        items__product__seller=seller
-    ).distinct()
+    confirmed_orders = OrderItem.objects.filter(
+        product__seller=seller,
+        order__payment_status=Order.PaymentStatusChoices.SUCCESSFUL
+    ).distinct
+
+    # Retrieve products associated with confirmed orders
+    # products = Product.objects.filter(order__in=confirmed_orders).distinct()
+    print(confirmed_orders)
     context = {'category_count': category_count, 'product_count': product_count,'confirmed_orders': confirmed_orders}
     return render(request, 'Seller/sellerindex.html', context)
 @login_required

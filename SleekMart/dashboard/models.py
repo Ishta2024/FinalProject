@@ -172,42 +172,36 @@ class WishlistItems(models.Model):
    
 
 class Order(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    class PaymentStatusChoices(models.TextChoices):
+        PENDING = 'pending', 'Pending'
+        SUCCESSFUL = 'successful', 'Successful'
+        FAILED = 'failed', 'Failed'
+
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=1)
+    products = models.ManyToManyField(Product)  # Assuming you have a Product model
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
     order_date = models.DateTimeField(auto_now_add=True)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
-
-    def __str__(self):
-        return f"Order #{self.id} by {self.user.email}"
-    
-
+    razorpay_order_id = models.CharField(max_length=255, default=1)
+    payment_status = models.CharField(max_length=20, choices=PaymentStatusChoices.choices, default=PaymentStatusChoices.PENDING)
+    def str(self):
+        return self.user.name 
 class OrderItem(models.Model):
-    CONFIRMED = 'confirmed'
-    CANCELED = 'canceled'
-    PENDING = 'pending'
-
-    ORDER_CONFIRMATION_CHOICES = [
-        (CONFIRMED, 'Confirmed'),
-        (CANCELED, 'Canceled'),
-        (PENDING, 'Pending'),
-    ]
-
-    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, default=1)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, default=1)
+    seller = models.ForeignKey(Seller, on_delete=models.CASCADE, default=1)  # Assuming the seller is also a User
     quantity = models.PositiveIntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    order_confirmation = models.CharField(
-        max_length=20,
-        choices=ORDER_CONFIRMATION_CHOICES,
-        default=PENDING,
-    )
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        if self.order_confirmation == OrderItem.CONFIRMED:
-            self.product.reduce_quantity(self.quantity)
-
-    def __str__(self):
-        return f"{self.quantity} x {self.product.name} in Order #{self.order.id}"
+        # Calculate the total price for this order item based on quantity and price
+        self.total_price = self.quantity * self.price
+        super(OrderItem, self).save(*args, **kwargs)
+        
+        # Update the total order price in the associated Order model
+        order = self.order
+        order.total_price = sum(order_item.total_price for order_item in order.orderitem_set.all())
+        order.save()
     
 class AddCart(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE) 

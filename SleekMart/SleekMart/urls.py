@@ -48,10 +48,10 @@ urlpatterns = [
     
     path('checkout/', views.checkout, name='checkout'),
     path('buy_now/<int:product_id>/' , views.buy_now, name='buy_now'),
-    path('checkout_complete/<int:order_id>/', views.checkout_complete, name='checkout_complete'),
+    path('checkout_complete', views.checkout_complete, name='checkout_complete'),
     path('create_order/', views.create_order, name='create_order'),
     path('order_list/', views.order_list, name='order_list'),
-    path('remove_from_order/<int:order_id>/<int:item_id>/', views.remove_from_order, name='remove_from_order'),
+   path('remove_from_order/<int:item_id>/<int:cart_item_id>/', views.remove_from_order, name='remove_from_order'),
     path('order_detail/<int:order_id>/', views.order_detail, name='order_detail'),
     path('order_placed_successfully/<int:order_id>/', views.order_placed_successfully, name='order_placed_successfully'),
     path('cancel_order_confirmation/<int:order_id>/', views.cancel_order_confirmation, name='cancel_order_confirmation'),
@@ -128,7 +128,10 @@ urlpatterns = [
     path('password-change/', ChangePasswordView.as_view(), name='password_change'),
     # path('social-auth/', include('social_django.urls', namespace='social'))
     path("", include("allauth.urls")),
-    path('social/signup/', signup_redirect, name='signup_redirect')
+    path('social/signup/', signup_redirect, name='signup_redirect'),
+
+    path('paymenthandler/', views.paymenthandler, name='paymenthandler'),
+
 
 ]
 

@@ -96,8 +96,7 @@
 
             <h2>Order Items</h2>
             <ul class="order-items">
-                {% for item in order.items.all %}
-                    {% if item.order_confirmation == 'confirmed' %}
+                {% for item in order.orderitem_set.all %}
                         <li>
                             <p>Product: {{ item.product.name }}</p>
                             <p>Quantity: {{ item.quantity }}</p>
@@ -105,10 +104,10 @@
                             <p>Supplier: {{ item.product.seller.business_name }}</p>
                             <a href="{% url 'add_review' product_id=item.product.id %}" class="review-button">Add Review</a>
                         </li>
-                    {% else %}
+                    {% comment %} {% else %}
                          <p>Product: {{ item.product.name }}</p>
                          <p>Item Cancelled</p>
-                    {% endif %}
+                    {% endif %} {% endcomment %}
                 {% endfor %}
             </ul>
         </div>
