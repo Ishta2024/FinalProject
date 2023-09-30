@@ -43,8 +43,22 @@
                         <span class="text">Dashboard</span>
                     </a>
                 </li>
+                {% comment %} <li class="menu-item has-submenu">
+                    <a class="menu-link" href="{% url 'productlist' %}"> <i class="icon material-icons md-shopping_bag"></i>
+                        <span class="text">Manage</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="{% url 'categories' %}">Categories</a>
+                        <a href="{% url 'subcategories' %}">Sub Categories</a>
+                        <a href="{% url 'productlist' %}">Product List</a> {% endcomment %}
+                        
+                        {% comment %} <a href="page-products-grid.html">Product grid</a>
+                        <a href="page-products-grid-2.html">Product grid 2</a> {% endcomment %}
+{% comment %}                         
+                    </div>
+                </li> {% endcomment %}
                 <li class="menu-item has-submenu">
-                    <a class="menu-link" href=""> <i class="icon material-icons md-shopping_bag"></i>
+                    <a class="menu-link" href="{% url 'productlist' %}"> <i class="icon material-icons md-shopping_bag"></i>
                         <span class="text">Manage</span>
                     </a>
                     <div class="submenu">

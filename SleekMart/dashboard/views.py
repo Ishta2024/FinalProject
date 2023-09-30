@@ -456,7 +456,7 @@ def checkout_complete(request):
     if not cart_items:
         return render(request, 'Customer/checkout_complete.html')
     total_price = Decimal(sum(cart_item.product.selling_price * cart_item.quantity for cart_item in cart_items))
-    
+    # total_price = cart_item.product.selling_price * cart_item.quantity    
     currency = 'INR'
 
     # Set the 'amount' variable to 'total_price'
@@ -583,7 +583,7 @@ def paymenthandler(request):
                 return HttpResponseBadRequest("Insufficient stock for some items")
 
         # Redirect to a payment success page
-        return redirect('dashboard_home')
+        return redirect('order_history')
 
     return HttpResponseBadRequest("Invalid request method")
 
