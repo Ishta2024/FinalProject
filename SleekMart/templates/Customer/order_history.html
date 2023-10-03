@@ -84,35 +84,59 @@
     </style>
 </head>
 <body>
+    <a href="{% url 'dashboard_home' %}"> Go to Homepage</a>
+
     <h1>Your Order History</h1>
 
-    {% for order in orders %}
+    {% for order in page_obj %}
         <div class="order-details">
             <h2>Order Details</h2>
             <p>Order ID: {{ order.id }}</p>
             <p>Total Amount: ${{ order.total_price }}</p>
             <p>Placed Date: {{ order.order_date }}</p>
-            <p>Sold to: {{ order.user.name }}</p>
-
+            <p>Order Address: {{ order.user.address }}</p>
+            <p>Total Price: {{ order.total_price }}</p>
+            <p>Payment Status: {{ order.payment_status }}</p>
             <h2>Order Items</h2>
             <ul class="order-items">
                 {% for item in order.orderitem_set.all %}
-                        <li>
-                            <p>Product: {{ item.product.name }}</p>
-                            <p>Quantity: {{ item.quantity }}</p>
-                            <p>Price: ${{ item.price }}</p>
-                            <p>Supplier: {{ item.product.seller.business_name }}</p>
-                            <a href="{% url 'add_review' product_id=item.product.id %}" class="review-button">Add Review</a>
-                        </li>
-                    {% comment %} {% else %}
-                         <p>Product: {{ item.product.name }}</p>
-                         <p>Item Cancelled</p>
-                    {% endif %} {% endcomment %}
+                    <li>
+                        <p>Product: {{ item.product.name }}</p>
+                        <p>Quantity: {{ item.quantity }}</p>
+                        <p>Price: ${{ item.price }}</p>
+                        <p>Supplier: {{ item.product.seller.business_name }}</p>
+                        <a href="{% url 'add_review' product_id=item.product.id %}" class="review-button">Add Review</a>
+                    </li>
                 {% endfor %}
             </ul>
         </div>
         <hr>
     {% endfor %}
+    
+    <div class="pagination">
+        <span class="step-links">
+            <div>
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">First</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                {% else %}
+                    <span>First</span>
+                    <span>Previous</span>
+                {% endif %}
+            
+                <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">Next</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                {% else %}
+                    <span>Next</span>
+                    <span>Last</span>
+                {% endif %}
+            </div>
+        </span>
+    </div>
+    
 </body>
 
 </html>

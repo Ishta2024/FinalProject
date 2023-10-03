@@ -162,6 +162,53 @@
             transform: translateY(1px); /* Change translateY to push down */
         }
         
+        .product-reviews-container {
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+        
+        .product-reviews {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .review-item {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .review-item:last-child {
+            border-bottom: none;
+        }
+        
+        .review-user {
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .review-content {
+            flex-grow: 1;
+        }
+        
+        .no-review {
+            font-style: italic;
+        }
+        
         
         
 
@@ -356,23 +403,31 @@
                 {% endif %} {% endcomment %}
             </div>
             <h2>Product Reviews</h2>
-            <ul class="product-reviews">
-                {% if product.reviews.exists %}
-                {% for review in product.reviews.all %}
-                    <li>
-                        <p><strong>{{ review.user.name }}</strong></p>
+<div class="product-reviews-container">
+    <ul class="product-reviews">
+        {% if product.reviews.exists %}
+            {% for review in product.reviews.all %}
+                <li class="review-item">
+                    <div class="review-user">
+                        <div class="user-avatar" style="background-image: url('{{ review.user.profile_pic.url }}')"></div>
+                        <strong>{{ review.user.name }}</strong>
+                    </div>
+                    <div class="review-content">
                         <p>{{ review.rating.comment }}</p>
                         {% if review.rating.rating > 0 %}
-                        <p>{{ review.rating.rating }}</p>
+                            <p>Rating: {{ review.rating.rating }}/5</p>
                         {% endif %}
-                    </li>
-                {% endfor %}
-                {% else %}
-                <li>
-                    <p>No reviews available for this product.</p>
+                    </div>
                 </li>
-            {% endif %}
-            </ul>
+            {% endfor %}
+        {% else %}
+            <li class="no-review">
+                <p>No reviews available for this product.</p>
+            </li>
+        {% endif %}
+    </ul>
+</div>
+
             </div>
         </div>
     </section>

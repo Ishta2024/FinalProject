@@ -510,7 +510,7 @@
                                             </div>
                                         </th>
                                         <th class="align-middle" scope="col">Order ID</th>
-                                        <th class="align-middle" scope="col">Billing Name</th>
+                                        <th class="align-middle" scope="col">Billing Address</th>
                                         <th class="align-middle" scope="col">Date</th>
                                         <th class="align-middle" scope="col">Total</th>
                                         {% comment %} <th class="align-middle" scope="col">Seller Name</th> {% endcomment %}
@@ -524,7 +524,7 @@
                                     <!-- Display order details -->
                                     <td></td>
                                     <td class="align-middle">{{ order.id }}</td>
-                                    <td class="align-middle">{{ order.order.user.name }}</td>
+                                    <td class="align-middle">{{ order.order.user.address }}</td>
                                     <td class="align-middle">{{ order.order.order_date }}</td>
                                     <td class="align-middle">{{ order.total_price }}</td>
                                     {% comment %} <td class="align-middle">{{ order.items.first.product.seller.user.name }}</td> {% endcomment %}

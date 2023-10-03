@@ -548,21 +548,21 @@ def paymenthandler(request):
             # Order is not in a pending state, do not proceed with stock update.
             return HttpResponseBadRequest("Invalid order status")
 
-        # Capture the payment amount
-        amount = int(order.total_price * 100)  # Convert Decimal to paise
+        
+        amount = int(order.total_price * 100) 
         razorpay_client.payment.capture(payment_id, amount)
 
-        # Update the order with payment ID and change status to "Successful"
+        
         order.payment_id = payment_id
         order.payment_status = Order.PaymentStatusChoices.SUCCESSFUL
         order.save()
         
         add_cart, created = AddCart.objects.get_or_create(user=request.user)
 
-        # Associate the order with the AddCart
+        
         add_cart.order = order
         add_cart.save()
-        # Remove the products from the cart and update stock
+        
         try:
             cart = AddCart.objects.get(order=order)
         except AddCart.DoesNotExist:
@@ -579,11 +579,12 @@ def paymenthandler(request):
                 # Remove the item from the cart
                 cart_item.delete()
             else:
-                # Handle insufficient stock, you can redirect or show an error message
+                
                 return HttpResponseBadRequest("Insufficient stock for some items")
-
-        # Redirect to a payment success page
-        return redirect('order_history')
+        order_items = OrderItem.objects.filter(order=order)
+        order_item_id = order_items.first().id
+        return redirect(reverse('order_details', kwargs={'order_item_id': order_item_id}))
+        # return redirect('order_summary', order_id=order.id)
 
     return HttpResponseBadRequest("Invalid request method")
 
@@ -628,10 +629,18 @@ def order_placed_successfully(request, order_id):
 #     orders = Order.objects.filter(user=request.user)
 #     confirmed_orders = Order.objects.filter(order_confirmation='confirmed')
 #     return render(request, 'Customer/order_history.html', {'orders': orders,'confirmed_orders': confirmed_orders})
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 @login_required
 def order_history(request):
-    orders = Order.objects.filter(user=request.user)
-    return render(request, 'Customer/order_history.html', {'orders': orders})
+    orders = Order.objects.filter(user=request.user, payment_status=Order.PaymentStatusChoices.SUCCESSFUL).order_by('-order_date')
+    page_number = request.GET.get('page', 1)
+    paginator = Paginator(orders, 2)  # 2 orders per page
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj
+    }
+    return render(request, 'Customer/order_history.html', {'orders': orders, 'page_obj':page_obj})
 
 def remove_from_order(request, item_id, cart_item_id):
     # Get the cart item

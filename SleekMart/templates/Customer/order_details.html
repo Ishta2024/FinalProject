@@ -62,24 +62,29 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Order Placed Successfully</h1>
-        <p>Your order with Order ID: {{ order.id }} has been placed successfully!</p>
-        <h2>Order Summary</h2>
-
-        <div class="order-summary">
-            <div class="order-item">
-                <img src="{{ order_item.product.product_image.url }}" alt="{{ product.name }}">
-                <div class="order-item-details">
-                    <h3>{{ order_item.product.name }}</h3>
-                    <p>Price: ${{ order_item.order.total_price }}</p>
+    <body>
+        <div class="container">
+            <h1>Order Placed Successfully</h1>
+            <p>Your order with Order ID: {{ order_item.id }} has been placed successfully!</p>
+            <h2>Order Summary</h2>
+    
+            <div class="order-summary">
+                {% for item in order_item.order.orderitem_set.all %}
+                <div class="order-item">
+                    <img src="{{ item.product.product_image.url }}" alt="{{ item.product.name }}">
+                    <div class="order-item-details">
+                        <h3>{{ item.product.name }}</h3>
+                        <p>Price: ${{ item.price }}</p>
+                    </div>
+                    <div class="order-item-quantity">
+                        <p>Quantity: {{ item.quantity }}</p>
+                    </div>
                 </div>
-                <div class="order-item-quantity">
-                    <p>Quantity: {{ order_item.quantity }}</p>
-                </div>
+                {% endfor %}
+                <p><b>Total Price: {{order_item.order.total_price}}</b></p>
             </div>
         </div>
-    </div>
+       
     <a href="{% url 'dashboard_home' %}">Continue Shopping</a>
 </body>
 </html>
