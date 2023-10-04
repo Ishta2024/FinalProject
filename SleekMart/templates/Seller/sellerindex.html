@@ -77,7 +77,7 @@
                     <div class="submenu">
                         {% comment %} <a href="page-orders-1.html">Order list 1</a>
                         <a href="page-orders-2.html">Order list 2</a> {% endcomment %}
-                        <a href="page-orders-detail.html">Order detail</a>
+                        <a href="{% url 'order_itemdetails' %}">Order detail</a>
                         <a href="page-orders-tracking.html">Order tracking</a>
 <a href="page-invoice.html">Invoice</a>
                     </div>
@@ -251,8 +251,8 @@
                             <div class="text">
                                 <h6 class="mb-1 card-title">Orders</h6>
                                  {% comment %} <span>53.668</span> {% endcomment %}
-                                <span class="text-sm">
-                                    {% comment %} Excluding orders in transit {% endcomment %}
+                                <span>
+                                    {{ order_count }}
                                 </span>
                             </div>
                         </article>
