@@ -706,8 +706,13 @@ def add_review(request, product_id):
         return redirect('each_product', product_id=product_id)
 
     return render(request, 'Customer/add_review.html', {'product': product})
-def order_itemdetails(request):
-    return render(request, 'Seller/order_details.html')
+@login_required
+def order_itemdetails(request, order_id):
+    print('hai')
+    order = get_object_or_404(Order, id=order_id)
+    order_items = OrderItem.objects.filter(order=order)
+    print(order)
+    return render(request, 'Seller/order_details.html', {'order': order,'order_items': order_items})
 @login_required
 def create_order(request):
     # Get the user's cart items
@@ -847,6 +852,7 @@ def sellerindex(request):
     categories = Category.objects.filter(status=False)
     category_count = categories.count() 
     seller = Seller.objects.get(user=request.user)
+    orders = Order.objects.all()
     order_count = OrderItem.objects.filter(seller=seller).count()
     print(seller)
     product_count = Product.objects.filter(seller=seller, status=False).count()
@@ -859,7 +865,7 @@ def sellerindex(request):
     # Retrieve products associated with confirmed orders
     # products = Product.objects.filter(order__in=confirmed_orders).distinct()
     print(confirmed_orders)
-    context = {'category_count': category_count, 'product_count': product_count,'confirmed_orders': confirmed_orders,'order_count':order_count}
+    context = {'category_count': category_count, 'product_count': product_count,'confirmed_orders': confirmed_orders,'order_count':order_count,'orders':orders}
     return render(request, 'Seller/sellerindex.html', context)
 @login_required
 def sellerprofile(request):

@@ -60,7 +60,7 @@ urlpatterns = [
     path('order_history', views.order_history, name='order_history'),
     path('confirm_order/<int:product_id>/', views.ConfirmOrderView.as_view(), name='single_confirm_order'),
     path('order_details/<int:order_item_id>/', views.OrderDetailsView.as_view(), name='order_details'),
-    path('order_itemdetails/', views.order_itemdetails, name='order_itemdetails'),
+    path('order_itemdetails/<int:order_id>/', views.order_itemdetails, name='order_itemdetails'),
     # path('buy_now/<int:product_id>/', views.buy_now, name='buy_now'),
     path('add_review/<int:product_id>/', views.add_review, name='add_review'),
 
