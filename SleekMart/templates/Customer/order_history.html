@@ -81,6 +81,12 @@
         .order-items li .review-button:hover {
             background-color: #45a049;
         }
+        .product-image {
+            width: 100px;
+            height: 100px; 
+            object-fit: cover; 
+           
+          }
     </style>
 </head>
 <body>
@@ -102,6 +108,8 @@
                 {% for item in order.orderitem_set.all %}
                     <li>
                         <p>Product: {{ item.product.name }}</p>
+                        <p>Image:</p>
+                        <img src="{{ item.product.product_image.url }}" alt="Product Image" class="product-image">
                         <p>Quantity: {{ item.quantity }}</p>
                         <p>Price: ${{ item.price }}</p>
                         <p>Supplier: {{ item.product.seller.business_name }}</p>
