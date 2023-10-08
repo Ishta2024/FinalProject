@@ -216,6 +216,7 @@
                 </li>
             </ul>
             <div id="message" style="color: red;"></div>
+            <p>Total Quantity: <span id="totalQuantity">{{ product.quantity }}</span></p>
             <p>Total Price: $<span id="totalPrice">{{ product.selling_price }}</span></p>
             {% csrf_token %}
             {% comment %} <a id="cancelLink" href="{% url 'single_cancel_order' order.id %}?total_price={{ product.selling_price }}" class="cancel-link" onclick="cancelOrder()">Cancel Your Order</a> {% endcomment %}
@@ -227,7 +228,7 @@
 
     <script>
         document.getElementById('quantityInput').value = 1;
-    
+        document.getElementById('totalQuantity').innerText = 1;
         function validateQuantity(input) {
             var value = parseInt(input.value, 10);
             var maxQuantity = 5;
@@ -242,6 +243,8 @@
                 messageDiv.innerText = '';
             }
             updateTotalPrice();
+            var totalQuantity = parseInt(document.getElementById('quantityInput').value, 10);
+           document.getElementById('totalQuantity').innerText = totalQuantity;
             // Update the total price based on the new quantity
             var sellingPrice = parseFloat("{{ product.selling_price }}");
             var newTotalPrice = sellingPrice * value;
@@ -262,6 +265,7 @@
     
             // Update the displayed quantity and total price
             quantityElement.value = newQuantity;
+            
             validateQuantity(quantityElement);
         }
         function updateTotalPrice() {

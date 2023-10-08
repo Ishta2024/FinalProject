@@ -429,7 +429,8 @@ class ConfirmOrderView(View):
             messages.error(request, "Product not found.")
             return redirect('dashboard_home')
 
-        return redirect('order_details')
+        # return redirect('order_details')
+        return redirect('dashboard_home')
     
 class OrderDetailsView(View):
     template_name = 'Customer/order_details.html'  # Replace with your actual template name

@@ -213,7 +213,7 @@
                         </div>
                         <div class="quantity buttons_added">
                             <input type="button" value="-" class="minus quantity-button" data-field="quantityInput{{ item.id }}" onclick="updateQuantity({{ item.id }}, {{ item.price }}, -1)">
-                            <input type="number" min="1" max="{{ item.product.quantity }}" name="quantity{{ item.id }}" value="{{ item.quantity }}" id="quantityInput{{ item.id }}" title="Qty" class="input-text qty text quantity-input" size="4" pattern="" inputmode="" oninput="validateQuantity(this)">
+                            <input type="number" min="1" max="{{ item.product.quantity }}" name="quantity{{ item.id }}" value="{{ item.quantity }}" id="quantityInput{{ item.id }}" title="Qty" class="input-text qty text quantity-input" size="4" pattern="" inputmode="" oninput="updateQuantity(this)">
                             <input type="button" value="+" class="plus quantity-button" data-field="quantityInput{{ item.id }}" onclick="updateQuantity({{ item.id }}, {{ item.price }}, 1)">
                         </div>
                         <div class="quantity buttons_added">
@@ -223,13 +223,15 @@
                 {% endfor %}
             </ul>
             <a href="{% url 'cancel_order_confirmation' order.id %}" class="cancel-link">Cancel Your Order</a>
-            <button type="submit" class="confirm-button">Confirm Your Order</button>
+            <button type="submit" class="confirm-button">Confirm Your Orders</button> 
+             {% comment %} <button type="submit" id="pay-btn" class="confirm-button">Confirm Your Order</button>  {% endcomment %}
         </div>
     </form>
     {% else %}
     <p> <a href = {% url 'dashboard_home' %}>Continue Shopping </a> </p>
     {% endif %}
-    <script>
+    {% comment %} <script src="https://checkout.razorpay.com/v1/checkout.js"></script> {% endcomment %}
+    <script> 
         {% comment %} function updateQuantity(itemId, itemPrice, change) {
             var quantityElement = document.getElementById('quantityInput' + itemId);
             var newQuantity = parseInt(quantityElement.value, 10) + change;
@@ -255,7 +257,40 @@
                 input.value = max;
             }
         } {% endcomment %}
+      
+        
+            {% comment %} var options = {
+           
+                // Enter the Key ID generated from the Dashboard
+                key: "{{ razorpay_merchant_key }}",
+                 
+                // Amount is in currency subunits.
+                // Default currency is INR. Hence,
+                // 50000 refers to 50000 paise
+                amount: "{{ razorpay_amount }}",
+               
+                currency: "{{ currency }}",
+                 
+                // Your/store name.
+                name: "SleekMart Razorpay",
+                 
+                // Pass the `id` obtained in the response of Step 1
+                order_id: "{{ razorpay_order_id }}",
+                callback_url: "{{ callback_url }}",
+                
+              };
+              console.log('Options:', options);
+              // initialise razorpay with the options.
+              var rzp1 = new Razorpay(options);
+               
+              // add event listener to the payment button.
+            document.getElementById("pay-btn").onclick = function (e) {
+                rzp1.open();
+                e.preventDefault();
+              }; {% endcomment %}
+    
         function updateQuantity(itemId, itemPrice, change) {
+            console.log('got')
             var quantityElement = document.getElementById('quantityInput' + itemId);
             var maxQuantity = parseInt(quantityElement.max, 10);
             var currentQuantity = parseInt(quantityElement.value, 10);
@@ -266,6 +301,7 @@
             newQuantity = Math.min(newQuantity, maxQuantity);
         
             var quantityDisplayElement = document.getElementById('quantity' + itemId);
+            console.log(quantityDisplayElement)
             var priceElement = document.getElementById('totalPrice');
         
             // Calculate the new total price only if the new quantity is within the allowed range
