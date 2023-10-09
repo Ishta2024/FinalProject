@@ -233,7 +233,36 @@
             <button type="submit" id="pay-btn" class="confirm-button">Confirm Your Order</button>
         </div>
     </form>
+    
+    {% elif product %}
+    {% comment %} {% url 'order_placed_successfully' order.id %}
+    {% url 'cancel_order_confirmation' order.id %} {% endcomment %}
+    <form method="post" action="">
+        <div class="container">
+            <h1>Your Order Summary</h1>
+            <p>You're almost there! Please review your order details.</p>
+            <p>Order ID: {{ razorpay_order_id }}</p>
+            <p>Total Price: $<span id="totalPrice">{{ total_price }}</span></p>
+            <h2>Order Items</h2>
+            {% csrf_token %}
+            <ul class="order-items">
+                
+                    <li class="order-item">
+                        <img src="{{ product.product_image.url }}" alt="{{ product.name }}">
+                        <div class="product-details">
+                            <span class="quantity" id="quantity{{ product.id }}">{{ quantity }}</span> x {{ product.name }} - ${{ product.selling_price }} each
+                            <span class="product-price">{{ product.selling_price }}</span>
+                        </div>
+                        
+                    </li>
+                
+            </ul>
+            <a href="" class="cancel-link">Cancel Your Order</a>
+            <button type="submit" id="pay-btn" class="confirm-button">Confirm Your Order</button>
+        </div>
+    </form>
     {% else %}
+
     <p> <a href = {% url 'dashboard_home' %}>Continue Shopping </a> </p>
     {% endif %}
 

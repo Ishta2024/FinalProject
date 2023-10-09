@@ -209,7 +209,8 @@
                     <p>Explore Now</p>
                 </div>
                 <div>
-                    <a href="index.html#" class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Create report</a>
+                <a href="{% url 'generate_report' %}" class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Create report</a>
+                    {% comment %} <li><a href="{% url 'generate_report' %}" class="button">Generate Report</a></li> {% endcomment %}
                 </div>
             </div>
             <div class="row">

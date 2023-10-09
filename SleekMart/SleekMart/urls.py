@@ -44,11 +44,13 @@ urlpatterns = [
 
     path('search/', views.search, name='search'),
     path('search_products/', views.search_products, name='search_products'),
+    path('generate_report/', views.generate_report, name='generate_report'),
 
     
     path('checkout/', views.checkout, name='checkout'),
     path('buy_now/<int:product_id>/' , views.buy_now, name='buy_now'),
     path('checkout_complete', views.checkout_complete, name='checkout_complete'),
+    path('buyNowComplete/<int:product_id>/<int:quantity>', views.buyNowComplete, name='buyNowComplete'),
     path('create_order/', views.create_order, name='create_order'),
     path('order_list/', views.order_list, name='order_list'),
     path('remove_from_order/<int:item_id>/<int:cart_item_id>/', views.remove_from_order, name='remove_from_order'),

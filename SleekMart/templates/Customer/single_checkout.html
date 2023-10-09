@@ -193,7 +193,8 @@
     </style>
 </head>
 <body>
-    <form method="post" action="{% url 'single_confirm_order' product.id %}">
+    {% comment %} <form method="post" action="{% url 'single_confirm_order' product.id %}"> {% endcomment %}
+        <form method="post" action="">
         <div class="container">
             <h1>Your Order Summary</h1>
             <p>You're almost there! Please review your order details.</p>
@@ -223,9 +224,12 @@
 
 
             <button type="submit" class="confirm-button">Confirm Your Order</button>
+           
+
+
         </div>
     </form>
-
+ 
     <script>
         document.getElementById('quantityInput').value = 1;
         document.getElementById('totalQuantity').innerText = 1;
@@ -280,16 +284,20 @@
         }
         
         // Update total price when the page loads
-        document.addEventListener('DOMContentLoaded', function () {
+        {% comment %} document.addEventListener('DOMContentLoaded', function () {
             var storedTotalPrice = localStorage.getItem('totalPrice');
             if (storedTotalPrice) {
                 document.getElementById('totalPrice').innerText = storedTotalPrice;
             }
-        });
+        }); {% endcomment %}
         function cancelOrder() {
             // Clear the total price from local storage
             localStorage.removeItem('totalPrice');
         }
+       
+
+        
+        
     </script>
     
     <!-- Add this <div> where the message will be displayed -->

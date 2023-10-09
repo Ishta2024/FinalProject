@@ -388,6 +388,11 @@ def checkout(request):
 
 def buy_now(request, product_id):
     product = get_object_or_404(Product, id=product_id)
+    if request.method=='POST':
+        print("Submit")
+        quantity=request.POST.get('quantityinput')
+        print(quantity)
+        return redirect('buyNowComplete', product_id=product_id, quantity=quantity)
 
     # Fixed quantity for Buy Now
     # quantity = int(1)
@@ -514,6 +519,65 @@ def checkout_complete(request):
     }
 
     return render(request, 'Customer/checkout_complete.html', context=context)
+
+def buyNowComplete(request, product_id, quantity):
+    try:
+        product = get_object_or_404(Product, id=product_id)
+        total_price = Decimal(product.selling_price * quantity)
+        print(total_price)
+        seller_id = product.seller_id
+        amount = int(total_price * 100)
+        # Convert total price to paise and round to 2 decimal places
+        # amount_in_paise = int(total_price * 100)
+        # rounded_amount = Decimal(amount_in_paise).quantize(Decimal('1.00'))
+
+        # Create a Razorpay Order
+        razorpay_order = razorpay_client.order.create(dict(
+            amount=amount,
+            currency='INR',
+            payment_capture='0'
+        ))
+
+        razorpay_order_id = razorpay_order['id']
+        callback_url = '/paymenthandler/'
+
+        order = Order.objects.create(
+            user=request.user,
+            total_price=total_price,
+            razorpay_order_id=razorpay_order_id,
+            payment_status=Order.PaymentStatusChoices.PENDING,
+        )
+
+        # Add the product to the order
+        order_item = OrderItem.objects.create(
+            order=order,
+            product=product,
+            seller_id=seller_id,
+            quantity=quantity,
+            price=product.selling_price,
+            total_price=amount,
+        )
+        
+        # Save the order to generate an order ID
+        order.save()
+        cart_items=Product.objects.get(id=product_id)
+        # Create a context dictionary with variables for the template
+        context = {
+            'product': cart_items,
+            'quantity':quantity,
+            'total_price': total_price,
+            'razorpay_order_id': razorpay_order_id,
+            'razorpay_merchant_key': settings.RAZOR_KEY_ID,
+            'razorpay_amount': amount,
+            'currency': 'INR',
+            'callback_url': callback_url,
+        }
+
+        return render(request, 'Customer/checkout_complete.html', context=context)
+
+    except (Product.DoesNotExist, Seller.DoesNotExist) as e:
+        # Handle cases where product or seller does not exist
+        return HttpResponseBadRequest("Product or Seller does not exist.")
 
 @csrf_exempt
 def paymenthandler(request):
@@ -1576,7 +1640,80 @@ def delete_customer(request, customer_id):
   
 
 
-  # Display the category creation form
+from django.http import HttpResponse
+from reportlab.pdfgen import canvas
+from .models import Seller, Product, OrderItem
+from django.db.models import Sum
+from datetime import datetime
+
+def generate_report(request):
+    # Fetch the data for the report
+    sellers = Seller.objects.all()
+    
+    # Get the current month
+    current_month = datetime.now().month
+
+    products_sold_by_seller = []
+    products_added_by_seller = []
+   
+
+    
+
+    for seller in sellers:
+        # Calculate total products sold by the seller
+        total_sold = OrderItem.objects.filter(product__seller=seller).aggregate(total_sold=Sum('quantity'))['total_sold'] or 0
+        products_sold_by_seller.append({
+            'seller__name': seller.user.name,
+            'total_sold': total_sold
+        })
+
+        # Calculate total products added by the seller for the current month
+        total_added = Product.objects.filter(seller=seller, created_date__month=current_month).count()
+        products_added_by_seller.append({
+            'seller__name': seller.user.name,
+            'month': current_month,
+            'total_added': total_added
+        })
+       
+
+    # Create a PDF document
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="Sleek_Mart_Report.pdf"'
+
+    p = canvas.Canvas(response)
+    
+    # Set font and size for the title
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(100, 750, "Sleek Mart Report Generation")
+    
+    # Set font and size for the headings
+    p.setFont("Helvetica-Bold", 12)
+    
+    # Position for the first section
+    y_position = 700
+    
+    # Write the first section - Total Sellers and Total Products Added by Each Seller
+    p.drawString(100, y_position, "1. Total Sellers and Total Products Added by Each Seller:")
+    y_position -= 20
+    
+    for item in products_added_by_seller:
+        p.drawString(120, y_position, f"{item['seller__name']}: {item['total_added']} products added")
+        y_position -= 15
+    
+    # Write the second section - Product Sales Details for Each Month
+    p.drawString(100, y_position, f"\n2. Product Sales Details for Month {current_month}:")
+    y_position -= 20
+    
+    for item in products_sold_by_seller:
+        p.drawString(120, y_position, f"{item['seller__name']}: {item['total_sold']} products sold")
+        y_position -= 15
+
+    
+    
+    p.showPage()
+    p.save()
+    return response
+
 
 
 
