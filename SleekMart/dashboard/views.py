@@ -478,7 +478,8 @@ def checkout_complete(request):
 
     # Order id of the newly created order
     razorpay_order_id = razorpay_order['id']
-    callback_url = '/paymenthandler/'
+    callback_url = '/paymenthandler/cart/'
+
 
     order = Order.objects.create(
         user=request.user,
@@ -539,7 +540,9 @@ def buyNowComplete(request, product_id, quantity):
         ))
 
         razorpay_order_id = razorpay_order['id']
-        callback_url = '/paymenthandler/'
+        callback_url = '/paymenthandler/buynow/'
+
+
 
         order = Order.objects.create(
             user=request.user,
@@ -580,7 +583,7 @@ def buyNowComplete(request, product_id, quantity):
         return HttpResponseBadRequest("Product or Seller does not exist.")
 
 @csrf_exempt
-def paymenthandler(request):
+def paymenthandler(request, cart_order=False):
     if request.method == "POST":
         payment_id = request.POST.get('razorpay_payment_id', '')
         razorpay_order_id = request.POST.get('razorpay_order_id', '')
@@ -634,22 +637,84 @@ def paymenthandler(request):
             return HttpResponseBadRequest("Cart not found for the order")
 
         # Retrieve the cart items associated with the cart
-        cart_items = CartItems.objects.filter(cart=cart)
-        for cart_item in cart_items:
-            product = cart_item.product
-            if product.selling_price >= cart_item.quantity:
-                # Decrease the product stock and update ProductSummary
-                product.selling_price -= cart_item.quantity
-                product.save()
-                # Remove the item from the cart
-                cart_item.delete()
-            else:
+        # cart_items = CartItems.objects.filter(cart=cart)
+        # for cart_item in cart_items:
+        #     product = cart_item.product
+        #     if product.selling_price >= cart_item.quantity:
+        #         # Decrease the product stock and update ProductSummary
+        #         product.selling_price -= cart_item.quantity
                 
-                return HttpResponseBadRequest("Insufficient stock for some items")
-        order_items = OrderItem.objects.filter(order=order)
-        order_item_id = order_items.first().id
-        return redirect(reverse('order_details', kwargs={'order_item_id': order_item_id}))
+        #         product.save()
+        #         # Remove the item from the cart
+        #         cart_item.delete()
+        # cart_items = CartItems.objects.filter(cart=cart)
+        # for cart_item in cart_items:
+        #     product = cart_item.product
+        #     if product.quantity >= cart_item.quantity:
+        #         # Decrease the product stock and update ProductSummary
+        #         product.quantity -= cart_item.quantity
+                
+        #         product.save()
+        #         # Remove the item from the cart
+        #         cart_item.delete()
+        #     else:
+                
+        #         return HttpResponseBadRequest("Insufficient stock for some items")
+        # order_items = OrderItem.objects.filter(order=order)
+        # order_item_id = order_items.first().id
+        # for order_item in order_items:
+        #     product = order_item.product
+        #     if product.quantity >= order_item.quantity:
+        #         # Decrease the product quantity by the ordered quantity
+        #         product.quantity -= order_item.quantity
+        #         product.save()
+        #     else:
+        #         # Handle the case where there is insufficient product quantity
+        #         return HttpResponseBadRequest("Insufficient product quantity")
+        # return redirect(reverse('order_details', kwargs={'order_item_id': order_item_id}))
         # return redirect('order_summary', order_id=order.id)
+        if cart_order:
+           cart_items = CartItems.objects.filter(cart=cart)
+           order_items = OrderItem.objects.filter(order=order)
+           if cart_items.exists():
+               order_item_id = order_items.first().id
+               print(order_item_id)
+               for cart_item in cart_items:
+                  product = cart_item.product
+                  if product.quantity >= cart_item.quantity:
+                # Decrease the product quantity by the quantity in the cart
+                    product.quantity -= cart_item.quantity
+                    product.save()
+                  else:
+                # Handle the case where there is insufficient product quantity
+                      return HttpResponseBadRequest("Insufficient product quantity")
+
+            # Remove the item from the cart
+                  cart_item.delete()
+
+        # Retrieve the first order item ID for redirection
+               
+
+           return redirect(reverse('order_details', kwargs={'order_item_id': order_item_id}))
+        else:
+            order_items = OrderItem.objects.filter(order=order)
+            if order_items.exists():
+                order_item_id = order_items.first().id
+                for order_item in order_items:
+                    product = order_item.product
+                    if product.quantity >= order_item.quantity:
+                        # Decrease the product quantity by the ordered quantity
+                        product.quantity -= order_item.quantity
+                        product.save()
+                    else:
+                        # Handle the case where there is insufficient product quantity
+                        return HttpResponseBadRequest("Insufficient product quantity")
+            else:
+                return HttpResponseBadRequest("Order items not found")
+
+            # Retrieve the first order item ID for redirection
+
+            return redirect(reverse('order_details', kwargs={'order_item_id': order_item_id}))
 
     return HttpResponseBadRequest("Invalid request method")
 
@@ -918,7 +983,8 @@ def sellerindex(request):
     category_count = categories.count() 
     seller = Seller.objects.get(user=request.user)
     orders = Order.objects.all()
-    order_count = OrderItem.objects.filter(seller=seller).count()
+    
+    order_count = Order.objects.filter(orderitem__seller=seller, payment_status=Order.PaymentStatusChoices.SUCCESSFUL).count()
     print(seller)
     product_count = Product.objects.filter(seller=seller, status=False).count()
     

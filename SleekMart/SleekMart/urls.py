@@ -132,7 +132,10 @@ urlpatterns = [
     path("", include("allauth.urls")),
     path('social/signup/', signup_redirect, name='signup_redirect'),
 
-    path('paymenthandler/', views.paymenthandler, name='paymenthandler'),
+    path('paymenthandler/cart/', views.paymenthandler,{'cart_order': True}, name='paymenthandler'),
+
+    # For buy now (single product) orders
+    path('paymenthandler/buynow/', views.paymenthandler, {'cart_order': False}, name='paymenthandler'),
 
 
 ]
