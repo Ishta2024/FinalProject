@@ -468,7 +468,7 @@ def checkout_complete(request):
     # Set the 'amount' variable to 'total_price'
     amount = int(total_price*100)
     # amount=20000
-
+    
     # Create a Razorpay Order
     razorpay_order = razorpay_client.order.create(dict(
         amount=amount,
@@ -588,7 +588,7 @@ def paymenthandler(request, cart_order=False):
         payment_id = request.POST.get('razorpay_payment_id', '')
         razorpay_order_id = request.POST.get('razorpay_order_id', '')
         signature = request.POST.get('razorpay_signature', '')
-
+       
         # Verify the payment signature.
         params_dict = {
             'razorpay_order_id': razorpay_order_id,

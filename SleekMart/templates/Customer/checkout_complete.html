@@ -212,14 +212,14 @@
                         <img src="{{ item.product.product_image.url }}" alt="{{ item.product.name }}">
                         <div class="product-details">
                             <span class="quantity" id="quantity{{ item.id }}">{{ item.quantity }}</span> x {{ item.product.name }} - ${{ item.product.selling_price }} each
-                            <span class="product-price">{{ item.product.selling_price }}</span> each
+                            {% comment %} <span class="product-price">{{ item.product.selling_price }}</span> each {% endcomment %}
                         </div>
-                        <div class="quantity buttons_added">
+                        {% comment %} <div class="quantity buttons_added">
                             <input type="button" value="-" class="minus quantity-button" data-field="quantityInput{{ item.id }}" onclick="updateQuantity('{{ item.id }}', -1, '{{ item.product.selling_price }}')">
 <!-- Plus button -->
                             <input type="number" min="1" max="{{ item.product.quantity }}" name="quantity{{ item.id }}" value="{{ item.quantity }}" id="quantityInput{{ item.id }}" title="Qty" class="input-text qty text quantity-input" size="4" pattern="" inputmode="" oninput="updateQuantity(this)">
                             <input type="button" value="+" class="plus quantity-button" data-field="quantityInput{{ item.id }}" onclick="updateQuantity('{{ item.id }}', 1, '{{ item.product.selling_price }}')">
-                        </div>
+                        </div> {% endcomment %}
                         <div class="quantity buttons_added">
                             
                             <input type="button" value="Remove" class="remove-button" onclick="removeItem('{{ item.id }}', '{{ item.product.selling_price }}', '{{ item.id }}')">
@@ -229,6 +229,23 @@
                     </li>
                 {% endfor %}
             </ul>
+            <div class="container">
+                <!-- Existing order summary content -->
+    
+                <!-- Shipping address form -->
+                <h2>Shipping Address</h2>
+                <label for="street_address">Street Address:</label>
+                <input type="text" id="street_address" name="street_address" required>
+                <br>
+                <label for="city">City:</label>
+                <input type="text" id="city" name="city" required>
+                <br>
+                <label for="state">State:</label>
+                <input type="text" id="state" name="state" required>
+                <br>
+                <label for="postal_code">Postal Code:</label>
+                <input type="text" id="postal_code" name="postal_code" required>
+            </div>    
             <a href="" class="cancel-link">Cancel Your Order</a>
             <button type="submit" id="pay-btn" class="confirm-button">Confirm Your Order</button>
         </div>
