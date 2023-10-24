@@ -972,10 +972,27 @@ def index(request):
     customers = CustomUser.objects.filter(role='customer', is_active = True)
     products = Product.objects.filter(status=False)
     sellers = Seller.objects.filter(is_approved='approved')
+    orders = Order.objects.filter(payment_status=Order.PaymentStatusChoices.SUCCESSFUL)
+    orders_count = orders.count()
     product_count = products.count()
     customer_count = customers.count() 
     seller_count = sellers.count()
-    context = {'customer_count': customer_count, 'product_count':product_count, 'seller_count':seller_count}
+    seller_totals = {}
+    for seller in sellers:
+        seller_orders = OrderItem.objects.filter(seller=seller)
+        successful_orders = seller_orders.filter(order__payment_status=Order.PaymentStatusChoices.SUCCESSFUL)
+        
+        total_earnings = sum(order_item.total_price for order_item in successful_orders)
+        total_products_sold = sum(order_item.quantity for order_item in successful_orders)
+        
+       
+        order_count = successful_orders.count()
+        seller_totals[seller] = {
+            'total_earnings': total_earnings,
+            'total_products_sold': total_products_sold,
+            'order_count': order_count
+        }
+    context = {'customer_count': customer_count, 'orders_count':orders_count,'product_count':product_count, 'seller_count':seller_count,'seller_totals': seller_totals}
     return render(request, 'MainUser/index.html', context)
 @login_required
 def sellerindex(request):
@@ -1096,6 +1113,14 @@ def productlist(request):
         'selected_subcategory': selected_subcategory,
     }
     return render(request, template_name, context)
+@login_required
+def reviews(request):
+    reviews = Review.objects.all()
+    # products = Product.objects.all()
+
+    # for product in products:
+    #     product.avg_rating = product.calculate_average_rating()
+    return render(request, 'MainUser/reviews.html', {'reviews': reviews,'products': products})
 @login_required
 def editproduct(request, product_id):
     product = get_object_or_404(Product, pk=product_id)

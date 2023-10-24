@@ -229,7 +229,7 @@
                     </li>
                 {% endfor %}
             </ul>
-            <div class="container">
+            {% comment %} <div class="container">
                 <!-- Existing order summary content -->
     
                 <!-- Shipping address form -->
@@ -245,7 +245,7 @@
                 <br>
                 <label for="postal_code">Postal Code:</label>
                 <input type="text" id="postal_code" name="postal_code" required>
-            </div>    
+            </div>     {% endcomment %}
             <a href="" class="cancel-link">Cancel Your Order</a>
             <button type="submit" id="pay-btn" class="confirm-button">Confirm Your Order</button>
         </div>

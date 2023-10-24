@@ -65,6 +65,7 @@ urlpatterns = [
     path('order_itemdetails/<int:order_id>/', views.order_itemdetails, name='order_itemdetails'),
     # path('buy_now/<int:product_id>/', views.buy_now, name='buy_now'),
     path('add_review/<int:product_id>/', views.add_review, name='add_review'),
+    path('reviews', views.reviews, name='reviews'),
 
     path('contact' , views.contact, name='contact'),
     path('about' , views.about, name='about'),

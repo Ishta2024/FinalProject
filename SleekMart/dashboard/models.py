@@ -242,3 +242,13 @@ class ReviewRating(models.Model):
 
     def __str__(self):
         return f"Rating for Review ID {self.review.id}"
+    
+class Shippings(models.Model):
+     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+     shipname = models.CharField(max_length=100, null=False, blank=False)
+     shipaddress = models.TextField(blank=True, null=True)
+     shipcity = models.TextField(blank=True, null=True)
+     shippingpincode = models.IntegerField()
+
+     def __str__(self):
+        return self.shipname
