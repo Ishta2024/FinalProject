@@ -57,9 +57,9 @@
                     <div class="submenu">
                         {% comment %} <a href="page-orders-1.html">Order list 1</a>
                         <a href="page-orders-2.html">Order list 2</a> {% endcomment %}
-                        <a href="page-orders-detail.html">Order detail</a>
-                        <a href="page-orders-tracking.html">Order tracking</a>
-<a href="page-invoice.html">Invoice</a>
+                        <a href="{% url 'seller_orders' %}">Order detail</a>
+                        {% comment %} <a href="page-orders-tracking.html">Order tracking</a>
+<a href="page-invoice.html">Invoice</a> {% endcomment %}
                     </div>
                 </li>
                 {% comment %} <li class="menu-item has-submenu">
@@ -103,7 +103,7 @@
                     </div>
                 </li>
                 <li class="menu-item">
-                    <a class="menu-link" href="page-reviews.html"> <i class="icon material-icons md-comment"></i>
+                    <a class="menu-link" href="{% url 'sellerreviews' %}"> <i class="icon material-icons md-comment"></i>
                         <span class="text">Reviews</span>
                     </a>
                 </li>
@@ -120,9 +120,9 @@
             <hr>
             <ul class="menu-aside">
                 <li class="menu-item has-submenu">
-                    <a class="menu-link" href="page-categories.html#"> <i class="icon material-icons md-settings"></i>
+                    {% comment %} <a class="menu-link" href="page-categories.html#"> <i class="icon material-icons md-settings"></i>
                         <span class="text">Settings</span>
-                    </a>
+                    </a> {% endcomment %}
                     {% comment %} <div class="submenu">
                         <a href="page-settings-1.html">Setting sample 1</a>
                         <a href="page-settings-2.html">Setting sample 2</a>

@@ -222,6 +222,7 @@
                     </li>
                 {% endfor %}
             </ul>
+            
             <a href="{% url 'cancel_order_confirmation' order.id %}" class="cancel-link">Cancel Your Order</a>
             <button type="submit" class="confirm-button">Confirm Your Orders</button> 
              {% comment %} <button type="submit" id="pay-btn" class="confirm-button">Confirm Your Order</button>  {% endcomment %}

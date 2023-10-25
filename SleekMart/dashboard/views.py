@@ -5,7 +5,7 @@ from django.contrib import messages
 from .models import Customer, CustomUser, Seller, AddWishlist,WishlistItems,AddCart, CartItems, Order, OrderItem, Review, ReviewRating
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from .models import Category, Product, Subcategory
+from .models import Category, Product, Subcategory, Shippings
 from django.urls import reverse
 from django.core.mail import send_mail
 from django.urls import reverse_lazy
@@ -388,6 +388,7 @@ def checkout(request):
 
 def buy_now(request, product_id):
     product = get_object_or_404(Product, id=product_id)
+    shippings = Shippings.objects.get(user=request.user)
     if request.method=='POST':
         print("Submit")
         quantity=request.POST.get('quantityinput')
@@ -416,7 +417,7 @@ def buy_now(request, product_id):
     # order.save()
     
     # Redirect to a purchase success page
-    return render(request, 'Customer/single_checkout.html',{'product':product}) 
+    return render(request, 'Customer/single_checkout.html',{'product':product,'shippings':shippings}) 
 
 from django.views import View
 class ConfirmOrderView(View):
@@ -457,6 +458,8 @@ razorpay_client = razorpay.Client(
 
 def checkout_complete(request):
     user = request.user
+    shippings = Shippings.objects.get(user=user)
+    print(shippings)
     cart = get_object_or_404(AddCart, user=user)
     cart_items = CartItems.objects.filter(cart=cart)
     if not cart_items:
@@ -517,6 +520,7 @@ def checkout_complete(request):
         'razorpay_amount': amount,  # Set to 'total_price'
         'currency': currency,
         'callback_url': callback_url,
+        'shippings': shippings
     }
 
     return render(request, 'Customer/checkout_complete.html', context=context)
@@ -1016,6 +1020,18 @@ def sellerindex(request):
     context = {'category_count': category_count, 'product_count': product_count,'confirmed_orders': confirmed_orders,'order_count':order_count,'orders':orders}
     return render(request, 'Seller/sellerindex.html', context)
 @login_required
+def seller_orders(request):
+    
+    seller = Seller.objects.get(user=request.user)
+
+    seller_orders = Order.objects.filter(orderitem__seller=seller).distinct()
+
+    context = {
+        'seller_orders': seller_orders,
+    }
+
+    return render(request, 'Seller/orderview.html', context)
+@login_required
 def sellerprofile(request):
     return render(request, 'Seller/sellerprofile.html')
 @login_required
@@ -1121,6 +1137,14 @@ def reviews(request):
     # for product in products:
     #     product.avg_rating = product.calculate_average_rating()
     return render(request, 'MainUser/reviews.html', {'reviews': reviews,'products': products})
+@login_required
+def sellerreviews(request):
+    reviews = Review.objects.all()
+    # products = Product.objects.all()
+
+    # for product in products:
+    #     product.avg_rating = product.calculate_average_rating()
+    return render(request, 'Seller/sellerevview.html', {'reviews': reviews,'products': products})
 @login_required
 def editproduct(request, product_id):
     product = get_object_or_404(Product, pk=product_id)

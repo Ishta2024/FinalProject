@@ -245,6 +245,7 @@ class ReviewRating(models.Model):
     
 class Shippings(models.Model):
      user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+     order = models.ForeignKey(Order, null=True, blank=True, on_delete=models.SET_NULL)
      shipname = models.CharField(max_length=100, null=False, blank=False)
      shipaddress = models.TextField(blank=True, null=True)
      shipcity = models.TextField(blank=True, null=True)

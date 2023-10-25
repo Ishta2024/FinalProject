@@ -221,9 +221,26 @@
             <p>Total Price: $<span id="totalPrice">{{ product.selling_price }}</span></p>
             {% csrf_token %}
             {% comment %} <a id="cancelLink" href="{% url 'single_cancel_order' order.id %}?total_price={{ product.selling_price }}" class="cancel-link" onclick="cancelOrder()">Cancel Your Order</a> {% endcomment %}
+            <div class="container">
+                <!-- Existing order summary content -->
+    
+                <!-- Shipping address form -->
+                <h2>Shipping Address</h2>
+                <label for="street_address">Street Address:</label>
+                <textarea id="street_address" name="street_address" rows="4" required>{{ shippings.shipaddress }}</textarea>
 
+                <br>
+                <label for="state">Name:</label>
+                <input type="text" id="state" name="state" value="{{shippings.shipname}}" required>
+                <br>
+                <label for="city">City:</label>
+                <input type="text" id="city" name="city" value="{{shippings.shipcity}}" required>
+                <br>
+                <label for="postal_code">Postal Code:</label>
+                <input type="text" id="postal_code" name="postal_code" value="{{shippings.shippingpincode}}" required>
+            </div>     
 
-            <button type="submit" class="confirm-button">Confirm Your Order</button>
+            <button type="submit" class="confirm-button">Continue With Your Order</button>
            
 
 
