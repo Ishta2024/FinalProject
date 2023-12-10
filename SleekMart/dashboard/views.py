@@ -1755,24 +1755,25 @@ def delete_customer(request, customer_id):
   
 
 
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import PageBreak, Spacer
 from django.http import HttpResponse
-from reportlab.pdfgen import canvas
-from .models import Seller, Product, OrderItem
-from django.db.models import Sum
+from django.db.models import Sum  # Import the Sum function
 from datetime import datetime
+from .models import Seller, Product, Customer  # Import your Customer model
+from reportlab.lib.styles import getSampleStyleSheet
 
 def generate_report(request):
     # Fetch the data for the report
     sellers = Seller.objects.all()
-    
-    # Get the current month
-    current_month = datetime.now().month
+    customers = Customer.objects.all()  # Fetch customer details
+
+    # Get the current date
+    current_date = datetime.now().strftime("%Y-%m-%d")
 
     products_sold_by_seller = []
     products_added_by_seller = []
-   
-
-    
 
     for seller in sellers:
         # Calculate total products sold by the seller
@@ -1783,51 +1784,105 @@ def generate_report(request):
         })
 
         # Calculate total products added by the seller for the current month
-        total_added = Product.objects.filter(seller=seller, created_date__month=current_month).count()
+        total_added = Product.objects.filter(seller=seller).count()
         products_added_by_seller.append({
             'seller__name': seller.user.name,
-            'month': current_month,
+            'month': datetime.now().month,
             'total_added': total_added
         })
-       
 
     # Create a PDF document
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="Sleek_Mart_Report.pdf"'
+    response['Content-Disposition'] = 'attachment; filename="Sleek_Mart_Report.pdf'
 
-    p = canvas.Canvas(response)
-    
-    # Set font and size for the title
-    p.setFont("Helvetica-Bold", 16)
-    p.drawString(100, 750, "Sleek Mart Report Generation")
-    
-    # Set font and size for the headings
-    p.setFont("Helvetica-Bold", 12)
-    
-    # Position for the first section
-    y_position = 700
-    
-    # Write the first section - Total Sellers and Total Products Added by Each Seller
-    p.drawString(100, y_position, "1. Total Sellers and Total Products Added by Each Seller:")
-    y_position -= 20
+    doc = SimpleDocTemplate(response, pagesize=letter)
+    story = []
+
+    # Define the data for the table
+    table_data = []
+    table_data.append(["Seller Name", "Products Added", "Total Quantity of Products Sold"])
     
     for item in products_added_by_seller:
-        p.drawString(120, y_position, f"{item['seller__name']}: {item['total_added']} products added")
-        y_position -= 15
-    
-    # Write the second section - Product Sales Details for Each Month
-    p.drawString(100, y_position, f"\n2. Product Sales Details for Month {current_month}:")
-    y_position -= 20
-    
-    for item in products_sold_by_seller:
-        p.drawString(120, y_position, f"{item['seller__name']}: {item['total_sold']} products sold")
-        y_position -= 15
+        table_data.append([item['seller__name'], item['total_added'], 0])
 
-    
-    
-    p.showPage()
-    p.save()
+    for item in products_sold_by_seller:
+        for row in table_data[1:]:
+            if row[0] == item['seller__name']:
+                row[2] = item['total_sold']
+                break
+
+    # Create the table and set its style
+    table = Table(table_data)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), (0.9, 0.9, 0.9)),
+        ('TEXTCOLOR', (0, 0), (-1, 0), (0, 0, 0)),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), (0.85, 0.85, 0.85)),
+        ('GRID', (0, 0), (-1, -1), 1, (0, 0, 0)),
+    ]))
+
+    # Add the heading and current date to the story
+    styles = getSampleStyleSheet()
+    styleN = styles['Normal']
+    styleH = styles['Heading1']
+
+    report_heading = Paragraph("SLEEKMART REPORT GENERATION", styleH)
+    story.append(report_heading)
+
+    story.append(Spacer(1, 12))
+
+    report_date = Paragraph(f"Date: {current_date}", styleN)
+    story.append(report_date)
+    story.append(Spacer(1, 12))
+
+    # Add the customer details table
+    customer_table_data = [["Customer Name", "Email", "Phone"]]  # Define customer table structure
+    for customer in customers:
+        customer_table_data.append([customer.user.name, customer.user.email, customer.user.mobile])  # Populate customer data
+
+    customer_table = Table(customer_table_data)
+    customer_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), (0.9, 0.9, 0.9)),
+        ('TEXTCOLOR', (0, 0), (-1, 0), (0, 0, 0)),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BACKGROUND', (0, 1), (-1, -1), (0.85, 0.85, 0.85)),
+        ('GRID', (0, 0), (-1, -1), 1, (0, 0, 0)),
+    ]))
+    story.append(Paragraph("Customer and Seller Details:", styleH))
+    story.append(customer_table)
+    story.append(Spacer(1, 12))
+
+    story.append(table)
+
+    # Add a page break
+    story.append(PageBreak())
+
+    # Add a table for listing products by seller
+    for seller in sellers:
+        seller_products = Product.objects.filter(seller=seller)
+        if seller_products:
+            product_table_data = [["Product Name", "Price"]]
+            for product in seller_products:
+                product_table_data.append([product.name, product.selling_price])
+            product_table = Table(product_table_data)
+            product_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), (0.9, 0.9, 0.9)),
+                ('TEXTCOLOR', (0, 0), (-1, 0), (0, 0, 0)),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('BACKGROUND', (0, 1), (-1, -1), (0.85, 0.85, 0.85)),
+                ('GRID', (0, 0), (-1, -1), 1, (0, 0, 0)),
+            ]))
+            story.append(Paragraph(f"Products added by {seller.user.name}:", styleH))
+            story.append(product_table)
+            story.append(Spacer(1, 12))
+
+    doc.build(story)
     return response
+
 
 
 

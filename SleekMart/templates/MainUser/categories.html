@@ -223,7 +223,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-3">
-                            <form method="post" enctype="multipart/form-data" >
+                            <form method="post" id= "yourForm" enctype="multipart/form-data" >
                                 {% csrf_token %}
                                 <div class="mb-4">
                                     <label for="product_name" class="form-label">Name</label>
@@ -237,7 +237,7 @@
                                 </div>
                                 <div class="mb-4">
                                     <label class="form-label">Description</label>
-                                    <input type="text" placeholder="Type here" name="catdescription" class="form-control" required></textarea>
+                                    <textarea placeholder="Type here" name="catdescription" class="form-control" required></textarea>
                                     <span id="descriptionError" class="error"></span>
                                 </div>
                                 <div class="card-body">
@@ -350,14 +350,14 @@
     
         // Add input event listener to the slug input
         
-        {% comment %} var slugInput = document.getElementById("product_slug");
+        var slugInput = document.getElementById("product_slug");
         var slugError = document.getElementById("slugError");
         slugInput.addEventListener("input", function () {
             validateSlug();
-        }); {% endcomment %}
+        });
     
         // Add input event listener to the description textarea
-        var descriptionInput = document.querySelector("textarea[name='description']");
+        var descriptionInput = document.querySelector("textarea[name='catdescription']");
         var descriptionError = document.getElementById("descriptionError");
         descriptionInput.addEventListener("input", function () {
             validateDescription();
@@ -414,7 +414,7 @@
             const descending = 'zyxwvutsrqponmlkjihgfedcba';
             return ascending.includes(str.toLowerCase()) || descending.includes(str.toLowerCase());
         }
-        {% comment %} function validateSlug() {
+         function validateSlug() {
             var nameValue = nameInput.value.trim();
             var slugValue = nameValue.toLowerCase().replace(/\s+/g, '-');
             slugInput.value = slugValue;
@@ -427,7 +427,7 @@
             } else if (!/^[a-z_\-]+$/.test(slugValue)) {
                   slugError.textContent = "Slug should only contain lowercase letters, underscores, and hyphens.";
             }
-        } {% endcomment %}
+        } 
     
         function validateDescription() {
             var descriptionValue = descriptionInput.value.trim();

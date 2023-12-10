@@ -218,13 +218,13 @@
                     <small class="text-muted">Order ID: {{order.id}}</small>
                 </div>
                 <div class="col-lg-6 col-md-6 ms-auto text-md-end">
-                    <select class="form-select d-inline-block mb-lg-0 mb-15 mw-200">
+                    {% comment %} <select class="form-select d-inline-block mb-lg-0 mb-15 mw-200">
                         <option>Change status</option>
                         <option>Awaiting payment</option>
                         <option>Confirmed</option>
                         <option>Shipped</option>
                         <option>Delivered</option>
-                    </select>
+                    </select> {% endcomment %}
                     {% comment %} <a class="btn btn-primary" href="page-orders-detail.html#">Save</a>
                     <a class="btn btn-secondary print ms-2" href="page-orders-detail.html#"><i class="icon material-icons md-print"></i></a> {% endcomment %}
                 </div>
@@ -242,7 +242,7 @@
                             <p class="mb-1">
                                 {{order.user.name}} <br> {{order.user.email }}<br> {{order.user.mobile}}
                             </p>
-                            <a href="page-orders-detail.html#">View profile</a>
+                            {% comment %} <a href="page-orders-detail.html#">View profile</a> {% endcomment %}
                         </div>
                     </article>
                 </div> <!-- col// -->
@@ -256,7 +256,7 @@
                             <p class="mb-1">
                                 {{order.user.address}} <br> Pay method: UPI <br> Status: Confirmed<br>Transaction Id:  {{order.razorpay_order_id}}
                             </p>
-                            <a href="page-orders-detail.html#">Download info</a>
+                            {% comment %} <a href="page-orders-detail.html#">Download info</a> {% endcomment %}
                         </div>
                     </article>
                 </div> <!-- col// -->
@@ -270,7 +270,7 @@
                             <p class="mb-1">
                                 {{order.user.address}} <br> 
                             </p>
-                            <a href="page-orders-detail.html#">View profile</a>
+                            {% comment %} <a href="page-orders-detail.html#">View profile</a> {% endcomment %}
                         </div>
                     </article>
                 </div> <!-- col// -->
