@@ -62,7 +62,7 @@
     </style>
 </head>
 <body>
-    <body>
+   
         <div class="container">
             <h1>Order Placed Successfully</h1>
             <p>Your order with Order ID: {{ order_item.id }} has been placed successfully!</p>
@@ -82,6 +82,7 @@
                 </div>
                 {% endfor %}
                 <p><b>Total Price: {{order_item.order.total_price}}</b></p>
+                <p><b>Download Bill:</b> <a href="{% url 'generate_bill' order_item.id %}">Download</a></p>
             </div>
         </div>
        

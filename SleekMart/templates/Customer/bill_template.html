@@ -1,0 +1,48 @@
+<!-- bill_template.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/bill_style.css' %}">
+    <title>Order Bill</title>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Sleek Mart</h1>
+            <div class="company-logo">
+                <img src="{% static 'images/logos.png' %}" alt="Company Logo">
+            </div>
+        </div>
+        <h2>Order Bill</h2>
+
+        <div class="seller-info">
+            <p><strong>Seller Business Name:</strong> {{ order_item.product.seller.business_name }}</p>
+            <p><strong>Seller Phone Number:</strong> {{ order_item.product.seller.user.mobile }}</p>
+        </div>
+
+        <table class="product-table">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order_item.order.orderitem_set.all %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>${{ item.price }}</td>
+                        <td>{{ item.quantity }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <p class="total-price"><strong>Total Price:</strong> ${{ order_item.order.total_price }}</p>
+    </div>
+</body>
+</html>

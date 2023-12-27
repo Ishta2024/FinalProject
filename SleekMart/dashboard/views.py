@@ -889,6 +889,33 @@ def order_detail(request, order_id):
     return render(request, 'order_detail.html', {'order': order})
 
 
+from django.template.loader import get_template
+from django.views import View
+from xhtml2pdf import pisa 
+from django.shortcuts import get_object_or_404
+
+
+class GenerateBillPDF(View):
+    def get(self, request, order_item_id, *args, **kwargs):
+        order_item = get_object_or_404(OrderItem, id=order_item_id)
+
+        # Render the HTML content using a Django template
+        template_path = 'Customer/bill_template.html'  # Provide the path to your HTML template
+        context = {'order_item': order_item}
+        template = get_template(template_path)
+        html = template.render(context)
+
+        # Create a PDF document
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="bill_{order_item.id}.pdf"'
+
+        # Generate PDF using xhtml2pdf library
+        pisa_status = pisa.CreatePDF(html, dest=response)
+        if pisa_status.err:
+            return HttpResponse('We had some errors <pre>' + html + '</pre>')
+
+        return response
+
 @login_required
 def view_wishlist(request):
     # Check if the user is authenticated

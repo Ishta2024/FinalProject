@@ -27,6 +27,7 @@ from django.contrib.auth.views import LoginView
 from django.conf.urls.static import static
 
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',  views.dashboard_home, name='dashboard_home'),
@@ -63,6 +64,7 @@ urlpatterns = [
     path('confirm_order/<int:product_id>/', views.ConfirmOrderView.as_view(), name='single_confirm_order'),
     path('order_details/<int:order_item_id>/', views.OrderDetailsView.as_view(), name='order_details'),
     path('order_itemdetails/<int:order_id>/', views.order_itemdetails, name='order_itemdetails'),
+    path('generate_bill/<int:order_item_id>/', views.GenerateBillPDF.as_view(), name='generate_bill'),
     # path('buy_now/<int:product_id>/', views.buy_now, name='buy_now'),
     path('add_review/<int:product_id>/', views.add_review, name='add_review'),
     path('reviews', views.reviews, name='reviews'),
