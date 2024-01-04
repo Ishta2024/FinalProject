@@ -1,4 +1,4 @@
-<!-- bill_template.html -->
+ <!-- bill_template.html -->
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -7,22 +7,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/bill_style.css' %}">
     <title>Order Bill</title>
+    <style>  
+        table {
+            border-collapse: collapse; 
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>Sleek Mart</h1>
             <div class="company-logo">
-                <img src="{% static 'images/logos.png' %}" alt="Company Logo">
+                
             </div>
         </div>
         <h2>Order Bill</h2>
 
         <div class="seller-info">
             <p><strong>Seller Business Name:</strong> {{ order_item.product.seller.business_name }}</p>
-            <p><strong>Seller Phone Number:</strong> {{ order_item.product.seller.user.mobile }}</p>
+            <p><strong>Order ID:</strong> {{ order_item.id }}</p>
+            <p><strong>Order Date:</strong> {{ order_item.order.order_date }}</p>
+            
         </div>
-
+        <h2>Shipment Address</h2>
+        <div class="seller-info">
+            <p><strong>Customer Name:</strong> {{ order_item.order.user.name }}</p>
+            <p><strong>Order Delivery Address:</strong> {{ order_item.order.user.address }}</p>
+            <p><strong>Mode of Payment:</strong> Online </p>
+            
+        </div>
+        <h2>Product Details</h2>
         <table class="product-table">
             <thead>
                 <tr>
@@ -46,3 +66,4 @@
     </div>
 </body>
 </html>
+

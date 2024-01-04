@@ -34,6 +34,7 @@ h1, h2, h3 {
 .seller-info {
     text-align: center;
     margin-bottom: 20px;
+    
 }
 
 .product-table {
@@ -43,13 +44,13 @@ h1, h2, h3 {
 }
 
 .product-table th, .product-table td {
-    border: 1px solid #ddd;
+    border: 1px solid #242323;
     padding: 10px;
     text-align: left;
 }
 
 .product-table th {
-    background-color: #f2f2f2; /* Add a background color to the header */
+    background-color: #121212; 
 }
 
 .total-price {
