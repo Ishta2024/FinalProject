@@ -204,7 +204,8 @@
                 </ul>
             </div>
         </header>
-        
+        <form method="post" id= "yourForm" enctype="multipart/form-data" >
+            {% csrf_token %}
         <section class="content-main">
             <div class="row">
                 <div class="col-6">
@@ -212,15 +213,28 @@
                         <h2 class="content-title">Add New Delivery Agent</h2>
                         <div>
                             <button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Cancel</button>
-                            {% comment %} <button class="btn btn-md rounded font-sm hover-up">Publich</button> {% endcomment %}
+                            <button class="btn btn-md rounded font-sm hover-up">Save</button> 
                         </div>
                     </div>
                 </div>
             </div>
+            {% if messages %}
+            <div class="messages text-center"> <!-- Add "text-center" class -->
+              {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            </div>
+            {% endif %}
+            
             <div class="row">
+                
+               
                 <div class="col-lg-6">
                     <div class="card mb-4">
                         <div class="card-body">
+                            
                             <div class="row">
                                 <div class="col-md-3">
                                     <h6>1. General info</h6>
@@ -228,23 +242,23 @@
                                 <div class="col-md-9">
                                     <div class="mb-4">
                                         <label class="form-label">Agent Name</label>
-                                        <input type="text" placeholder="Type here" class="form-control">
+                                        <input type="text" name="agent_name" placeholder="Type here" class="form-control">
                                     </div>
                                     <div class="mb-4">
                                         <label class="form-label">Place</label>
-                                        <input type="text" placeholder="Type here" class="form-control">
-                                    </div>
+                                        <input type="text" name="place" placeholder="Type here" class="form-control">
+                                    </div> 
                                     <div class="mb-4">
                                         <label class="form-label">Mobile Number</label>
-                                        <input type="text" placeholder="Type here" class="form-control">
+                                        <input type="text" name="mobile" placeholder="Type here" class="form-control">
                                     </div>
                                     <div class="mb-4">
                                         <label class="form-label">Pincode</label>
-                                        <input type="text" placeholder="Type here" class="form-control">
+                                        <input type="text" name="pincode" placeholder="Type here" class="form-control">
                                     </div>
                                     <div class="mb-4">
                                         <label class="form-label">Choose Location</label>
-                                        <select class="form-select">
+                                        <select class="form-select" name="location">
                                             <option> Kottayam </option>
                                             <option> Pathanamthitta </option>
                                             <option> Erumely </option>
@@ -260,11 +274,11 @@
                                 <div class="col-md-9">
                                     <div class="mb-4">
                                         <label class="form-label">Email</label>
-                                        <input type="text" placeholder="Enter Email" class="form-control">  
+                                        <input type="text" name="email" placeholder="Enter Email" class="form-control">  
                                     </div>
                                     <div class="mb-4">
                                         <label class="form-label">Create Password</label>
-                                        <input type="text" placeholder="Enter Password" class="form-control">  
+                                        <input type="text" name="password" placeholder="Enter Password" class="form-control">  
                                     </div>
                                 </div> <!-- col.// -->
                             </div> <!-- row.// -->
@@ -277,21 +291,22 @@
                                 <div class="col-md-9">
                                     <div class="mb-4">
                                         <label class="form-label">Choose Seller</label>
-                                        <select class="form-select">
+                                        <select class="form-select" name="seller">
                                             <option> QMart </option>
                                             <option> Elcome </option>
                                             <option> SMart </option>
                                         </select>
                                     </div>
                                 </div> <!-- col.// -->
-                            </div> <!-- .row end// -->
+                            
+                            </div> <!-- .row end// -->   
                         </div>
                     </div>
                 </div>
             </div>
             </div>
         </section> <!-- content-main end// -->
-           
+    </form>
         <footer class="main-footer font-xs">
             <div class="row pb-30 pt-15">
                 <div class="col-sm-6">

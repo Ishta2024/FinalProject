@@ -5,7 +5,7 @@ from django.contrib import messages
 from .models import Customer, CustomUser, Seller, AddWishlist,WishlistItems,AddCart, CartItems, Order, OrderItem, Review, ReviewRating
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from .models import Category, Product, Subcategory, Shippings
+from .models import Category, Product, Subcategory, Shippings, DeliveryAgent
 from django.urls import reverse
 from django.core.mail import send_mail
 from django.urls import reverse_lazy
@@ -1509,9 +1509,7 @@ def delete_subcategory(request, subcategory_id):
 
     context = {'subcategory': subcategory}
     return render(request, 'MainUser/deletesubcategory.html', context)
-@login_required
-def add_da(request):
-    return render(request, 'MainUser/add_DA.html')
+
 def signup_redirect(request):
     messages.error(request, "Something Wrong Here, It May Be That You Already Have Account!")
     return redirect('dashboard_home')
@@ -1685,7 +1683,36 @@ def sellernotification_page(request):
 #         messages.error(request, 'Activation link is invalid.')
     
 #     return render(request, 'dashboard_home.html')
+@login_required
 
+def add_da(request):
+    if request.method == 'POST':
+        # Get data from the form
+        agent_name = request.POST.get('agent_name')
+        place = request.POST.get('place')
+        mobile_number = request.POST.get('mobile')
+        pincode = request.POST.get('pincode')
+        location = request.POST.get('location')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        assigned_seller = request.POST.get('seller')
+        role = 'delivery_agent'
+        # Create a new user
+        user = CustomUser.objects.create_user(email=email, password=password, name=agent_name,mobile=mobile_number,role=role)
+
+        # Create a DeliveryAgent instance
+        delivery_agent = DeliveryAgent.objects.create(
+            user=user,
+            place=place,
+            pincode=pincode,
+            location=location,
+            assigned_seller=assigned_seller # You may need to adjust this value
+        )
+        messages.success(request, 'Agent Added Succesfully')
+        # Redirect to a success page or any other appropriate action
+        return redirect('add_da')
+
+    return render(request, 'MainUser/add_DA.html')
 def register(request):
     if request.method == "POST":
         name=request.POST['name']
