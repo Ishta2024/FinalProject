@@ -89,6 +89,17 @@ class Customer(models.Model):
     def __str__(self):
         return self.user.email
     
+class DeliveryAgent(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    place = models.CharField(max_length=100, blank=True, null=True)
+    pincode = models.CharField(max_length=10, blank=True, null=True)
+    location = models.CharField(max_length=100, blank=True, null=True)
+    assigned_seller = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return self.user.email
+
+    
 class Category(models.Model):
     slug = models.CharField(max_length=50, null=False, blank=False)
     name=models.CharField(max_length=50, null=False, blank=False)
