@@ -102,6 +102,7 @@ urlpatterns = [
     path('view_detail/<int:product_id>/',  views.view_detail, name='view_detail'),
     path('categories/',  views.categories, name='categories'),
     path('subcategories/',  views.subcategories, name='subcategories'),
+    path('add_da/',  views.add_da, name='add_da'),
 
 
     path('edit_subcategory/<int:subcategory_id>/',  views.edit_subcategory, name='edit_subcategory'),

@@ -1509,7 +1509,9 @@ def delete_subcategory(request, subcategory_id):
 
     context = {'subcategory': subcategory}
     return render(request, 'MainUser/deletesubcategory.html', context)
-
+@login_required
+def add_da(request):
+    return render(request, 'MainUser/add_DA.html')
 def signup_redirect(request):
     messages.error(request, "Something Wrong Here, It May Be That You Already Have Account!")
     return redirect('dashboard_home')
