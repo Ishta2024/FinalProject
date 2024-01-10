@@ -70,7 +70,7 @@
                     </a>
                     <div class="submenu">
                         {% comment %} <a href="page-sellers-cards.html">Sellers cards</a> {% endcomment %}
-                        <a href="{% url 'sellerslist' %}">Sellers list</a>
+                       
                         {% comment %} <a href="page-seller-detail.html">Seller profile</a> {% endcomment %}
                     </div>
                 </li>
@@ -101,6 +101,7 @@
                     </a>
                     <div class="submenu">
                         <a href="{% url 'view_customer' %}">User Details</a>
+                        <a href="{% url 'sellerslist' %}">Sellers list</a>
                         {% comment %} <a href="page-account-login.html">User login</a>
                         <a href="page-account-register.html">User registration</a>
                         <a href="page-error-404.html">Error 404</a> {% endcomment %}

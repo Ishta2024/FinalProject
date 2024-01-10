@@ -178,7 +178,7 @@ class Order(models.Model):
         FAILED = 'failed', 'Failed'
 
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=1)
-    products = models.ManyToManyField(Product)  # Assuming you have a Product model
+    products = models.ManyToManyField(Product)  
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
     order_date = models.DateTimeField(auto_now_add=True)
     razorpay_order_id = models.CharField(max_length=255, default=1)
