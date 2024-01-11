@@ -1684,10 +1684,11 @@ def sellernotification_page(request):
     
 #     return render(request, 'dashboard_home.html')
 @login_required
-
 def add_da(request):
+    sellers = Seller.objects.all()
+    print("Sellers:", sellers)
     if request.method == 'POST':
-        # Get data from the form
+        # Extract form data
         agent_name = request.POST.get('agent_name')
         place = request.POST.get('place')
         mobile_number = request.POST.get('mobile')
@@ -1695,24 +1696,41 @@ def add_da(request):
         location = request.POST.get('location')
         email = request.POST.get('email')
         password = request.POST.get('password')
-        assigned_seller = request.POST.get('seller')
+        business_name = request.POST.get('seller') 
+        print(business_name)
         role = 'delivery_agent'
-        # Create a new user
-        user = CustomUser.objects.create_user(email=email, password=password, name=agent_name,mobile=mobile_number,role=role)
 
-        # Create a DeliveryAgent instance
-        delivery_agent = DeliveryAgent.objects.create(
-            user=user,
-            place=place,
-            pincode=pincode,
-            location=location,
-            assigned_seller=assigned_seller # You may need to adjust this value
-        )
-        messages.success(request, 'Agent Added Succesfully')
-        # Redirect to a success page or any other appropriate action
-        return redirect('add_da')
+        if business_name:
+            try:
+                # Attempt to retrieve the Seller instance
+                seller = Seller.objects.get(id=business_name)
+                print(seller)
+                if DeliveryAgent.objects.filter(assigned_seller=seller).count() > 6:
+                   messages.warning(request, 'Seller already has 6 delivery agents. Cannot assign more.')
+                   return redirect('add_da')
+                else:
+                   user = CustomUser.objects.create_user(email=email, password=password, name=agent_name, mobile=mobile_number, role=role)
+                   delivery_agent = DeliveryAgent.objects.create(
+                       user=user,
+                       place=place,
+                       pincode=pincode,
+                       location=location,
+                       assigned_seller=seller  # Corrected value to store Seller instance
+                   )
+                   messages.success(request, 'Agent Added Successfully')
+                   return redirect('add_da')
+            except Seller.DoesNotExist:
+                # Handle the case where the Seller with the given business name does not exist
+                messages.warning(request, 'Invalid seller business name. Please select a valid seller.')
+                return redirect('add_da')
+        
+        else:
+            # Handle the case where the business_name is empty
+            messages.warning(request, 'Seller business name is required. Please select a seller.')
+            return redirect('add_da')
 
-    return render(request, 'MainUser/add_DA.html')
+    return render(request, 'MainUser/add_DA.html', {'sellers': sellers})
+
 def register(request):
     if request.method == "POST":
         name=request.POST['name']

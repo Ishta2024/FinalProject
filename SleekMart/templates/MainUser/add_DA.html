@@ -292,9 +292,9 @@
                                     <div class="mb-4">
                                         <label class="form-label">Choose Seller</label>
                                         <select class="form-select" name="seller">
-                                            <option> QMart </option>
-                                            <option> Elcome </option>
-                                            <option> SMart </option>
+                                            {% for seller in sellers %}
+                                            <option value="{{ seller.id }}">{{ seller.business_name }}</option>
+                                        {% endfor %}
                                         </select>
                                     </div>
                                 </div> <!-- col.// -->
