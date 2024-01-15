@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 # from .models import UserProfile
-from .models import CustomUser, Seller, Customer, DeliveryAgent, Shippings
+from .models import CustomUser, Seller, Customer, DeliveryAgent, Shippings, Notification
 from .models import Category,Product, Subcategory,AddWishlist,WishlistItems,AddCart,CartItems,OrderItem, Order,Review,ReviewRating
 
 # class UserProfileAdmin(admin.ModelAdmin):
@@ -57,3 +57,4 @@ admin.site.register(CartItems)
 admin.site.register(Review)
 admin.site.register(ReviewRating)
 admin.site.register(Shippings)
+admin.site.register(Notification)

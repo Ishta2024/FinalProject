@@ -5,7 +5,7 @@ from django.contrib import messages
 from .models import Customer, CustomUser, Seller, AddWishlist,WishlistItems,AddCart, CartItems, Order, OrderItem, Review, ReviewRating
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from .models import Category, Product, Subcategory, Shippings, DeliveryAgent
+from .models import Category, Product, Subcategory, Shippings, DeliveryAgent, Notification
 from django.urls import reverse
 from django.core.mail import send_mail
 from django.urls import reverse_lazy
@@ -1035,6 +1035,7 @@ def sellerindex(request):
     order_count = Order.objects.filter(orderitem__seller=seller, payment_status=Order.PaymentStatusChoices.SUCCESSFUL).count()
     print(seller)
     product_count = Product.objects.filter(seller=seller, status=False).count()
+    unread_notifications_count = request.user.notification_set.filter(is_read=False).count()
     
     confirmed_orders = OrderItem.objects.filter(
         product__seller=seller,
@@ -1717,6 +1718,19 @@ def add_da(request):
                        location=location,
                        assigned_seller=seller  # Corrected value to store Seller instance
                    )
+
+                   Notification.objects.create(
+                        recipient=seller.user,  
+                        message=f'You have a new delivery agent {agent_name} assigned.'
+                    )
+                   
+
+                   subject = 'Welcome to SleekMart Delivery Team'
+                   message = f'Hi {agent_name},\n\nYou have been added as a delivery agent on SleekMart.\n\nYour login credentials:\nEmail: {email}\nPassword: {password}\n\nThank you for joining our team!'
+                   from_email = 'mailtoshowvalidationok@gmail.com'  # Replace with your email
+                   recipient_list = [email]
+
+                   send_mail(subject, message, from_email, recipient_list, fail_silently=False)
                    messages.success(request, 'Agent Added Successfully')
                    return redirect('add_da')
             except Seller.DoesNotExist:
@@ -1762,6 +1776,15 @@ def register(request):
         return render(request, 'Customer/register.html')
 def custnotification_page(request):
     return render(request, 'Customer/notification.html')
+
+@login_required
+def notifications(request):
+    user = request.user
+    notifications = Notification.objects.filter(recipient=user, is_read=False)
+    Notification.objects.filter(recipient=user, is_read=False).update(is_read=True)
+
+    return render(request, 'notifications.html', {'notifications': notifications})
+
 @login_required
 def profile(request):
     

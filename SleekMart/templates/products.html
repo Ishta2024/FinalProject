@@ -269,7 +269,9 @@
                                     <li><a href=""><i class="fa fa-shopping-cart"></i></a></li>
                                 </ul>
                             </div>
+                            <a href="{% url 'each_product' product.id %}">
                             <img src="{{ product.product_image.url }}" alt="{{ product.name }}" style="width: 300px;height:350px;">
+                            </a>
                         </div>
                         <div class="down-content">
                             <h4>{{ product.name }}</h4>

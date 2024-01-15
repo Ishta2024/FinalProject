@@ -212,7 +212,7 @@
                     <div class="content-header">
                         <h2 class="content-title">Add New Delivery Agent</h2>
                         <div>
-                            <button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Cancel</button>
+                            <button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Clear</button>
                             <button class="btn btn-md rounded font-sm hover-up">Save</button> 
                         </div>
                     </div>
@@ -256,14 +256,7 @@
                                         <label class="form-label">Pincode</label>
                                         <input type="text" name="pincode" placeholder="Type here" class="form-control">
                                     </div>
-                                    <div class="mb-4">
-                                        <label class="form-label">Choose Location</label>
-                                        <select class="form-select" name="location">
-                                            <option> Kottayam </option>
-                                            <option> Pathanamthitta </option>
-                                            <option> Erumely </option>
-                                        </select>
-                                    </div>
+                                    
                                 </div>
                             </div> 
                             <hr class="mb-4 mt-0">
@@ -295,6 +288,14 @@
                                             {% for seller in sellers %}
                                             <option value="{{ seller.id }}">{{ seller.business_name }}</option>
                                         {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label">Choose Location</label>
+                                        <select class="form-select" name="location">
+                                            <option> Kottayam </option>
+                                            <option> Pathanamthitta </option>
+                                            <option> Erumely </option>
                                         </select>
                                     </div>
                                 </div> <!-- col.// -->

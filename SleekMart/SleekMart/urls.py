@@ -120,7 +120,7 @@ urlpatterns = [
     path('delete_category/<slug:category_slug>/',  views.delete_category, name='delete_category'),
     path('approveseller/<int:seller_id>/', views.approveseller, name='approveseller'),
     path('rejectseller/<int:seller_id>/', views.rejectseller, name='rejectseller'),
-
+    path('notifications/', views.notifications, name='notifications'),
 
     path('loggout',  views.loggout, name='loggout'),
     path('password-reset/', ResetPasswordView.as_view(), name='password_reset'),

@@ -4,6 +4,8 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.utils import timezone
 from django.conf import settings
 from django.db.models import Avg
+     
+from django.contrib.auth import get_user_model
 # class UserProfile(models.Model):
 #     user = models.OneToOneField(User, on_delete=models.CASCADE)
 #     name = models.CharField(max_length=100)
@@ -264,3 +266,13 @@ class Shippings(models.Model):
 
      def __str__(self):
         return self.shipname
+
+
+class Notification(models.Model):
+    recipient = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.recipient

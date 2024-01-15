@@ -1,0 +1,28 @@
+<html>
+    <head>
+    <style>
+        .notifications-container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .notification {
+            background-color: black;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="notifications-container">
+        {% for notification in notifications %}
+            <div class="notification">
+                <p>{{ notification.message }}</p>
+                <!-- Additional fields like timestamp can also be displayed -->
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
