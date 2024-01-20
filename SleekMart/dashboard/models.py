@@ -75,6 +75,8 @@ class Seller(models.Model):
     business_address = models.TextField()
     business_website = models.URLField(blank=True, null=True)
     seller_proof = models.FileField(upload_to='seller_proofs/')
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     is_approved = models.CharField(
         max_length=20,
         choices=APPROVAL_CHOICES,
@@ -91,13 +93,21 @@ class Customer(models.Model):
     def __str__(self):
         return self.user.email
     
+class Route(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    Route_number = models.IntegerField()
+    location = models.CharField(max_length=100, blank=True, null=True)
+    def __str__(self):
+        return self.name
+    
 class DeliveryAgent(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     place = models.CharField(max_length=100, blank=True, null=True)
     pincode = models.CharField(max_length=10, blank=True, null=True)
     location = models.CharField(max_length=100, blank=True, null=True)
-    assigned_seller = models.CharField(max_length=100, blank=True, null=True)
-
+    assigned_seller = models.ForeignKey(Seller, on_delete=models.CASCADE, null=True, blank=True)
+    # assigned_route = models.ForeignKey(Route, null=True, blank=True, on_delete=models.SET_NULL)
     def __str__(self):
         return self.user.email
 
@@ -266,13 +276,19 @@ class Shippings(models.Model):
 
      def __str__(self):
         return self.shipname
-
+NOTIFICATION_TYPES = [
+    ('delivery_agent_assignment', 'Delivery Agent Assignment'),
+    ('other_notification_type', 'Other Notification Type'),
+    # Add more notification types as needed
+]
 
 class Notification(models.Model):
     recipient = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    delivery_agent = models.ForeignKey(DeliveryAgent, on_delete=models.CASCADE, null=True, blank=True)
     message = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
-
+    notification_type = models.CharField(max_length=50, choices=NOTIFICATION_TYPES,null=True, blank=True)
     def __str__(self):
-        return self.recipient
+        return self.message
+    

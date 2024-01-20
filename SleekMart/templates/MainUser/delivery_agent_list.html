@@ -206,108 +206,76 @@
         </header>
         <form method="post" id= "yourForm" enctype="multipart/form-data" >
             {% csrf_token %}
-        <section class="content-main">
-            <div class="row">
-                <div class="col-6">
-                    <div class="content-header">
-                        <h2 class="content-title">Add New Delivery Agent</h2>
-                        <div>
-                            <button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Clear</button>
-                            <button class="btn btn-md rounded font-sm hover-up">Save</button> 
-                            
-                        </div>
+            <section class="content-main">
+                <div class="content-header">
+                    <h2 class="content-title">DA cards</h2>
+                    <div>
+                        <a href="{%url 'add_da' %}" class="btn btn-primary"><i class="material-icons md-plus"></i> Create new</a>
                     </div>
                 </div>
-            </div>
-            {% if messages %}
-            <div class="messages text-center"> <!-- Add "text-center" class -->
-              {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                  {{ message }}
-                </div>
-              {% endfor %}
-            </div>
-            {% endif %}
-            
-            <div class="row">
-                
-               
-                <div class="col-lg-6">
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <h6>1. General info</h6>
-                                </div>
-                                <div class="col-md-9">
-                                    <div class="mb-4">
-                                        <label class="form-label">Agent Name</label>
-                                        <input type="text" name="agent_name" placeholder="Type here" class="form-control">
-                                    </div>
-                                    <div class="mb-4">
-                                        <label class="form-label">Place</label>
-                                        <input type="text" name="place" placeholder="Type here" class="form-control">
-                                    </div> 
-                                    <div class="mb-4">
-                                        <label class="form-label">Mobile Number</label>
-                                        <input type="text" name="mobile" placeholder="Type here" class="form-control">
-                                    </div>
-                                    <div class="mb-4">
-                                        <label class="form-label">Pincode</label>
-                                        <input type="text" name="pincode" placeholder="Type here" class="form-control">
-                                    </div>
-                                    
-                                </div>
-                            </div> 
-                            <hr class="mb-4 mt-0">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <h6>2. Account</h6>
-                                </div>
-                                <div class="col-md-9">
-                                    <div class="mb-4">
-                                        <label class="form-label">Email</label>
-                                        <input type="text" name="email" placeholder="Enter Email" class="form-control">  
-                                    </div>
-                                    <div class="mb-4">
-                                        <label class="form-label">Create Password</label>
-                                        <input type="text" name="password" placeholder="Enter Password" class="form-control">  
+                <div class="card mb-4">
+                    <header class="card-header">
+                        <div class="row gx-3">
+                            <div class="col-lg-4 col-md-6 me-auto">
+                                <input type="text" placeholder="Search..." class="form-control">
+                            </div>
+                            <div class="col-lg-2 col-6 col-md-3">
+                                <select class="form-select">
+                                    <option>Show 20</option>
+                                    <option>Show 30</option>
+                                    <option>Show 40</option>
+                                    <option>Show all</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-6 col-md-3">
+                                <select class="form-select">
+                                    <option>Status: all</option>
+                                    <option>Active only</option>
+                                    <option>Disabled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </header> <!-- card-header end// -->
+                    <div class="card-body">
+                        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4">
+                            {% for agent in delivery_agents %}
+                                <div class="col">
+                                    <div class="card card-user">
+                                        <div class="card-header">
+                                            <img class="img-md img-avatar" src="{% static 'images/women-01.jpg' %}" alt="User pic">
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title mt-50">{{ agent.agent_name }}</h5>
+                                            <div class="card-text text-muted">
+                                                <p class="m-0">Seller ID: #{{ agent.id }}</p>
+                                                <p>Email: <a href="mailto:{{ agent.user.email }}" class="__cf_email__" data-cfemail="{{ agent.email_encoded }}">{{ agent.email }}</a></p>
+                                                <p>Place: {{ agent.place }}</p>
+                                                <p>Mobile Number: {{ agent.user.mobile }}</p>
+                                                <p>Pincode: {{ agent.pincode }}</p>
+                                                <!-- Add other fields as needed -->
+                                              
+                                            </div>
+                                        </div>
                                     </div>
                                 </div> <!-- col.// -->
-                            </div> <!-- row.// -->
-                                                       
-                            <hr class="mb-4 mt-0">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <h6>3. Assign</h6>
-                                </div>
-                                <div class="col-md-9">
-                                    <div class="mb-4">
-                                        <label class="form-label">Choose Seller</label>
-                                        <select class="form-select" name="seller">
-                                            {% for seller in sellers %}
-                                            <option value="{{ seller.id }}">{{ seller.business_name }}</option>
-                                        {% endfor %}
-                                        </select>
-                                    </div>
-                                    <div class="mb-4">
-                                        <label class="form-label">Choose Location</label>
-                                        <select class="form-select" name="location">
-                                            <option> Kottayam </option>
-                                            <option> Pathanamthitta </option>
-                                            <option> Erumely </option>
-                                        </select>
-                                    </div>
-                                </div> <!-- col.// -->
-                            
-                            </div> <!-- .row end// -->   
+                            {% endfor %}
                         </div>
                     </div>
+                    
+                </div> <!-- card end// -->
+                <div class="pagination-area mt-15 mb-50">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-start">
+                            <li class="page-item active"><a class="page-link" href="page-sellers-cards.html#">01</a></li>
+                            <li class="page-item"><a class="page-link" href="page-sellers-cards.html#">02</a></li>
+                            <li class="page-item"><a class="page-link" href="page-sellers-cards.html#">03</a></li>
+                            <li class="page-item"><a class="page-link dot" href="page-sellers-cards.html#">...</a></li>
+                            <li class="page-item"><a class="page-link" href="page-sellers-cards.html#">16</a></li>
+                            <li class="page-item"><a class="page-link" href="page-sellers-cards.html#"><i class="material-icons md-chevron_right"></i></a></li>
+                        </ul>
+                    </nav>
                 </div>
-            </div>
-            </div>
-        </section> <!-- content-main end// -->
+            </section> <!-- content-main end// -->
     </form>
         <footer class="main-footer font-xs">
             <div class="row pb-30 pt-15">

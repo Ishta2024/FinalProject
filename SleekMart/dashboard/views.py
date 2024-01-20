@@ -1025,6 +1025,7 @@ def index(request):
         }
     context = {'customer_count': customer_count, 'orders_count':orders_count,'product_count':product_count, 'seller_count':seller_count,'seller_totals': seller_totals}
     return render(request, 'MainUser/index.html', context)
+
 @login_required
 def sellerindex(request):
     categories = Category.objects.filter(status=False)
@@ -1035,6 +1036,25 @@ def sellerindex(request):
     order_count = Order.objects.filter(orderitem__seller=seller, payment_status=Order.PaymentStatusChoices.SUCCESSFUL).count()
     print(seller)
     product_count = Product.objects.filter(seller=seller, status=False).count()
+    user = request.user
+  
+    if user.seller.latitude is None or user.seller.longitude is None:
+            # Check if a similar notification already exists
+            existing_notification = Notification.objects.filter(
+                recipient=user,
+                message='Please update your location for better service.',
+                notification_type='other_notification_type'
+            ).exists()
+
+            if not existing_notification:
+                # Create a notification only if a similar one doesn't exist
+                Notification.objects.create(
+                    recipient=user,
+                    message='Please update your location for better service.',
+                    notification_type='other_notification_type'
+                )
+    # Fetch unread notifications for the seller
+    notifications = Notification.objects.filter(recipient=user)
     unread_notifications_count = request.user.notification_set.filter(is_read=False).count()
     
     confirmed_orders = OrderItem.objects.filter(
@@ -1045,7 +1065,7 @@ def sellerindex(request):
     # Retrieve products associated with confirmed orders
     # products = Product.objects.filter(order__in=confirmed_orders).distinct()
     print(confirmed_orders)
-    context = {'category_count': category_count, 'product_count': product_count,'confirmed_orders': confirmed_orders,'order_count':order_count,'orders':orders}
+    context = {'unread_notifications_count': unread_notifications_count, 'notifications': notifications, 'category_count': category_count, 'product_count': product_count,'confirmed_orders': confirmed_orders,'order_count':order_count,'orders':orders}
     return render(request, 'Seller/sellerindex.html', context)
 @login_required
 def seller_orders(request):
@@ -1066,12 +1086,17 @@ def sellerprofile(request):
 def editseller(request):
     user_profile = CustomUser.objects.get(pk=request.user.pk)  # Get the CustomUser object
     seller_profile = Seller.objects.get(user=user_profile)
+    current_latitude = request.GET.get('currentLatitude')
+    current_longitude = request.GET.get('currentLongitude')
+    seller_profile.latitude = current_latitude
+    seller_profile.longitude = current_longitude
+    seller_profile.save()
     if request.method == "POST":
         name = request.POST.get('name')
         mobile = request.POST.get('mobile')
         email = request.POST.get('email')
         address = request.POST.get('address')
-        
+       
         # Check if a profile picture was uploaded
         if 'profile_pic' in request.FILES:
             profile_pic = request.FILES['profile_pic']
@@ -1087,6 +1112,9 @@ def editseller(request):
         business_address = request.POST.get('business_address')
         business_website = request.POST.get('business_website')
         
+        current_latitude = request.GET.get('currentLatitude')
+        current_longitude = request.GET.get('currentLongitude')
+        
         if 'seller_proof' in request.FILES:
             seller_proof = request.FILES['seller_proof']
             seller_profile.seller_proof = seller_proof
@@ -1094,7 +1122,8 @@ def editseller(request):
         seller_profile.business_name = business_name
         seller_profile.business_address = business_address
         seller_profile.business_website = business_website
-            
+        seller_profile.latitude = current_latitude
+        seller_profile.longitude = current_longitude
 
         
         seller_profile.save()
@@ -1721,7 +1750,8 @@ def add_da(request):
 
                    Notification.objects.create(
                         recipient=seller.user,  
-                        message=f'You have a new delivery agent {agent_name} assigned.'
+                        message=f'You have a new delivery agent {agent_name} assigned.',
+                        delivery_agent = delivery_agent
                     )
                    
 
@@ -1732,7 +1762,7 @@ def add_da(request):
 
                    send_mail(subject, message, from_email, recipient_list, fail_silently=False)
                    messages.success(request, 'Agent Added Successfully')
-                   return redirect('add_da')
+                   return redirect('view_da')
             except Seller.DoesNotExist:
                 # Handle the case where the Seller with the given business name does not exist
                 messages.warning(request, 'Invalid seller business name. Please select a valid seller.')
@@ -1744,6 +1774,18 @@ def add_da(request):
             return redirect('add_da')
 
     return render(request, 'MainUser/add_DA.html', {'sellers': sellers})
+
+def view_da(request):
+    delivery_agents = DeliveryAgent.objects.all()
+    
+    context = {
+        'delivery_agents': delivery_agents,
+    }
+    return render(request, 'MainUser/delivery_agent_list.html', context)
+
+def delivery_agent_details(request, delivery_agent_id):
+    delivery_agent = get_object_or_404(DeliveryAgent, id=delivery_agent_id)
+    return render(request, 'Seller/delivery_agent_details.html', {'delivery_agent': delivery_agent})
 
 def register(request):
     if request.method == "POST":
@@ -1777,13 +1819,24 @@ def register(request):
 def custnotification_page(request):
     return render(request, 'Customer/notification.html')
 
+def add_route(request):
+    return render(request, 'Seller/add_route.html')
+
 @login_required
 def notifications(request):
     user = request.user
-    notifications = Notification.objects.filter(recipient=user, is_read=False)
-    Notification.objects.filter(recipient=user, is_read=False).update(is_read=True)
-
-    return render(request, 'notifications.html', {'notifications': notifications})
+    
+    notifications = Notification.objects.filter(recipient=user)
+    print(notifications)
+    notification_count = notifications.filter(is_read=False).count()
+    
+   
+    if 'visited_notifications' not in request.session:
+        # Mark all unread notifications as read
+        notifications.filter(is_read=False).update(is_read=True)
+        request.session['visited_notifications'] = True
+    
+    return render(request, 'notifications.html', {'notifications': notifications,  'notification_count' : notification_count})
 
 @login_required
 def profile(request):

@@ -178,11 +178,12 @@
                 <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
                 <ul class="nav">
                     <li class="nav-item">
-                        <a class="nav-link btn-icon" href="{% url 'notifications' %}">
-                            <i class="material-icons md-notifications animation-shake"></i>
-                            <span class="badge rounded-pill">{{ unread_notifications_count }}</span>
+                        <!-- your_template.html -->
+                       <a class="nav-link btn-icon" href="{% url 'notifications' %}" id="notification-link">
+                           <i class="material-icons md-notifications animation-shake"></i>
+                           <span class="badge rounded-pill" id="notification-count">{{ unread_notifications_count }}</span>
+                       </a>
 
-                        </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link btn-icon darkmode" href="#"> <i class="material-icons md-nights_stay"></i> </a>
@@ -592,6 +593,23 @@
                 window.location.reload(); // Refresh the page
             }
         };
+
+        <!-- Include this script at the end of your HTML body or in a separate JavaScript file -->
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Get the notification link and count elements
+            const notificationLink = document.getElementById("notification-link");
+            const notificationCount = document.getElementById("notification-count");
+        
+            // Add a click event listener to the notification link
+            notificationLink.addEventListener("click", function () {
+                // Perform an AJAX request to mark notifications as read
+                // Update the count to 0 (assuming the request is successful)
+                notificationCount.textContent = "0";
+            });
+});
+
+
         </script>
 </body>
 

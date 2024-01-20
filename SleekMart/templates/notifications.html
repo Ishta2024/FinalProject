@@ -1,28 +1,81 @@
-<html>
-    <head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications</title>
     <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
         .notifications-container {
             width: 80%;
             margin: auto;
             padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            margin-top: 30px;
         }
 
         .notification {
-            background-color: black;
+            background-color: #f0f0f0;
             border: 1px solid #ddd;
             margin-bottom: 10px;
             padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .notification:hover {
+            background-color: #e0e0e0;
+        }
+
+        p {
+            margin: 0;
+            color: #333;
+        }
+
+        .date {
+            font-size: 0.8em;
+            color: #888;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
         }
     </style>
 </head>
 <body>
-    <div class="notifications-container">
-        {% for notification in notifications %}
-            <div class="notification">
-                <p>{{ notification.message }}</p>
-                <!-- Additional fields like timestamp can also be displayed -->
-            </div>
-        {% endfor %}
-    </div>
+    <!-- notifications.html -->
+<div class="notifications-container">
+    <a href="{% url 'sellerindex' %}">Go to Home Page</a></p>
+    <h2>Notifications</h2>
+    {% for notification in notifications %}
+        <div class="notification">
+            <p>{{ notification.message }}</p>
+            
+                {% if notification.notification_type == 'delivery_agent_assignment' and notification.delivery_agent %}
+                <p class="date">Date Assigned: {{ notification.timestamp }}
+                    <a href="{% url 'delivery_agent_details' delivery_agent_id=notification.delivery_agent.id %}">See More Details</a></p>
+                {% elif notification.notification_type == 'other_notification_type' %}
+                    <!-- Add link or action for other notification type -->
+                    <p class="date">Date: {{ notification.timestamp }}
+                    <a href="#">Update</a></p>
+                {% else %}
+                    <!-- Default action or link for unknown or generic notification type -->
+                    <p class="date">Date : {{ notification.timestamp }}
+                    <a href="#">Default Action</a></p>
+                {% endif %}
+            </p>
+        </div>
+    {% endfor %} 
+</div>
+
 </body>
 </html>

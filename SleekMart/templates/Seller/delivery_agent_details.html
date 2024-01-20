@@ -1,0 +1,447 @@
+{% comment %} <!-- delivery_agent_details.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Agent Details</title>
+    <!-- Add your styling here if needed -->
+</head>
+<body>
+    <h2>Delivery Agent Details</h2>
+    <div>
+        <p><strong>Name:</strong> {{ delivery_agent.user.name }}</p>
+        <p><strong>Email:</strong> {{ delivery_agent.user.email }}</p>
+        <!-- Add more details as needed -->
+    </div>
+</body>
+</html> {% endcomment %}
+{% load static %}
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>SleekMart Dashboard</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'assets/imgs/theme/favicon.svg' %}">
+    <!-- Template CSS -->
+    <link href="{% static 'assets/css/main.css' %}" rel="stylesheet" type="text/css" />
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+   
+    
+
+    <!-- Your script for geolocation and other functionalities -->
+   {% comment %} <script>
+    function getCurrentLocation() {
+     if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+
+                console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+
+                // Reverse geocode to get location address (optional)
+                reverseGeocode(latitude, longitude);
+
+                // Store geolocation in local storage
+                localStorage.setItem('currentLatitude', latitude);
+                localStorage.setItem('currentLongitude', longitude);
+
+                // Redirect to the page where latitude and longitude are updated
+                //window.location.href = `/editseller/?currentLatitude=${latitude}&currentLongitude=${longitude}`;
+            },
+            function (error) {
+                console.error('Error getting geolocation:', error);
+            }
+        );
+    } else {
+        console.error('Geolocation is not supported in this browser.');
+    }
+}
+
+function reverseGeocode(latitude, longitude) {
+    const apiKey = 'ApD6EZsbYwTxf5pLl1QAgalnbiMGc_BPoQuADqjedCl73WUqKqlwJ-7cbPXDdb6_';
+    const apiUrl = `https://dev.virtualearth.net/REST/v1/Locations/${latitude},${longitude}?key=${apiKey}`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            if (data.resourceSets && data.resourceSets.length > 0) {
+                const locationName = data.resourceSets[0].resources[0].name;
+                console.log(`Location Name: ${locationName}`);
+                document.getElementById('locationName').innerText = `Location: ${locationName}`;
+                // Update UI or do further processing with locationName
+            } else {
+                console.error('No results found for reverse geocoding.');
+            }
+        })
+        .catch(error => console.error('Error fetching reverse geocoding data:', error));
+}
+    
+    </script> {% endcomment %}
+    <style>
+    .error {
+        color: red;
+        font-size: 0.8rem;
+    }
+</style>
+</head>
+
+<body>
+    <div class="screen-overlay"></div>
+    <aside class="navbar-aside" id="offcanvas_aside">
+        <div class="aside-top">
+            <a href="index.html" class="brand-wrap">
+                <img src="{% static 'assets/imgs/theme/logo.svg' %}" class="logo" alt="Evara Dashboard">
+            </a>
+            <div>
+                <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
+            </div>
+        </div>
+        <nav>
+            <ul class="menu-aside">
+                <li class="menu-item">
+                    <a class="menu-link" href="{% url 'sellerindex' %}"> <i class="icon material-icons md-home"></i>
+                        <span class="text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item has-submenu active">
+                    <a class="menu-link" href="page-products-list.html"> <i class="icon material-icons md-shopping_bag"></i>
+                        <span class="text">Products</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="{% url 'categories' %}">Categories</a>
+                        <a href="{% url 'subcategories' %}">SubCategories</a>
+                        <a href="{% url 'productlist' %}" class="active">Product List</a>
+                        {% comment %} <a href="page-products-grid.html">Product grid</a>
+                        <a href="page-products-grid-2.html">Product grid 2</a> {% endcomment %}
+                        
+                    </div>
+                </li>
+                <li class="menu-item has-submenu ">
+                    <a class="menu-link" href="page-orders-1.html"> <i class="icon material-icons md-shopping_cart"></i>
+                        <span class="text">Orders</span>
+                    </a>
+                    <div class="submenu">
+                        {% comment %} <a href="page-orders-1.html">Order list 1</a>
+                        <a href="page-orders-2.html">Order list 2</a> {% endcomment %}
+                        <a href="{% url 'seller_orders' %}">Order detail</a>
+                        {% comment %} <a href="page-orders-tracking.html">Order tracking</a>
+<a href="page-invoice.html">Invoice</a> {% endcomment %}
+                    </div>
+                </li>
+                {% comment %} <li class="menu-item has-submenu">
+                    <a class="menu-link" href="page-sellers-cards.html"> <i class="icon material-icons md-store"></i>
+                        <span class="text">Sellers</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="page-sellers-cards.html">Sellers cards</a>
+                        <a href="page-sellers-list.html">Sellers list</a>
+                        <a href="page-seller-detail.html">Seller profile</a>
+                    </div>
+                </li> {% endcomment %}
+                {% comment %} <li class="menu-item has-submenu">
+                    <a class="menu-link" href="page-form-product-1.html"> <i class="icon material-icons md-add_box"></i>
+                        <span class="text">Add product</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="page-form-product-1.html">Add product 1</a>
+                        <a href="page-form-product-2.html">Add product 2</a>
+                        <a href="page-form-product-3.html">Add product 3</a>
+                        <a href="page-form-product-4.html">Add product 4</a>
+                    </div>
+                </li> {% endcomment %}
+                {% comment %} <li class="menu-item has-submenu">
+                    <a class="menu-link" href="page-transactions-1.html"> <i class="icon material-icons md-monetization_on"></i>
+                        <span class="text">Transactions</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="page-transactions-1.html">Transaction 1</a>
+                        <a href="page-transactions-2.html">Transaction 2</a>
+                        <a href="page-transactions-details.html">Transaction Details</a>
+                    </div>
+                </li> {% endcomment %}
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" href="page-products-list.html#"> <i class="icon material-icons md-person"></i>
+                        <span class="text">Account</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="{% url 'sellerprofile' %}">My Details</a>
+                        
+                    </div>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="{% url 'sellerreviews' %}"> <i class="icon material-icons md-comment"></i>
+                        <span class="text">Reviews</span>
+                    </a>
+                </li>
+                {% comment %} <li class="menu-item">
+                    <a class="menu-link" href="page-brands.html"> <i class="icon material-icons md-stars"></i>
+                        <span class="text">Brands</span> </a>
+                </li> {% endcomment %}
+                {% comment %} <li class="menu-item"> {% endcomment %}
+                    {% comment %} <a class="menu-link" disabled href="page-products-list.html#"> <i class="icon material-icons md-pie_chart"></i>
+                        <span class="text">Statistics</span>
+                    </a> {% endcomment %}
+                {% comment %} </li> {% endcomment %}
+            </ul>
+            <hr>
+            <ul class="menu-aside">
+                <li class="menu-item has-submenu">
+                    {% comment %} <a class="menu-link" href="page-products-list.html#"> <i class="icon material-icons md-settings"></i>
+                        <span class="text">Settings</span>
+                    </a> {% endcomment %}
+                    <div class="submenu">
+                        {% comment %} <a href="page-settings-1.html">Setting sample 1</a>
+                        <a href="page-settings-2.html">Setting sample 2</a> {% endcomment %}
+                    </div>
+                </li>
+                <li class="menu-item">
+                    {% comment %} <a class="menu-link" href="page-blank.html"> <i class="icon material-icons md-local_offer"></i>
+                        <span class="text"> Starter page </span>
+                    </a> {% endcomment %}
+                </li>
+            </ul>
+            <br>
+            <br>
+        </nav>
+    </aside>
+    <main class="main-wrap">
+        <header class="main-header navbar">
+            <div class="col-search">
+                <form class="searchform">
+                    <div class="input-group">
+                        <input list="search_terms" type="text" class="form-control" placeholder="Search term">
+                        <button class="btn btn-light bg" type="button"> <i class="material-icons md-search"></i></button>
+                    </div>
+                    <datalist id="search_terms">
+                        <option value="Products">
+                        <option value="New orders">
+                        <option value="Apple iphone">
+                        <option value="Ahmed Hassan">
+                    </datalist>
+                </form>
+            </div>
+            <div class="col-nav">
+                <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link btn-icon" href="#">
+                            <i class="material-icons md-notifications animation-shake"></i>
+                            <span class="badge rounded-pill">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn-icon darkmode" href="#"> <i class="material-icons md-nights_stay"></i> </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="requestfullscreen nav-link btn-icon"><i class="material-icons md-cast"></i></a>
+                    </li>
+                    {% comment %} <li class="dropdown nav-item">
+                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="page-products-list.html#" id="dropdownLanguage" aria-expanded="false"><i class="material-icons md-public"></i></a>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownLanguage">
+                            <a class="dropdown-item text-brand" href="page-products-list.html#"><img src="assets/imgs/theme/flag-us.png" alt="English">English</a>
+                            <a class="dropdown-item" href="page-products-list.html#"><img src="assets/imgs/theme/flag-fr.png" alt="Français">Français</a>
+                            <a class="dropdown-item" href="page-products-list.html#"><img src="assets/imgs/theme/flag-jp.png" alt="Français">日本語</a>
+                            <a class="dropdown-item" href="page-products-list.html#"><img src="assets/imgs/theme/flag-cn.png" alt="Français">中国人</a>
+                        </div>
+                    </li> {% endcomment %}
+                    <li class="dropdown nav-item">
+                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> 
+                            {% if request.user.profile_pic %}
+                            <img src="{{ request.user.profile_pic.url }}" alt="profile pic" class="img-xs rounded-circle" />
+                {% else %}
+                            <img src="{% static 'images/propic.jpg' %}" alt="Seller" class="img-xs rounded-circle" />
+                {% endif %}
+                {% comment %} <img class="img-xs rounded-circle" src="{% static 'assets/imgs/people/avatar2.jpg' %}" alt="User"></a> {% endcomment %}
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
+                            <a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i>{{ request.user.name}}</a>
+                            <a class="dropdown-item" href="{% url 'sellerprofile' %}"><i class="material-icons md-perm_identity"></i>View Profile</a>
+                            {% comment %} <a class="dropdown-item" href="page-products-list.html#"><i class="material-icons md-perm_identity"></i>Edit Profile</a>
+                            <a class="dropdown-item" href="page-products-list.html#"><i class="material-icons md-settings"></i>Account Settings</a>
+                            <a class="dropdown-item" href="page-products-list.html#"><i class="material-icons md-account_balance_wallet"></i>Wallet</a>
+                            <a class="dropdown-item" href="page-products-list.html#"><i class="material-icons md-receipt"></i>Billing</a>
+                            <a class="dropdown-item" href="page-products-list.html#"><i class="material-icons md-help_outline"></i>Help center</a> {% endcomment %}
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger" href="{% url 'loggout' %}"><i class="material-icons md-exit_to_app"></i>Logout</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </header>
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">Delivery Agent</h2>
+                    <p>Details for Delivery Agent: {{delivery_agent.id}}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-10 col-md-12">
+                    <div class="card">
+                        <header class="card-header">
+                            <div class="row align-items-center">
+                                <div class="col-lg-6 col-md-6 mb-lg-0 mb-15">
+                                    <span>
+                                        <i class="material-icons md-calendar_today"></i> <b>{{delivery_agent.user.date_joined}}</b>
+                                    </span> <br>
+                                    <small class="text-muted">Agent ID: {{delivery_agent.id}}</small>
+                                </div>
+                                <div class="col-lg-6 col-md-6 ms-auto text-md-end">                                   
+                                    <a class="btn btn-primary" href="{% url 'sellerindex' %}"> <i class="icon material-icons md-cloud_download mr-5"></i>Back</a>
+                                    <a class="btn btn-secondary print ms-2" href="{% url 'sellerindex' %}"><i class="icon material-icons md-home mr-5"></i>Home</a>
+                                </div>
+                            </div>
+                        </header> <!-- card-header end// -->
+                        <div class="card-body">
+                            <div class="receipt-content">
+                                <div class="container bootstrap snippets bootdey">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="invoice-wrapper">
+                                                <div class="intro">
+                                                    <strong>{{delivery_agent.user.name}}</strong>,
+                                                    <br>
+                                                    This is the receipt for the details of <strong>delievery agent</strong> for your works
+                                                </div>
+                    
+                                                <div class="payment-info">
+                                                    <div class="row">
+                                                        <div class="col-sm-6">
+                                                            <span>Agent ID</span>
+                                                            <strong> {{delivery_agent.id}}</strong>
+                                                            <strong>{{delivery_agent.user.email}}</strong>
+                                                            <strong>{{delivery_agent.location}}</strong>
+                                                            <strong>{{delivery_agent.pincode}}</strong>
+                                                        </div>
+                                                        <div class="col-sm-6 text-end">
+                                                            <span>Joined Date</span>
+                                                            <strong>{{delivery_agent.user.date_joined}}</strong>
+                                                           
+                                                        </div>
+                                                    </div>
+                                                </div>
+                    
+                                                <div class="payment-details">
+                                                    <div class="row">
+                                                        <div class="col-sm-6">
+                                                            <span>Assigned Seller</span>
+                                                            <strong>
+                                                                 {{delivery_agent.assigned_seller.user.name}} 
+                                                            </strong>
+                                                            <p>
+                                                                {{delivery_agent.assigned_seller.business_name}}  <br>
+                                                                {{delivery_agent.assigned_seller.user.email}} 
+                                                                
+                                                            </p>
+                                                        </div>
+                                                        <div class="col-sm-6 text-end">
+                                                            <span>Route Not Assigned</span>
+                                                         
+                                                            <div class="col-lg-6 col-md-6 ms-auto text-md-end">                                   
+                                                              {% comment %} <a class="btn btn-primary" href="{% url 'add_route' %}"> <i class="icon material-icons md-cloud_download mr-5"></i>Add Current Location</a> {% endcomment %}
+                                                              <button type="button" class="btn btn-primary" onclick="getCurrentLocation()"> 
+                                                                <i class="icon material-icons md-cloud_download mr-5"></i>Add Current Location</button> 
+
+                                                                
+                                                            </div>
+                                                            {% comment %} <strong>
+                                                                Kottayam
+                                                            </strong>
+                                                            <p>
+                                                                Pampadi <br>
+                                                                Kanjikuzhy <br>
+                                                                {{delivery_agent.pincode}}  <br>
+                                                               Kerala <br>
+                                                                
+                                                            </p> {% endcomment %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                    
+                                                
+                                             
+                                            </div>
+                    
+                                            <div class="footer">
+                                                Copyright © 2024. SleekMart
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> <!-- card-body end// -->
+                    </div> <!-- card end// -->
+                </div>
+            </div>
+        </section> <!-- content-main end// -->
+        <footer class="main-footer font-xs">
+            <div class="row pb-30 pt-15">
+                <div class="col-sm-6">
+                    <script>
+                    document.write(new Date().getFullYear())
+                    </script> ©, SleekMart - A Home Appliances Ecommerce Website .
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-sm-end">
+                        All rights reserved
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </main>
+    <script src="{% static 'assets/js/vendors/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/select2.min.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/perfect-scrollbar.js' %}"></script>
+    <script src="{% static 'assets/js/vendors/jquery.fullscreen.min.js' %}"></script>
+    <!-- Main Script -->
+    <script src="{% static 'assets/js/main.js' %}" type="text/javascript"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        console.log(latitude)
+                        // Redirect to the page where latitude and longitude are updated
+                        window.location.href = `/editseller/?currentLatitude=${latitude}&currentLongitude=${longitude}`;
+                    },
+                    function(error) {
+                        console.error('Error getting geolocation:', error);
+                    }
+               
+                );
+            } else {
+                console.error('Geolocation is not supported by this browser.');
+            }
+        }
+    </script>
+{% comment %} <script>
+    $(document).ready(function () {
+        $("#category-select").change(function () {
+            $("#category-filter-form").submit();
+        });
+    });
+</script> {% endcomment %}
+
+</body>
+
+</html>
+

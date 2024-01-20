@@ -84,7 +84,7 @@ urlpatterns = [
     path('seller_details/<int:seller_id>/', views.seller_details, name='seller_details'),
     path('blockcustomer/<int:user_id>/', views.blockcustomer, name='blockcustomer'),
     path('unblockcustomer/<int:user_id>/', views.unblockcustomer, name='unblockcustomer'),
-    path('editseller', views.editseller, name='editseller'),
+    path('editseller/', views.editseller, name='editseller'),
     path('sellerprofile', views.sellerprofile, name='sellerprofile'),
     path('sellerslist',  views.sellerslist, name='sellerslist'),
     path('sellerindex',  views.sellerindex, name='sellerindex'),
@@ -103,6 +103,9 @@ urlpatterns = [
     path('categories/',  views.categories, name='categories'),
     path('subcategories/',  views.subcategories, name='subcategories'),
     path('add_da/',  views.add_da, name='add_da'),
+    path('add_route/',  views.add_route, name='add_route'),
+    path('view_da', views.view_da, name='view_da'),
+    path('delivery_agent_details/<int:delivery_agent_id>/', views.delivery_agent_details, name='delivery_agent_details'),
 
 
     path('edit_subcategory/<int:subcategory_id>/',  views.edit_subcategory, name='edit_subcategory'),
