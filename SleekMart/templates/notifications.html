@@ -60,13 +60,13 @@
         <div class="notification">
             <p>{{ notification.message }}</p>
             
-                {% if notification.notification_type == 'delivery_agent_assignment' and notification.delivery_agent %}
+                {% if notification.notification_type == 'delivery_agent_assignment'  %}
                 <p class="date">Date Assigned: {{ notification.timestamp }}
                     <a href="{% url 'delivery_agent_details' delivery_agent_id=notification.delivery_agent.id %}">See More Details</a></p>
                 {% elif notification.notification_type == 'other_notification_type' %}
                     <!-- Add link or action for other notification type -->
                     <p class="date">Date: {{ notification.timestamp }}
-                    <a href="#">Update</a></p>
+                    <a href="{% url 'editseller' %}">Update</a></p>
                 {% else %}
                     <!-- Default action or link for unknown or generic notification type -->
                     <p class="date">Date : {{ notification.timestamp }}

@@ -291,7 +291,7 @@
     <script type='text/javascript'>
     var map;
 
-    function GetMap() {
+    {% comment %} function GetMap() {
         // Replace 'YOUR_BING_MAPS_API_KEY' with your actual Bing Maps API key
         var apiKey = 'ApD6EZsbYwTxf5pLl1QAgalnbiMGc_BPoQuADqjedCl73WUqKqlwJ-7cbPXDdb6_';
 
@@ -312,7 +312,29 @@
         map.entities.push(pin);
 
         reverseGeocode(currentLatitude, currentLongitude);
+    } {% endcomment %}
+    function GetMap() {
+        var apiKey = 'ApD6EZsbYwTxf5pLl1QAgalnbiMGc_BPoQuADqjedCl73WUqKqlwJ-7cbPXDdb6_';
+        var latitude = {{ user.seller.latitude|default:0 }};
+        var longitude = {{ user.seller.longitude|default:0 }};
+        console.log(latitude);
+        console.log(longitude);
+        var map = new Microsoft.Maps.Map('#myMap', {
+            credentials: apiKey,
+            center: new Microsoft.Maps.Location(latitude, longitude),
+            zoom: 10
+        });
+
+        var location = new Microsoft.Maps.Location(latitude, longitude);
+        var pin = new Microsoft.Maps.Pushpin(location, { title: 'Seller Location' });
+        map.entities.push(pin);
+
+        reverseGeocode(latitude, longitude);
     }
+    
+        
+   
+    
     function reverseGeocode(latitude, longitude) {
         var apiKey = 'ApD6EZsbYwTxf5pLl1QAgalnbiMGc_BPoQuADqjedCl73WUqKqlwJ-7cbPXDdb6_';
         var apiUrl = `https://dev.virtualearth.net/REST/v1/Locations/${latitude},${longitude}?key=${apiKey}`;

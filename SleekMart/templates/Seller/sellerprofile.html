@@ -199,7 +199,26 @@
                                 </div>
                             </div>
                         </div> <!-- col.// -->
-                        
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h4>Current Location</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row gx-2">
+                                    
+                                    <div class="mb-4">
+                                        <label for="product_name" class="form-label">Latitude</label>
+                                        <input type="text" name="latitude" value="{{ user.seller.latitude }}" class="form-control">
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="product_name" class="form-label">Longitude</label>
+                                        <input type="text" name="longitude" value="{{ user.seller.longitude }}" class="form-control">
+                                    </div>
+                                    <div class="mb-4" id="myMap" style="width: 600px; height: 400px;"></div>
+                                    <div class="mb-4" id="locationInfo"></div>
+                                </div> <!-- row.// -->
+                            </div>
+                        </div> 
                 </div> <!-- card-body end// -->
             </div> <!-- card end// -->
            
@@ -226,6 +245,7 @@
     <script src="{% static 'assets/js/vendors/jquery.fullscreen.min.js' %}"></script>
     <!-- Main Script -->
     <script src="{% static 'assets/js/main.js' %}" type="text/javascript"></script>
+    <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?callback=GetMap' async defer></script>
     <script>
         $(document).ready(function () {
                    
@@ -240,6 +260,53 @@
                 window.location.reload(); // Refresh the page
             }
         };
+        </script>
+        <script type='text/javascript'>
+            var map;
+            function GetMap() {
+                var apiKey = 'ApD6EZsbYwTxf5pLl1QAgalnbiMGc_BPoQuADqjedCl73WUqKqlwJ-7cbPXDdb6_';
+                var latitude = {{ user.seller.latitude|default:0 }};
+                var longitude = {{ user.seller.longitude|default:0 }};
+                console.log(latitude);
+                console.log(longitude);
+                var map = new Microsoft.Maps.Map('#myMap', {
+                    credentials: apiKey,
+                    center: new Microsoft.Maps.Location(latitude, longitude),
+                    zoom: 10
+                });
+        
+                var location = new Microsoft.Maps.Location(latitude, longitude);
+                var pin = new Microsoft.Maps.Pushpin(location, { title: 'Seller Location' });
+                map.entities.push(pin);
+        
+                reverseGeocode(latitude, longitude);
+            }
+            
+                
+           
+            
+            function reverseGeocode(latitude, longitude) {
+                var apiKey = 'ApD6EZsbYwTxf5pLl1QAgalnbiMGc_BPoQuADqjedCl73WUqKqlwJ-7cbPXDdb6_';
+                var apiUrl = `https://dev.virtualearth.net/REST/v1/Locations/${latitude},${longitude}?key=${apiKey}`;
+        
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.resourceSets && data.resourceSets.length > 0) {
+                            const locationName = data.resourceSets[0].resources[0].name;
+                            displayLocationInfo(locationName);
+                        } else {
+                            console.error('No results found for reverse geocoding.');
+                        }
+                    })
+                    .catch(error => console.error('Error fetching reverse geocoding data:', error));
+            }
+        
+            function displayLocationInfo(locationName) {
+                // Display the location name in the specified div
+                var locationInfoDiv = document.getElementById('locationInfo');
+                locationInfoDiv.textContent = 'Location Name: ' + locationName;
+            }
         </script>
 </body>
 

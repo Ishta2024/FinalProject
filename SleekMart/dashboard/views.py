@@ -1086,8 +1086,10 @@ def sellerprofile(request):
 def editseller(request):
     user_profile = CustomUser.objects.get(pk=request.user.pk)  # Get the CustomUser object
     seller_profile = Seller.objects.get(user=user_profile)
-    current_latitude = request.GET.get('currentLatitude')
-    current_longitude = request.GET.get('currentLongitude')
+    current_latitude = request.POST.get('latitude') or request.GET.get('currentLatitude')
+    current_longitude = request.POST.get('longitude') or request.GET.get('currentLongitude')
+    print('Hello')
+    print(current_latitude)
     seller_profile.latitude = current_latitude
     seller_profile.longitude = current_longitude
     seller_profile.save()
@@ -1112,8 +1114,8 @@ def editseller(request):
         business_address = request.POST.get('business_address')
         business_website = request.POST.get('business_website')
         
-        current_latitude = request.GET.get('currentLatitude')
-        current_longitude = request.GET.get('currentLongitude')
+        current_latitude = request.POST.get('latitude') or request.GET.get('currentLatitude')
+        current_longitude = request.POST.get('longitude') or request.GET.get('currentLongitude')
         
         if 'seller_proof' in request.FILES:
             seller_proof = request.FILES['seller_proof']
@@ -1751,7 +1753,8 @@ def add_da(request):
                    Notification.objects.create(
                         recipient=seller.user,  
                         message=f'You have a new delivery agent {agent_name} assigned.',
-                        delivery_agent = delivery_agent
+                        delivery_agent = delivery_agent,
+                        notification_type = 'delivery_agent_assignment'
                     )
                    
 

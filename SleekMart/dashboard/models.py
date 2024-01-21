@@ -75,6 +75,7 @@ class Seller(models.Model):
     business_address = models.TextField()
     business_website = models.URLField(blank=True, null=True)
     seller_proof = models.FileField(upload_to='seller_proofs/')
+    nearby_delivery_agents = models.ManyToManyField('DeliveryAgent', blank=True)
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     is_approved = models.CharField(
@@ -85,6 +86,9 @@ class Seller(models.Model):
 
     def __str__(self):
         return self.business_name
+    def assign_nearby_agents(self, nearby_agents):
+        self.nearby_delivery_agents.clear()
+        self.nearby_delivery_agents.add(*nearby_agents)
 
 class Customer(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
@@ -107,6 +111,8 @@ class DeliveryAgent(models.Model):
     pincode = models.CharField(max_length=10, blank=True, null=True)
     location = models.CharField(max_length=100, blank=True, null=True)
     assigned_seller = models.ForeignKey(Seller, on_delete=models.CASCADE, null=True, blank=True)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     # assigned_route = models.ForeignKey(Route, null=True, blank=True, on_delete=models.SET_NULL)
     def __str__(self):
         return self.user.email
