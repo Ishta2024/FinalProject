@@ -44,6 +44,8 @@ urlpatterns = [
 
 
     path('search/', views.search, name='search'),
+    path('delivery_agent_dashboard/', views.delivery_agent_dashboard, name='delivery_agent_dashboard'),
+    path('da_details/', views.da_details, name='da_details'),
     path('search_products/', views.search_products, name='search_products'),
     path('generate_report/', views.generate_report, name='generate_report'),
 

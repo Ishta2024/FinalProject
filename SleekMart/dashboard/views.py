@@ -1594,6 +1594,12 @@ def login_page(request):
     else:
         return render(request, 'Customer/login.html')
 @login_required
+def delivery_agent_dashboard(request):
+    return render(request, 'DeliveryAgent/dashboard.html')
+@login_required
+def da_details(request):
+    return render(request, 'DeliveryAgent/da_details.html')
+@login_required
 def blockcustomer(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
     if request.method == 'POST':
