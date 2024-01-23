@@ -1670,13 +1670,16 @@ from math import radians, sin, cos, sqrt, atan2
 def haversine(lat1, lon1, lat2, lon2):
     # Helper function to calculate distance between two points on the Earth's surface
     def convert_coord(coord):
-        if isinstance(coord, F):
-            raise TypeError("F expression not allowed in haversine function.")
-        return radians(coord)
+      if coord is not None:
+        return float(coord)
+      else:
+        return 0.0
+
+
 
     # Convert latitude and longitude to radians
     lat1, lon1, lat2, lon2 = map(convert_coord, [lat1, lon1, lat2, lon2])
-
+    
     # Haversine formula
     dlat = lat2 - lat1
     dlon = lon2 - lon1
@@ -1687,79 +1690,37 @@ def haversine(lat1, lon1, lat2, lon2):
     return distance
 
 def assign_nearby_agents_to_seller(seller, nearby_agents):
+
+    for agent in nearby_agents:
+        agent.assigned_seller = seller
+        agent.save()
     # Clear existing assignments
     seller.nearby_delivery_agents.clear()
     # Add the new nearby agents
     seller.nearby_delivery_agents.add(*nearby_agents)
-def display_nearby_agents(request, seller_id):
-    seller = get_object_or_404(Seller, id=seller_id)
-    seller_latitude = seller.latitude
-    seller_longitude = seller.longitude
-
-    # Retrieve all sellers with the same location
-    sellers_with_same_location = Seller.objects.filter(
-        latitude=seller_latitude,
-        longitude=seller_longitude
-    ).exclude(id=seller_id)
-
-    # Retrieve all delivery agents not assigned to any seller
-    available_agents = DeliveryAgent.objects.filter(
-        latitude__isnull=False,
-        longitude__isnull=False,
-        seller__isnull=True  # Filter agents not assigned to any seller
-    )
-
-    # Calculate distances for each agent and print details
-    print("Seller:", seller)
-    print("Seller Location:", seller_latitude, seller_longitude)
-
-    for agent in available_agents:
-        # Calculate distance for each agent using haversine
-        distance = haversine(agent.latitude, agent.longitude, seller_latitude, seller_longitude)
-        print(f"Agent: {agent.user.email} - Latitude: {agent.latitude}, Longitude: {agent.longitude}")
-        print(f"Distance: {distance} km\n")
-
-        # Update the agent's distance field in the database
-        DeliveryAgent.objects.filter(pk=agent.pk).update(distance=distance)
-
-    # Filter nearby agents based on distance
-    nearby_agents = available_agents.order_by('distance')[:3]
-
-    print("Nearby Agents:")
-    for agent in nearby_agents:
-        print(f"{agent.user.email} - Distance: {agent.distance} km")
-
-    # Assign the top three nearby agents to the seller
-    seller.nearby_delivery_agents.set(nearby_agents)
-
-    # Assign remaining nearest agents to other sellers with the same location
-    remaining_agents = available_agents.exclude(id__in=nearby_agents.values_list('id', flat=True))
-    
-    for other_seller in sellers_with_same_location:
-        other_seller_nearby_agents = remaining_agents.order_by('distance')[:3]
-        remaining_agents = remaining_agents.exclude(id__in=other_seller_nearby_agents.values_list('id', flat=True))
-        other_seller.nearby_delivery_agents.set(other_seller_nearby_agents)
-
-    context = {
-        'seller': seller,
-        'delivery_agents': nearby_agents,
-    }
-
-    return render(request, 'Seller/display_nearby_agents.html', context)
 # def display_nearby_agents(request, seller_id):
-#     # Retrieve the seller's location
 #     seller = get_object_or_404(Seller, id=seller_id)
 #     seller_latitude = seller.latitude
 #     seller_longitude = seller.longitude
 
-#     # Retrieve all delivery agents
-#     delivery_agents = DeliveryAgent.objects.all()
+#     # Retrieve all sellers with the same location
+#     sellers_with_same_location = Seller.objects.filter(
+#         latitude=seller_latitude,
+#         longitude=seller_longitude
+#     ).exclude(id=seller_id)
+
+#     # Retrieve all delivery agents not assigned to any seller
+#     available_agents = DeliveryAgent.objects.filter(
+#         latitude__isnull=False,
+#         longitude__isnull=False,
+#         seller__isnull=True  # Filter agents not assigned to any seller
+#     )
 
 #     # Calculate distances for each agent and print details
 #     print("Seller:", seller)
 #     print("Seller Location:", seller_latitude, seller_longitude)
 
-#     for agent in delivery_agents:
+#     for agent in available_agents:
 #         # Calculate distance for each agent using haversine
 #         distance = haversine(agent.latitude, agent.longitude, seller_latitude, seller_longitude)
 #         print(f"Agent: {agent.user.email} - Latitude: {agent.latitude}, Longitude: {agent.longitude}")
@@ -1769,18 +1730,22 @@ def display_nearby_agents(request, seller_id):
 #         DeliveryAgent.objects.filter(pk=agent.pk).update(distance=distance)
 
 #     # Filter nearby agents based on distance
-#     nearby_agents = delivery_agents.filter(
-#         latitude__isnull=False, 
-#         longitude__isnull=False, 
-#         distance__lte=10
-#     ).order_by('distance')[:3]
+#     nearby_agents = available_agents.order_by('distance')[:3]
 
 #     print("Nearby Agents:")
 #     for agent in nearby_agents:
 #         print(f"{agent.user.email} - Distance: {agent.distance} km")
 
-#     # Assign the nearby agents to the seller
-#     assign_nearby_agents_to_seller(seller, nearby_agents)
+#     # Assign the top three nearby agents to the seller
+#     seller.nearby_delivery_agents.set(nearby_agents)
+
+#     # Assign remaining nearest agents to other sellers with the same location
+#     remaining_agents = available_agents.exclude(id__in=nearby_agents.values_list('id', flat=True))
+    
+#     for other_seller in sellers_with_same_location:
+#         other_seller_nearby_agents = remaining_agents.order_by('distance')[:3]
+#         remaining_agents = remaining_agents.exclude(id__in=other_seller_nearby_agents.values_list('id', flat=True))
+#         other_seller.nearby_delivery_agents.set(other_seller_nearby_agents)
 
 #     context = {
 #         'seller': seller,
@@ -1788,6 +1753,48 @@ def display_nearby_agents(request, seller_id):
 #     }
 
 #     return render(request, 'Seller/display_nearby_agents.html', context)
+def display_nearby_agents(request, seller_id):
+    # Retrieve the seller's location
+    seller = get_object_or_404(Seller, id=seller_id)
+    seller_latitude = seller.latitude
+    seller_longitude = seller.longitude
+
+    # Retrieve all delivery agents
+    delivery_agents = DeliveryAgent.objects.all()
+
+    # Calculate distances for each agent and print details
+    print("Seller:", seller)
+    print("Seller Location:", seller_latitude, seller_longitude)
+
+    for agent in delivery_agents:
+        # Calculate distance for each agent using haversine
+        distance = haversine(agent.latitude, agent.longitude, seller_latitude, seller_longitude)
+        print(f"Agent: {agent.user.email} - Latitude: {agent.latitude}, Longitude: {agent.longitude}")
+        print(f"Distance: {distance} km\n")
+
+        # Update the agent's distance field in the database
+        DeliveryAgent.objects.filter(pk=agent.pk).update(distance=distance)
+
+    # Filter nearby agents based on distance
+    nearby_agents = delivery_agents.filter(
+        latitude__isnull=False, 
+        longitude__isnull=False, 
+        distance__lte=10
+    ).order_by('distance')[:3]
+
+    print("Nearby Agents:")
+    for agent in nearby_agents:
+        print(f"{agent.user.email} - Distance: {agent.distance} km")
+
+    # Assign the nearby agents to the seller
+    assign_nearby_agents_to_seller(seller, nearby_agents)
+
+    context = {
+        'seller': seller,
+        'delivery_agents': nearby_agents,
+    }
+
+    return render(request, 'Seller/display_nearby_agents.html', context)
 def display_nearby_agents_map(request, seller_id):
     seller = get_object_or_404(Seller, id=seller_id)
     seller_latitude = seller.latitude
