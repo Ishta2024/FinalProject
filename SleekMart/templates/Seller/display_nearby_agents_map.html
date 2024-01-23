@@ -1,0 +1,31 @@
+{% load static %}
+{% block content %}
+    <h1>Nearby Delivery Agents Map</h1>
+
+    <div id="map" style="height: 500px;"></div>
+
+    <!-- Include Leaflet scripts and styles -->
+    <link rel="stylesheet" href="{% static 'leaflet/leaflet.css' %}" />
+    <script src="{% static 'leaflet/leaflet.js' %}"></script>
+
+    <script>
+        var map = L.map('map').setView([{{ seller_latitude }}, {{ seller_longitude }}], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        console.log("Seller Latitude:", {{ seller_latitude }});
+        console.log("Seller Longitude:", {{ seller_longitude }});
+        console.log("Map initialized");
+      
+        {% for agent in delivery_agents %}
+            console.log("Agent Latitude:", {{ agent.latitude }});
+            console.log("Agent Longitude:", {{ agent.longitude }});
+
+            L.marker([{{ agent.latitude }}, {{ agent.longitude }}])
+                .bindPopup("{{ agent.user.email }} - Distance: {{ agent.distance }} km")
+                .addTo(map);
+        {% endfor %}
+    </script>
+{% endblock %}

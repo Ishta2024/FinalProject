@@ -119,6 +119,7 @@
                     </a>
                     <div class="submenu">
                         <a href="{% url 'sellerprofile' %}">My Details</a>
+                        <a href="{% url 'display_nearby_agents' seller_id=request.user.seller.id %}">View Nearby Agents</a>
                        
                     </div>
                 </li>

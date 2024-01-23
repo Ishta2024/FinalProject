@@ -19,6 +19,10 @@ import razorpay
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseBadRequest
+from django.db.models import F, FloatField,Func
+from django.db.models.functions import Cos, Radians, Sin
+class Acos(Func):
+    function = 'ACOS'
 
 
 # Create your views here.
@@ -1600,6 +1604,234 @@ def delivery_agent_dashboard(request):
 def da_details(request):
     return render(request, 'DeliveryAgent/da_details.html')
 @login_required
+def edit_details(request):
+    user_profile = CustomUser.objects.get(pk=request.user.pk)  # Get the CustomUser object
+    delivery_profile = DeliveryAgent.objects.get(user=user_profile)
+    current_latitude = request.POST.get('latitude') or request.GET.get('currentLatitude')
+    current_longitude = request.POST.get('longitude') or request.GET.get('currentLongitude')
+    print('Hello')
+    print(current_latitude)
+    delivery_profile.latitude = current_latitude
+    delivery_profile.longitude = current_longitude
+    delivery_profile.save()
+    if request.method == "POST":
+        name = request.POST.get('name')
+        mobile = request.POST.get('mobile')
+        email = request.POST.get('email')
+        address = request.POST.get('address')
+       
+        # Check if a profile picture was uploaded
+        if 'profile_pic' in request.FILES:
+            profile_pic = request.FILES['profile_pic']
+            user_profile.profile_pic = profile_pic
+
+        user_profile.name = name
+        user_profile.mobile = mobile
+        user_profile.address = address
+        user_profile.email = email  # Update the email field of the CustomUser object
+        user_profile.save()
+
+        
+        
+        current_latitude = request.POST.get('latitude') or request.GET.get('currentLatitude')
+        current_longitude = request.POST.get('longitude') or request.GET.get('currentLongitude')
+        
+       
+        delivery_profile.latitude = current_latitude
+        delivery_profile.longitude = current_longitude
+
+        
+        delivery_profile.save()
+
+        messages.success(request, 'Profile updated successfully.')
+        return redirect('da_details')  # Redirect to the profile page
+
+    return render(request, 'DeliveryAgent/edit_details.html',{'user_profile': user_profile, 'delivery_profile': delivery_profile})
+from django.db.models import ExpressionWrapper, F, FloatField
+from django.db.models.functions import ACos, Cos, Radians, Sin
+
+
+# def calculate_distance(lat1, lon1, lat2, lon2):
+#     def convert_coord(coord):
+#         if isinstance(coord, F):
+#             return coord
+#         else:
+#             return radians(coord)
+
+#     lat1_rad, lon1_rad, lat2_rad, lon2_rad = map(convert_coord, [lat1, lon1, lat2, lon2])
+
+#     distance_expr = ExpressionWrapper(
+#         6371.0 * Acos(Sin(lat1_rad) * Sin(lat2_rad) + Cos(lat1_rad) * Cos(lat2_rad) * Cos(lon2_rad - lon1_rad)),
+#         output_field=FloatField()
+#     )
+#     return distance_expr
+from math import radians, sin, cos, sqrt, atan2
+
+def haversine(lat1, lon1, lat2, lon2):
+    # Helper function to calculate distance between two points on the Earth's surface
+    def convert_coord(coord):
+        if isinstance(coord, F):
+            raise TypeError("F expression not allowed in haversine function.")
+        return radians(coord)
+
+    # Convert latitude and longitude to radians
+    lat1, lon1, lat2, lon2 = map(convert_coord, [lat1, lon1, lat2, lon2])
+
+    # Haversine formula
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    distance = 6371.0 * c  # Radius of Earth in kilometers
+
+    return distance
+
+def assign_nearby_agents_to_seller(seller, nearby_agents):
+    # Clear existing assignments
+    seller.nearby_delivery_agents.clear()
+    # Add the new nearby agents
+    seller.nearby_delivery_agents.add(*nearby_agents)
+def display_nearby_agents(request, seller_id):
+    seller = get_object_or_404(Seller, id=seller_id)
+    seller_latitude = seller.latitude
+    seller_longitude = seller.longitude
+
+    # Retrieve all sellers with the same location
+    sellers_with_same_location = Seller.objects.filter(
+        latitude=seller_latitude,
+        longitude=seller_longitude
+    ).exclude(id=seller_id)
+
+    # Retrieve all delivery agents not assigned to any seller
+    available_agents = DeliveryAgent.objects.filter(
+        latitude__isnull=False,
+        longitude__isnull=False,
+        seller__isnull=True  # Filter agents not assigned to any seller
+    )
+
+    # Calculate distances for each agent and print details
+    print("Seller:", seller)
+    print("Seller Location:", seller_latitude, seller_longitude)
+
+    for agent in available_agents:
+        # Calculate distance for each agent using haversine
+        distance = haversine(agent.latitude, agent.longitude, seller_latitude, seller_longitude)
+        print(f"Agent: {agent.user.email} - Latitude: {agent.latitude}, Longitude: {agent.longitude}")
+        print(f"Distance: {distance} km\n")
+
+        # Update the agent's distance field in the database
+        DeliveryAgent.objects.filter(pk=agent.pk).update(distance=distance)
+
+    # Filter nearby agents based on distance
+    nearby_agents = available_agents.order_by('distance')[:3]
+
+    print("Nearby Agents:")
+    for agent in nearby_agents:
+        print(f"{agent.user.email} - Distance: {agent.distance} km")
+
+    # Assign the top three nearby agents to the seller
+    seller.nearby_delivery_agents.set(nearby_agents)
+
+    # Assign remaining nearest agents to other sellers with the same location
+    remaining_agents = available_agents.exclude(id__in=nearby_agents.values_list('id', flat=True))
+    
+    for other_seller in sellers_with_same_location:
+        other_seller_nearby_agents = remaining_agents.order_by('distance')[:3]
+        remaining_agents = remaining_agents.exclude(id__in=other_seller_nearby_agents.values_list('id', flat=True))
+        other_seller.nearby_delivery_agents.set(other_seller_nearby_agents)
+
+    context = {
+        'seller': seller,
+        'delivery_agents': nearby_agents,
+    }
+
+    return render(request, 'Seller/display_nearby_agents.html', context)
+# def display_nearby_agents(request, seller_id):
+#     # Retrieve the seller's location
+#     seller = get_object_or_404(Seller, id=seller_id)
+#     seller_latitude = seller.latitude
+#     seller_longitude = seller.longitude
+
+#     # Retrieve all delivery agents
+#     delivery_agents = DeliveryAgent.objects.all()
+
+#     # Calculate distances for each agent and print details
+#     print("Seller:", seller)
+#     print("Seller Location:", seller_latitude, seller_longitude)
+
+#     for agent in delivery_agents:
+#         # Calculate distance for each agent using haversine
+#         distance = haversine(agent.latitude, agent.longitude, seller_latitude, seller_longitude)
+#         print(f"Agent: {agent.user.email} - Latitude: {agent.latitude}, Longitude: {agent.longitude}")
+#         print(f"Distance: {distance} km\n")
+
+#         # Update the agent's distance field in the database
+#         DeliveryAgent.objects.filter(pk=agent.pk).update(distance=distance)
+
+#     # Filter nearby agents based on distance
+#     nearby_agents = delivery_agents.filter(
+#         latitude__isnull=False, 
+#         longitude__isnull=False, 
+#         distance__lte=10
+#     ).order_by('distance')[:3]
+
+#     print("Nearby Agents:")
+#     for agent in nearby_agents:
+#         print(f"{agent.user.email} - Distance: {agent.distance} km")
+
+#     # Assign the nearby agents to the seller
+#     assign_nearby_agents_to_seller(seller, nearby_agents)
+
+#     context = {
+#         'seller': seller,
+#         'delivery_agents': nearby_agents,
+#     }
+
+#     return render(request, 'Seller/display_nearby_agents.html', context)
+def display_nearby_agents_map(request, seller_id):
+    seller = get_object_or_404(Seller, id=seller_id)
+    seller_latitude = seller.latitude
+    seller_longitude = seller.longitude
+
+    # Retrieve all delivery agents
+    delivery_agents = DeliveryAgent.objects.all()
+
+    # Calculate distances for each agent and print details
+    print("Seller:", seller)
+    print("Seller Location:", seller_latitude, seller_longitude)
+
+    for agent in delivery_agents:
+        # Calculate distance for each agent using haversine
+        distance = haversine(agent.latitude, agent.longitude, seller_latitude, seller_longitude)
+        print(f"Agent: {agent.user.email} - Latitude: {agent.latitude}, Longitude: {agent.longitude}")
+        print(f"Distance: {distance} km\n")
+
+        # Update the agent's distance field in the database
+        DeliveryAgent.objects.filter(pk=agent.pk).update(distance=distance)
+
+    # Filter nearby agents based on distance
+    nearby_agents = delivery_agents.filter(
+        latitude__isnull=False, 
+        longitude__isnull=False, 
+        distance__lte=10
+    ).order_by('distance')[:3]
+
+    print("Nearby Agents:")
+    for agent in nearby_agents:
+        print(f"{agent.user.email} - Distance: {agent.distance} km")
+
+    # Assign the nearby agents to the seller
+    
+
+    context = {
+        'seller': seller,
+        'delivery_agents': nearby_agents,
+        'seller_latitude': seller_latitude,
+        'seller_longitude': seller_longitude,
+    }
+
+    return render(request, 'Seller/display_nearby_agents_map.html', context)
+@login_required
 def blockcustomer(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
     if request.method == 'POST':
@@ -1731,56 +1963,30 @@ def add_da(request):
         place = request.POST.get('place')
         mobile_number = request.POST.get('mobile')
         pincode = request.POST.get('pincode')
-        location = request.POST.get('location')
+        # location = request.POST.get('location')
         email = request.POST.get('email')
         password = request.POST.get('password')
-        business_name = request.POST.get('seller') 
-        print(business_name)
+        # business_name = request.POST.get('seller') 
+     
         role = 'delivery_agent'
+        user = CustomUser.objects.create_user(email=email, password=password, name=agent_name, mobile=mobile_number, role=role)
+        delivery_agent = DeliveryAgent.objects.create(
+            user=user,
+            place=place,
+            pincode=pincode,
+            location=place,
+                         # Corrected value to store Seller instance
+        )
+ 
 
-        if business_name:
-            try:
-                # Attempt to retrieve the Seller instance
-                seller = Seller.objects.get(id=business_name)
-                print(seller)
-                if DeliveryAgent.objects.filter(assigned_seller=seller).count() > 6:
-                   messages.warning(request, 'Seller already has 6 delivery agents. Cannot assign more.')
-                   return redirect('add_da')
-                else:
-                   user = CustomUser.objects.create_user(email=email, password=password, name=agent_name, mobile=mobile_number, role=role)
-                   delivery_agent = DeliveryAgent.objects.create(
-                       user=user,
-                       place=place,
-                       pincode=pincode,
-                       location=location,
-                       assigned_seller=seller  # Corrected value to store Seller instance
-                   )
+        subject = 'Welcome to SleekMart Delivery Team'
+        message = f'Hi {agent_name},\n\nYou have been added as a delivery agent on SleekMart.\n\nYour login credentials:\nEmail: {email}\nPassword: {password}\n\nThank you for joining our team!'
+        from_email = 'mailtoshowvalidationok@gmail.com'  # Replace with your email
+        recipient_list = [email]
 
-                   Notification.objects.create(
-                        recipient=seller.user,  
-                        message=f'You have a new delivery agent {agent_name} assigned.',
-                        delivery_agent = delivery_agent,
-                        notification_type = 'delivery_agent_assignment'
-                    )
-                   
-
-                   subject = 'Welcome to SleekMart Delivery Team'
-                   message = f'Hi {agent_name},\n\nYou have been added as a delivery agent on SleekMart.\n\nYour login credentials:\nEmail: {email}\nPassword: {password}\n\nThank you for joining our team!'
-                   from_email = 'mailtoshowvalidationok@gmail.com'  # Replace with your email
-                   recipient_list = [email]
-
-                   send_mail(subject, message, from_email, recipient_list, fail_silently=False)
-                   messages.success(request, 'Agent Added Successfully')
-                   return redirect('view_da')
-            except Seller.DoesNotExist:
-                # Handle the case where the Seller with the given business name does not exist
-                messages.warning(request, 'Invalid seller business name. Please select a valid seller.')
-                return redirect('add_da')
-        
-        else:
-            # Handle the case where the business_name is empty
-            messages.warning(request, 'Seller business name is required. Please select a seller.')
-            return redirect('add_da')
+        send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+        messages.success(request, 'Agent Added Successfully')
+        return redirect('view_da')
 
     return render(request, 'MainUser/add_DA.html', {'sellers': sellers})
 

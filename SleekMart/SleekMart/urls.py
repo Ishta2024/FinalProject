@@ -46,6 +46,9 @@ urlpatterns = [
     path('search/', views.search, name='search'),
     path('delivery_agent_dashboard/', views.delivery_agent_dashboard, name='delivery_agent_dashboard'),
     path('da_details/', views.da_details, name='da_details'),
+    path('edit_details/', views.edit_details, name='edit_details'),
+    path('display_nearby_agents/<int:seller_id>/', views.display_nearby_agents, name='display_nearby_agents'),
+    path('display_nearby_agents_map/<int:seller_id>/', views.display_nearby_agents_map, name='display_nearby_agents_map'),
     path('search_products/', views.search_products, name='search_products'),
     path('generate_report/', views.generate_report, name='generate_report'),
 

@@ -113,6 +113,7 @@ class DeliveryAgent(models.Model):
     assigned_seller = models.ForeignKey(Seller, on_delete=models.CASCADE, null=True, blank=True)
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    distance = models.FloatField(null=True, blank=True)
     # assigned_route = models.ForeignKey(Route, null=True, blank=True, on_delete=models.SET_NULL)
     def __str__(self):
         return self.user.email

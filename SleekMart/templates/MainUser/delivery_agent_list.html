@@ -204,6 +204,15 @@
                 </ul>
             </div>
         </header>
+        {% if messages %}
+<div class="messages text-center"> <!-- Add "text-center" class -->
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+      {{ message }}
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
         <form method="post" id= "yourForm" enctype="multipart/form-data" >
             {% csrf_token %}
             <section class="content-main">
@@ -247,8 +256,8 @@
                                         <div class="card-body">
                                             <h5 class="card-title mt-50">{{ agent.agent_name }}</h5>
                                             <div class="card-text text-muted">
-                                                <p class="m-0">Seller ID: #{{ agent.id }}</p>
-                                                <p>Email: <a href="mailto:{{ agent.user.email }}" class="__cf_email__" data-cfemail="{{ agent.email_encoded }}">{{ agent.email }}</a></p>
+                                                <p class="m-0">Agent ID: #{{ agent.id }}</p>
+                                                <p>Email: {{agent.user.email}}</p>
                                                 <p>Place: {{ agent.place }}</p>
                                                 <p>Mobile Number: {{ agent.user.mobile }}</p>
                                                 <p>Pincode: {{ agent.pincode }}</p>
