@@ -883,11 +883,20 @@ def add_review(request, product_id):
     return render(request, 'Customer/add_review.html', {'product': product})
 @login_required
 def order_itemdetails(request, order_id):
-    print('hai')
+    
     order = get_object_or_404(Order, id=order_id)
     order_items = OrderItem.objects.filter(order=order)
     print(order)
     return render(request, 'Seller/order_details.html', {'order': order,'order_items': order_items})
+
+@login_required
+def delivery_order_itemdetails(request, order_id):
+    
+    order = get_object_or_404(Order, id=order_id)
+    order_items = OrderItem.objects.filter(order=order)
+    print(order)
+    return render(request, 'DeliveryAgent/order_details.html', {'order': order,'order_items': order_items})
+
 @login_required
 def create_order(request):
     # Get the user's cart items
@@ -1120,6 +1129,18 @@ def seller_orders(request):
     }
 
     return render(request, 'Seller/orderview.html', context)
+@login_required
+def delivery_orders(request):
+    
+    delivery_agent = DeliveryAgent.objects.get(user=request.user)
+
+    delivery_orders = Order.objects.filter(orderitem__delivery_agent=delivery_agent).distinct()
+
+    context = {
+        'delivery_orders': delivery_orders,
+    }
+
+    return render(request, 'DeliveryAgent/orderview.html', context)
 @login_required
 def sellerprofile(request):
     return render(request, 'Seller/sellerprofile.html')

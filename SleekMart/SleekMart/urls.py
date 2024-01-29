@@ -69,12 +69,15 @@ urlpatterns = [
     path('confirm_order/<int:product_id>/', views.ConfirmOrderView.as_view(), name='single_confirm_order'),
     path('order_details/<int:order_item_id>/', views.OrderDetailsView.as_view(), name='order_details'),
     path('order_itemdetails/<int:order_id>/', views.order_itemdetails, name='order_itemdetails'),
+    path('delivery_order_itemdetails/<int:order_id>/', views.delivery_order_itemdetails, name='delivery_order_itemdetails'),
     path('generate_bill/<int:order_item_id>/', views.GenerateBillPDF.as_view(), name='generate_bill'),
     # path('buy_now/<int:product_id>/', views.buy_now, name='buy_now'),
+
     path('add_review/<int:product_id>/', views.add_review, name='add_review'),
     path('reviews', views.reviews, name='reviews'),
     path('sellerreviews', views.sellerreviews, name='sellerreviews'),
     path('seller_orders', views.seller_orders, name='seller_orders'),
+    path('delivery_orders', views.delivery_orders, name='delivery_orders'),
 
     path('contact' , views.contact, name='contact'),
     path('about' , views.about, name='about'),
