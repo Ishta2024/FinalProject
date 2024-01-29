@@ -4,6 +4,17 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.utils import timezone
 from django.conf import settings
 from django.db.models import Avg
+import qrcode
+from PIL import ImageFile, Image
+from io import BytesIO
+import qrcode
+from django.core.files.base import ContentFile
+from django.db import models
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+
+
+
      
 from django.contrib.auth import get_user_model
 # class UserProfile(models.Model):
@@ -92,6 +103,10 @@ class Seller(models.Model):
 
 class Customer(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    location = models.CharField(max_length=100, blank=True, null=True)
+    pincode = models.CharField(max_length=10, blank=True, null=True) 
     # Add any customer-specific fields here
 
     def __str__(self):
@@ -114,6 +129,7 @@ class DeliveryAgent(models.Model):
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     distance = models.FloatField(null=True, blank=True)
+    is_available = models.BooleanField(default=True)
     # assigned_route = models.ForeignKey(Route, null=True, blank=True, on_delete=models.SET_NULL)
     def __str__(self):
         return self.user.email
@@ -208,15 +224,48 @@ class Order(models.Model):
         FAILED = 'failed', 'Failed'
 
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=1)
+    
     products = models.ManyToManyField(Product)  
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
     order_date = models.DateTimeField(auto_now_add=True)
     razorpay_order_id = models.CharField(max_length=255, default=1)
+    qr_code = models.ImageField(upload_to='qr_codes/', blank=True, null=True)
     payment_status = models.CharField(max_length=20, choices=PaymentStatusChoices.choices, default=PaymentStatusChoices.PENDING)
-    def str(self):
-        return self.user.name 
+    def generate_qr_code(self):
+        # Only generate QR code if payment_status is successful and there is no existing QR code
+        if self.payment_status == self.PaymentStatusChoices.SUCCESSFUL and not self.qr_code:
+            # Generate QR code data based on order information
+            qr_code_data = f"Order ID: {self.id}, User: {self.user.name}, Total Price: ${self.total_price}"
+
+            # Create a QR code instance
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=4,
+            )
+            qr.add_data(qr_code_data)
+            qr.make(fit=True)
+
+            # Create an image from the QR code
+            img = qr.make_image(fill_color="black", back_color="white")
+
+            # Save the image to a BytesIO buffer
+            buffer = BytesIO()
+            img.save(buffer, format="PNG")
+            buffer.seek(0)
+
+            # Save the QR code image to a file
+            image_name = f"order_{self.id}_qr_code.png"
+            self.qr_code.save(image_name, ContentFile(buffer.read()), save=True)
+
+# Connect the Order model's save method to generate the QR code when an order is saved
+@receiver(pre_save, sender=Order)
+def order_pre_save(sender, instance: Order, **kwargs):
+    instance.generate_qr_code()
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, default=1)
+    delivery_agent = models.ForeignKey(DeliveryAgent, blank=True, null=True, on_delete=models.SET_NULL)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, default=1)
     seller = models.ForeignKey(Seller, on_delete=models.CASCADE, default=1)  # Assuming the seller is also a User
     quantity = models.PositiveIntegerField()
@@ -232,6 +281,8 @@ class OrderItem(models.Model):
         order = self.order
         order.total_price = sum(order_item.total_price for order_item in order.orderitem_set.all())
         order.save()
+
+    
     
 class AddCart(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE) 

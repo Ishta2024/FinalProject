@@ -1,6 +1,7 @@
 {% extends 'Customer/customer_base.html' %}
 {% load widget_tweaks %}
 {% block content %}
+<script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?callback=GetMap' async defer></script>
 <style media="screen">
     body {
         background-color: #ffffff;
@@ -90,7 +91,19 @@
                           <input type="text" id="id_address" name="address" value="{{ user.address }}" class="form-control" required>
                           <span id="addressError" class="error"></span>
                       </div>
-                      
+                      <div class="form-group">
+                        <label for="id_address">Latitude</label>
+                        <input type="text" id="latitude" name="latitude" value="{{ customer_profile.latitude }}" class="form-control" required>
+                        <span id="addressError" class="error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_address">Longitude</label>
+                        <input type="text" id="longitude" name="longitude" value="{{ customer_profile.longitude }}" class="form-control" required>
+                        <span id="addressError" class="error"></span>
+                    </div>
+                    
+                    <div class="mb-4" id="myMap" style="width: 600px; height: 400px;"></div>
+                    <div class="mb-4" id="locationInfo"></div>
                     </div>
                 </div>
                 <div>
@@ -100,8 +113,56 @@
         </div>
     </div>
 </form>
+<script type='text/javascript'>
+    var map;
+    function GetMap() {
+        console.log("Ok")
+        var apiKey = 'ApD6EZsbYwTxf5pLl1QAgalnbiMGc_BPoQuADqjedCl73WUqKqlwJ-7cbPXDdb6_';
+        var latitude = {{ customer_profile.latitude|default:0 }};
+        var longitude = {{ customer_profile.longitude|default:0 }};
+        console.log(latitude);
+        console.log(longitude);
+        var map = new Microsoft.Maps.Map('#myMap', {
+            credentials: apiKey,
+            center: new Microsoft.Maps.Location(latitude, longitude),
+            zoom: 10
+        });
 
+        var location = new Microsoft.Maps.Location(latitude, longitude);
+        var pin = new Microsoft.Maps.Pushpin(location, { title: 'Seller Location' });
+        map.entities.push(pin);
+
+        reverseGeocode(latitude, longitude);
+    }
+    
+        
+   
+    
+    function reverseGeocode(latitude, longitude) {
+        var apiKey = 'ApD6EZsbYwTxf5pLl1QAgalnbiMGc_BPoQuADqjedCl73WUqKqlwJ-7cbPXDdb6_';
+        var apiUrl = `https://dev.virtualearth.net/REST/v1/Locations/${latitude},${longitude}?key=${apiKey}`;
+
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.resourceSets && data.resourceSets.length > 0) {
+                    const locationName = data.resourceSets[0].resources[0].name;
+                    displayLocationInfo(locationName);
+                } else {
+                    console.error('No results found for reverse geocoding.');
+                }
+            })
+            .catch(error => console.error('Error fetching reverse geocoding data:', error));
+    }
+
+    function displayLocationInfo(locationName) {
+        // Display the location name in the specified div
+        var locationInfoDiv = document.getElementById('locationInfo');
+        locationInfoDiv.textContent = 'Location Name: ' + locationName;
+    }
+</script>
 <script>
+    
     function validateRegistrationForm() {
     
         var name = document.getElementById("id_name").value;
@@ -401,4 +462,5 @@ function validateAddress() {
         };
     });  
 </script>
+
 {% endblock content %}

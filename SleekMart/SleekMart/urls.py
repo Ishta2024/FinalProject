@@ -115,7 +115,7 @@ urlpatterns = [
 
     path('edit_subcategory/<int:subcategory_id>/',  views.edit_subcategory, name='edit_subcategory'),
     path('delete_subcategory/<int:subcategory_id>/',  views.delete_subcategory, name='delete_subcategory'),
-    path('edit_profile',  views.edit_profile, name='edit_profile'),
+    path('edit_profile/',  views.edit_profile, name='edit_profile'),
     path('view_customer',  views.view_customer, name='view_customer'),
     path('view_products_by_category/<slug:category_slug>/', views.view_products_by_category, name='view_products_by_category'),
     path('editproduct/<int:product_id>/', views.editproduct, name='editproduct'),

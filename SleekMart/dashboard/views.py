@@ -442,17 +442,54 @@ class ConfirmOrderView(View):
         # return redirect('order_details')
         return redirect('dashboard_home')
     
+# class OrderDetailsView(View):
+#     template_name = 'Customer/order_details.html'  # Replace with your actual template name
+
+#     def get(self, request, *args, **kwargs):
+#         order_item_id = kwargs.get('order_item_id')
+#         order_item = OrderItem.objects.get(id=order_item_id)  # Assuming you can retrieve the order item using its ID
+#         return render(request, self.template_name, {'order_item': order_item})
+  # Redirect to the product listing page or appropriate page
+
 class OrderDetailsView(View):
-    template_name = 'Customer/order_details.html'  # Replace with your actual template name
+    template_name = 'Customer/order_details.html'
 
     def get(self, request, *args, **kwargs):
         order_item_id = kwargs.get('order_item_id')
-        order_item = OrderItem.objects.get(id=order_item_id)  # Assuming you can retrieve the order item using its ID
+        order_item = OrderItem.objects.get(id=order_item_id)
+
+        # Assign the first available delivery agent based on the seller
+        delivery_agent = self.get_first_available_delivery_agent(order_item.seller)
+
+        # Update the order item with the assigned delivery agent
+        order_item.delivery_agent = delivery_agent
+        order_item.save()
+
+        self.send_assignment_email(order_item)
+
         return render(request, self.template_name, {'order_item': order_item})
-  # Redirect to the product listing page or appropriate page
 
+    def get_first_available_delivery_agent(self, seller):
+        # Get the first available delivery agent for the seller
+        available_agents = DeliveryAgent.objects.filter(assigned_seller=seller, is_available=True).order_by('id')
 
+        if available_agents.exists():
+            return available_agents.first()
+        else:
+            # Handle the case where no available agents are found
+            # You might want to queue the order for later processing or take appropriate action
+            return None
+        
+    def send_assignment_email(self, order_item):
+        subject = 'Order Assignment'
+        message = f'You have been assigned to deliver the product: {order_item.product.name}\n'
+        message += f'To the user at address: {order_item.order.user.address}\n'
+        message += 'Please proceed with the delivery as soon as possible.'
 
+        from_email = 'your-email@example.com'  # Update with your email address
+        to_email = order_item.delivery_agent.user.email
+
+        send_mail(subject, message, from_email, [to_email])
 
 #payment
 
@@ -1090,8 +1127,8 @@ def sellerprofile(request):
 def editseller(request):
     user_profile = CustomUser.objects.get(pk=request.user.pk)  # Get the CustomUser object
     seller_profile = Seller.objects.get(user=user_profile)
-    current_latitude = request.POST.get('latitude') or request.GET.get('currentLatitude')
-    current_longitude = request.POST.get('longitude') or request.GET.get('currentLongitude')
+    current_latitude = request.GET.get('currentLatitude', seller_profile.latitude)
+    current_longitude = request.GET.get('currentLongitude', seller_profile.longitude)
     print('Hello')
     print(current_latitude)
     seller_profile.latitude = current_latitude
@@ -1607,8 +1644,10 @@ def da_details(request):
 def edit_details(request):
     user_profile = CustomUser.objects.get(pk=request.user.pk)  # Get the CustomUser object
     delivery_profile = DeliveryAgent.objects.get(user=user_profile)
-    current_latitude = request.POST.get('latitude') or request.GET.get('currentLatitude')
-    current_longitude = request.POST.get('longitude') or request.GET.get('currentLongitude')
+    # current_latitude = request.POST.get('latitude') or request.GET.get('currentLatitude')
+    # current_longitude = request.POST.get('longitude') or request.GET.get('currentLongitude')
+    current_latitude = request.GET.get('currentLatitude', delivery_profile.latitude)
+    current_longitude = request.GET.get('currentLongitude', delivery_profile.longitude)
     print('Hello')
     print(current_latitude)
     delivery_profile.latitude = current_latitude
@@ -2062,23 +2101,35 @@ def notifications(request):
 
 @login_required
 def profile(request):
-    
+    user_profile = CustomUser.objects.get(pk=request.user.pk)
+    customer_profile = Customer.objects.get(user=user_profile)
+    print(customer_profile)
     cart_count = 0
     if request.user.is_authenticated:
         user = request.user
         cart_count = CartItems.objects.filter(cart__user=user).count()
     context = {
-        'cart_count' : cart_count
+        'cart_count' : cart_count,
+        'customer_profile' : customer_profile,
     }
     return render(request, 'Customer/profile.html', context)
 @login_required
 def edit_profile(request):
-    user_profile = CustomUser.objects.get(pk=request.user.pk)  # Get the CustomUser object
+    user_profile = CustomUser.objects.get(pk=request.user.pk)
+    customer_profile = Customer.objects.get(user=user_profile)
+    print(customer_profile)
+      # Get the CustomUser object
     cart_count = 0
     if request.user.is_authenticated:
         user = request.user
         cart_count = CartItems.objects.filter(cart__user=user).count()
-    
+     
+    current_latitude = request.GET.get('currentLatitude', customer_profile.latitude)
+    print(current_latitude)
+    current_longitude = request.GET.get('currentLongitude', customer_profile.longitude)
+    customer_profile.latitude = current_latitude
+    customer_profile.longitude = current_longitude
+    customer_profile.save()
     if request.method == "POST":
         name = request.POST.get('name')
         mobile = request.POST.get('mobile')
@@ -2097,11 +2148,23 @@ def edit_profile(request):
 
         user_profile.save()
 
+        current_latitude = request.POST.get('latitude') or request.GET.get('currentLatitude')
+        current_longitude = request.POST.get('longitude') or request.GET.get('currentLongitude')
+        
+       
+        customer_profile.latitude = current_latitude
+        customer_profile.longitude = current_longitude
+
+        
+        customer_profile.save()
+
+
         messages.success(request, 'Profile updated successfully.')
         return redirect('profile')  # Redirect to the profile page
     context = {
         'cart_count' : cart_count,
-        'user_profile': user_profile
+        'user_profile': user_profile,
+        'customer_profile' : customer_profile
     }
 
     return render(request, 'Customer/edit-profile.html', context)  

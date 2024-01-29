@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +6,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Order History</title>
-
+    <!-- Add this to your HTML head section -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" integrity="sha384-TX8UEmTRL3jGFGWg+Z2Zl8aU0cSeuQGS6QewA2z4dP3KxWjJRg6dTFmFvUG1PxC" crossorigin="anonymous">
+    
+<!-- Bootstrap JS (Popper.js and Bootstrap JS) -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-rhegW6eDoP6IAC+ZQp5ZlYkO8DEfTdrVztkyFVt4vrDHMSwejjbe5blQ6CJl2DdS" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js" integrity="sha384-Sfrw+1aCVIpIPIBEEXUGPXZ1AZ1TOODfMz1E4zbXsqp0bq9GqYce06M01TMzUgP1" crossorigin="anonymous"></script>
+    
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -103,6 +112,25 @@
             <p>Order Address: {{ order.user.address }}</p>
             <p>Total Price: {{ order.total_price }}</p>
             <p>Payment Status: {{ order.payment_status }}</p>
+
+            {% comment %} <a href="#" class="openQrCodeModal" 
+                       data-bs-toggle="modal"
+                       data-bs-target="#qrCodeModal"
+                       data-order-id="{{ order.id }}" 
+                       data-qr-code-data="{{ order.total_price }}">
+                       <img class="qr-code-image" src={{ order.qr_code.url }} alt="QR Code" width="150px"height="150px">
+                    </a> {% endcomment %}
+                    <a href="#" class="openQrCodeModal" 
+   data-bs-toggle="modal"
+   data-bs-target="#qrCodeModal"
+   data-order-id="{{ order.id }}"
+   data-qr-code-data="{{ order.total_price }}"
+   data-qr-code-url="{{ order.qr_code.url }}">
+   <img class="QrCodeModal" src="{{ order.qr_code.url }}" alt="QR Code" width="150px" height="150px">
+</a>
+
+
+                    
             <h2>Order Items</h2>
             <ul class="order-items">
                 {% for item in order.orderitem_set.all %}
@@ -146,5 +174,95 @@
     </div>
     
 </body>
+<!-- Include jQuery (you can use your own preferred way to include jQuery) -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-eUJRL5mu5LExAuCvZLbKUp33+5tVYJhunJSKx4i3dmFBBX9WO4AyAxu1fTD1cfuc" crossorigin="anonymous"></script>
+
+
+<!-- Your custom JavaScript code -->
+{% comment %} <script>
+    $(document).ready(function () {
+        $('.openQrCodeModal').on('click', function () {
+            // Get the data attributes
+            var orderId = $(this).data('order-id');
+            var qrCodeData = $(this).data('qr-code-data');
+
+            // Use the data to perform the desired action, e.g., open a modal
+            // You need to implement your modal opening logic here
+            console.log('Order ID:', orderId);
+            console.log('QR Code Data:', qrCodeData);
+
+            // For demonstration purposes, you can alert the data
+            alert('Order ID: ' + orderId + '\nQR Code Data: ' + qrCodeData);
+
+            // Prevent the default link behavior (optional)
+            return false;
+           
+        });
+    }); 
+    
+</script> {% endcomment %}
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+<!-- Bootstrap JavaScript -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.18.0/font/bootstrap-icons.css" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"></script>
+
+
+<script>
+    $(document).ready(function () {
+        $('.openQrCodeModal').on('click', function () {
+            console.log("Ok")
+            console.log("Helo")
+            // Get the data attributes
+            var orderId = $(this).data('order-id');
+            console.log(orderId);
+            
+            var qrCodeData = $(this).data('qr-code-data');
+            console.log(qrCodeData);
+            
+            var qrCodeUrl = $(this).data('qr-code-url');
+            console.log(qrCodeUrl);
+           
+            // Dynamically generate the modal HTML
+            var modalHtml = `
+                <div class="modal fade" id="qrCodeModal" tabindex="-1" aria-labelledby="qrCodeModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="qrCodeModalLabel">Zoomed QR Code</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="height:50px;width:50px;">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                {% comment %} <button type="button" class="btn-close" data-bs-dismiss="modal" style="height:50px;width:50px;" aria-label="Close"></button> {% endcomment %}
+                            </div>
+                            <div class="modal-body text-center">
+                                <img class="qr-code-image-zoomed" src="${qrCodeUrl}" alt="Zoomed QR Code">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Append the modal HTML to the body
+            $('body').append(modalHtml);
+
+            // Show the modal
+            $('#qrCodeModal').modal('show');
+
+            // Prevent the default link behavior (optional)
+            return false;
+        });
+    });
+</script>
 
 </html>

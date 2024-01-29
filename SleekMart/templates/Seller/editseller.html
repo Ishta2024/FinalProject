@@ -313,7 +313,27 @@
 
         reverseGeocode(currentLatitude, currentLongitude);
     } {% endcomment %}
+    {% comment %} function getCurrentLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+                    console.log(latitude)
+                    // Redirect to the page where latitude and longitude are updated
+                    window.location.href = `/editseller/?currentLatitude=${latitude}&currentLongitude=${longitude}`;
+                },
+                function(error) {
+                    console.error('Error getting geolocation:', error);
+                }
+           
+            );
+        } else {
+            console.error('Geolocation is not supported by this browser.');
+        }
+    } {% endcomment %}
     function GetMap() {
+        console.log("Ok")
         var apiKey = 'ApD6EZsbYwTxf5pLl1QAgalnbiMGc_BPoQuADqjedCl73WUqKqlwJ-7cbPXDdb6_';
         var latitude = {{ user.seller.latitude|default:0 }};
         var longitude = {{ user.seller.longitude|default:0 }};

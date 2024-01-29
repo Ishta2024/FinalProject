@@ -180,9 +180,10 @@
                 </header> <!-- card-header end// -->
                 <div class="card-body">
                     <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4">
+                        {% if delivery_agents %}
                         {% for agent in delivery_agents %}
                         <div class="col">
-                            {% if delivery_agents %}
+                            
                            
                             <div class="card card-user">
                                 
@@ -207,15 +208,16 @@
                                 <a href="{% url 'delivery_agent_details' delivery_agent_id=agent.id %}" class="btn btn-md rounded font-sm hover-up">View Profile</a>
                             </div>
                            
-                            {% else %}
-                            <p class="m-0">No Da Found</p>
-                            {% endif %}
+                            <a href="{% url 'display_nearby_agents_map' seller_id=seller.id %}" class="btn btn-md rounded font-sm hover-up">View Nearby Agents Map</a>    
                         </div> <!-- col.// -->
                         {% endfor %}
+                        {% else %}
+                            <p class="m-0">No Da Found</p>
+                            {% endif %}
                         <br>
                         
                 </div> <!-- card-body end// -->
-                <a href="{% url 'display_nearby_agents_map' seller_id=seller.id %}" class="btn btn-md rounded font-sm hover-up">View Nearby Agents Map</a>
+                
             </div> <!-- card end// -->
            
         </section> <!-- content-main end// -->

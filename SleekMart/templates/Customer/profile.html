@@ -1,6 +1,7 @@
 {% extends 'Customer/customer_base.html' %}
 {% load static %}
 {% block content %}
+<script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?callback=GetMap' async defer></script>
 <style media="screen">
     body {
       background-color: #f7f7f7;
@@ -192,12 +193,18 @@
           <i class="contact-icon glyphicon glyphicon-map-marker"></i>
           <p class="contactno"><strong>Address:</strong> {{ request.user.address }}</p>
       </div>
+      <div class="mb-4" id="myMap" style="width: 400px; height: 400px;"></div>
+      <div class="mb-4" id="locationInfo"></div>
     </div>
 </div>
 </form>
 <div class="text-center edit-button">
   <a href="{% url 'edit_profile' %}"><button class="btn btn-primary btn-lg"><span>Edit Profile</span></button></a>
 </div>
+<div class="text-center edit-button" >
+<button class="btn btn-primary btn-lg" onclick="getCurrentLocation()"><span>Add Your Current Location</span></button>
+</div>
+
 <br><br><br><br><br><br>
 <script>
 $(document).ready(function() {
@@ -211,5 +218,70 @@ $(document).ready(function() {
       }
   };
 });  
+</script>
+<script>
+  function getCurrentLocation() {
+      if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+              function(position) {
+                  const latitude = position.coords.latitude;
+                  const longitude = position.coords.longitude;
+                  console.log(latitude)
+                  // Redirect to the page where latitude and longitude are updated
+                  window.location.href = `/edit_profile/?currentLatitude=${latitude}&currentLongitude=${longitude}`;
+              },
+              function(error) {
+                  console.error('Error getting geolocation:', error);
+              }
+         
+          );
+      } else {
+          console.error('Geolocation is not supported by this browser.');
+      }
+  }
+</script>
+<script type='text/javascript'>
+  var map;
+ function GetMap() {
+  var apiKey = 'ApD6EZsbYwTxf5pLl1QAgalnbiMGc_BPoQuADqjedCl73WUqKqlwJ-7cbPXDdb6_';
+  var latitude = {{ customer_profile.latitude|default:0 }};
+  var longitude = {{ customer_profile.longitude|default:0 }};
+  console.log(latitude);
+  console.log(longitude);
+  var map = new Microsoft.Maps.Map('#myMap', {
+      credentials: apiKey,
+      center: new Microsoft.Maps.Location(latitude, longitude),
+      zoom: 10
+  });
+
+  var location = new Microsoft.Maps.Location(latitude, longitude);
+  var pin = new Microsoft.Maps.Pushpin(location, { title: 'Seller Location' });
+  map.entities.push(pin);
+
+  reverseGeocode(latitude, longitude);
+}
+
+function reverseGeocode(latitude, longitude) {
+  var apiKey = 'ApD6EZsbYwTxf5pLl1QAgalnbiMGc_BPoQuADqjedCl73WUqKqlwJ-7cbPXDdb6_';
+  var apiUrl = `https://dev.virtualearth.net/REST/v1/Locations/${latitude},${longitude}?key=${apiKey}`;
+
+  fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => {
+          if (data.resourceSets && data.resourceSets.length > 0) {
+              const locationName = data.resourceSets[0].resources[0].name;
+              displayLocationInfo(locationName);
+          } else {
+              console.error('No results found for reverse geocoding.');
+          }
+      })
+      .catch(error => console.error('Error fetching reverse geocoding data:', error));
+}
+
+function displayLocationInfo(locationName) {
+  // Display the location name in the specified div
+  var locationInfoDiv = document.getElementById('locationInfo');
+  locationInfoDiv.textContent = 'Location Name: ' + locationName;
+}
 </script>
 {% endblock content %}
