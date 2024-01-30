@@ -43,9 +43,9 @@
                         <span class="text">Manage</span>
                     </a>
                     <div class="submenu">
-                        <a href="{% url 'categories' %}" class="active">Categories</a>
-                        <a href="{% url 'subcategories' %}" class="active">Sub Categories</a>
-                        <a href="{% url 'productlist' %}">Product List</a>
+                        <a href="{% url 'delivery_agent_dashboard' %}">View Orders Assigned</a>
+                        <a href="{% url 'delivery_agent_dashboard' %}">View Seller</a>
+                        <a href="{% url 'delivery_agent_dashboard' %}">Product List</a>
                         {% comment %} <a href="page-products-grid.html">Product grid</a>
                         <a href="page-products-grid-2.html">Product grid 2</a> {% endcomment %}
                     </div>
@@ -98,12 +98,12 @@
                         <span class="text">Account</span>
                     </a>
                     <div class="submenu">
-                        <a href="{% url 'sellerprofile' %}">My Details</a>
+                        <a href="{% url 'da_details' %}">My Details</a>
                         
                     </div>
                 </li>
                 <li class="menu-item">
-                    <a class="menu-link" href="{% url 'sellerreviews' %}"> <i class="icon material-icons md-comment"></i>
+                    <a class="menu-link" href=""> <i class="icon material-icons md-comment"></i>
                         <span class="text">Reviews</span>
                     </a>
                 </li>
@@ -304,6 +304,7 @@
     <script src="{% static 'assets/js/vendors/jquery.fullscreen.min.js' %}"></script>
     <!-- Main Script -->
     <script src="{% static 'assets/js/main.js' %}" type="text/javascript"></script>
+    
     <script>
         $(document).ready(function () {
            

@@ -112,7 +112,7 @@
             <p>Order Address: {{ order.user.address }}</p>
             <p>Total Price: {{ order.total_price }}</p>
             <p>Payment Status: {{ order.payment_status }}</p>
-
+            <p>Delivery Status: {{ order.delivery_status }}</p>
             {% comment %} <a href="#" class="openQrCodeModal" 
                        data-bs-toggle="modal"
                        data-bs-target="#qrCodeModal"
@@ -240,6 +240,7 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="qrCodeModalLabel">Zoomed QR Code</h5>
+                               
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="height:50px;width:50px;">
                                     <span aria-hidden="true">&times;</span>
                                 </button>

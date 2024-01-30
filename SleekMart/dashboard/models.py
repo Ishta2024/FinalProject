@@ -222,7 +222,16 @@ class Order(models.Model):
         PENDING = 'pending', 'Pending'
         SUCCESSFUL = 'successful', 'Successful'
         FAILED = 'failed', 'Failed'
+    class DeliveryStatusChoices(models.TextChoices):
+        PENDING = 'pending', 'Pending'
+        IN_TRANSIT = 'in_transit', 'In Transit'
+        DELIVERED = 'delivered', 'Delivered'
 
+    delivery_status = models.CharField(
+        max_length=20,
+        choices=DeliveryStatusChoices.choices,
+        default=DeliveryStatusChoices.PENDING,
+    )
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=1)
     
     products = models.ManyToManyField(Product)  
@@ -334,6 +343,7 @@ class Shippings(models.Model):
 
      def __str__(self):
         return self.shipname
+     
 NOTIFICATION_TYPES = [
     ('delivery_agent_assignment', 'Delivery Agent Assignment'),
     ('other_notification_type', 'Other Notification Type'),

@@ -896,7 +896,21 @@ def delivery_order_itemdetails(request, order_id):
     order_items = OrderItem.objects.filter(order=order)
     print(order)
     return render(request, 'DeliveryAgent/order_details.html', {'order': order,'order_items': order_items})
+@csrf_exempt
+def update_delivery_status(request):
+    if request.method == 'POST':
+        order_id = request.POST.get('order_id')
+        delivery_status = request.POST.get('delivery_status', 'delivered')
 
+        try:
+            order = Order.objects.get(pk=order_id)
+            order.delivery_status = delivery_status
+            order.save()
+            return JsonResponse({'success': True})
+        except Order.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Order not found'})
+    else:
+        return JsonResponse({'success': False, 'error': 'Invalid request method'})
 @login_required
 def create_order(request):
     # Get the user's cart items
@@ -2123,7 +2137,8 @@ def notifications(request):
 @login_required
 def profile(request):
     user_profile = CustomUser.objects.get(pk=request.user.pk)
-    customer_profile = Customer.objects.get(user=user_profile)
+    # customer_profile = Customer.objects.get(user=user_profile)
+    customer_profile, created = Customer.objects.get_or_create(user=user_profile)
     print(customer_profile)
     cart_count = 0
     if request.user.is_authenticated:
