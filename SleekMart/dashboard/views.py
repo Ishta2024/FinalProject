@@ -764,7 +764,20 @@ def paymenthandler(request, cart_order=False):
     return HttpResponseBadRequest("Invalid request method")
 
 from decimal import Decimal
-@login_required 
+def orders(request):
+    successorders = Order.objects.filter(payment_status=Order.PaymentStatusChoices.SUCCESSFUL)
+
+    # Pass successful orders to the template
+    context = {
+        'successorders': successorders,
+    }
+    return render(request, 'MainUser/orders.html', context) 
+def details_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    order_items = OrderItem.objects.filter(order=order)
+    print(order)
+    
+    return render(request, 'MainUser/details_order.html',{'order': order,'order_items': order_items})
 def order_placed_successfully(request, order_id):
     try:
         order = Order.objects.get(id=order_id, user=request.user)

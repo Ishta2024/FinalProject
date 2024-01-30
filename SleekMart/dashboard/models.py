@@ -275,6 +275,7 @@ def order_pre_save(sender, instance: Order, **kwargs):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, default=1)
     delivery_agent = models.ForeignKey(DeliveryAgent, blank=True, null=True, on_delete=models.SET_NULL)
+    delivery_date = models.DateTimeField(null=True, blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, default=1)
     seller = models.ForeignKey(Seller, on_delete=models.CASCADE, default=1)  # Assuming the seller is also a User
     quantity = models.PositiveIntegerField()
