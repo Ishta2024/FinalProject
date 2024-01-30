@@ -12,6 +12,12 @@ from django.core.files.base import ContentFile
 from django.db import models
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from django.core.mail import send_mail
+from django.db import IntegrityError
+from django.db import transaction
+
+
+
 
 
 
@@ -273,6 +279,7 @@ class Order(models.Model):
 def order_pre_save(sender, instance: Order, **kwargs):
     instance.generate_qr_code()
 class OrderItem(models.Model):
+  
     order = models.ForeignKey(Order, on_delete=models.CASCADE, default=1)
     delivery_agent = models.ForeignKey(DeliveryAgent, blank=True, null=True, on_delete=models.SET_NULL)
     delivery_date = models.DateTimeField(null=True, blank=True)
@@ -282,16 +289,101 @@ class OrderItem(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
 
+    def assign_delivery_agent(self):
+        # Get the associated seller
+        seller = self.seller
+
+        # Get all delivery agents associated with the seller
+        delivery_agents = DeliveryAgent.objects.filter(seller=seller)
+        
+        for agent in delivery_agents:
+            assigned_products_count = OrderItem.objects.filter(
+                seller=seller, delivery_agent=agent
+            ).exclude(id=self.id).count()
+
+            if assigned_products_count < 4:
+                # Assign the next delivery agent to the order item
+                self.delivery_agent = agent
+                self.save()
+
+                # Send email notification to the assigned delivery agent
+                self.send_assignment_email()
+
+                break  # Exit the loop after assigning to the first suitable delivery agent
+
+        # If no suitable delivery agent is found, assign to the agent with the fewest assigned order items
+            else:
+            # Find the delivery agent with the fewest assigned order items
+                min_assigned_agent = min(delivery_agents, key=lambda agent: OrderItem.objects.filter(
+                seller=seller, delivery_agent=agent
+            ).exclude(id=self.id).count())
+
+            # Assign the order item to the agent with the fewest assigned order items
+                self.delivery_agent = min_assigned_agent
+                self.save()
+
+            # Send email notification to the assigned delivery agent
+                self.send_assignment_email()
+        # Determine the number of products already assigned to delivery agents
+        # assigned_products_count = OrderItem.objects.filter(
+        #     seller=seller, delivery_agent__in=delivery_agents
+        # ).exclude(id=self.id).count()
+
+        # # Find the next available delivery agent
+        # next_delivery_agent = delivery_agents[assigned_products_count % len(delivery_agents)]
+
+        # # Assign the next delivery agent to the order item
+        # self.delivery_agent = next_delivery_agent
+        # self.save()
+
+        # # Send email notification to the assigned delivery agent
+        # self.send_assignment_email()
+
+    def send_assignment_email(self):
+        subject = 'Order Assignment'
+        message = f'You have been assigned to deliver the product: {self.product.name}\n'
+        message += f'To the user at address: {self.order.user.address}\n'
+        message += 'Please proceed with the delivery as soon as possible.'
+
+        from_email = 'mailtoshowvalidationok@gmail.com'  # Update with your email address
+        to_email = self.delivery_agent.user.email
+
+        send_mail(subject, message, from_email, [to_email])
+
+    # def save(self, *args, **kwargs):
+    #     # Calculate the total price for this order item based on quantity and price
+    #     self.total_price = self.quantity * self.price
+
+    #     if not self.delivery_agent:
+    #         self.assign_delivery_agent()
+    #     super(OrderItem, self).save(*args, **kwargs)
+        
+    #     # Update the total order price in the associated Order model
+    #     order = self.order
+    #     order.total_price = sum(order_item.total_price for order_item in order.orderitem_set.all())
+    #     order.save()
     def save(self, *args, **kwargs):
         # Calculate the total price for this order item based on quantity and price
         self.total_price = self.quantity * self.price
-        super(OrderItem, self).save(*args, **kwargs)
-        
-        # Update the total order price in the associated Order model
-        order = self.order
-        order.total_price = sum(order_item.total_price for order_item in order.orderitem_set.all())
-        order.save()
 
+        if not self.delivery_agent:
+            self.assign_delivery_agent()
+
+        try:
+            # Save the instance and handle IntegrityError for unique constraint on id
+            with transaction.atomic():
+                super(OrderItem, self).save(*args, **kwargs)
+
+                # Update the total order price in the associated Order model
+                order = self.order
+                order.total_price = sum(order_item.total_price for order_item in order.orderitem_set.all())
+                order.save()
+
+        except IntegrityError:
+            # Handle IntegrityError, possibly due to concurrent saves
+            # You can log the error or take appropriate action based on your requirements
+            pass
+    
     
     
 class AddCart(models.Model):

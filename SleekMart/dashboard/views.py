@@ -459,37 +459,37 @@ class OrderDetailsView(View):
         order_item = OrderItem.objects.get(id=order_item_id)
 
         # Assign the first available delivery agent based on the seller
-        delivery_agent = self.get_first_available_delivery_agent(order_item.seller)
+        # delivery_agent = self.get_first_available_delivery_agent(order_item.seller)
 
-        # Update the order item with the assigned delivery agent
-        order_item.delivery_agent = delivery_agent
-        order_item.save()
+        # # Update the order item with the assigned delivery agent
+        # order_item.delivery_agent = delivery_agent
+        # order_item.save()
 
-        self.send_assignment_email(order_item)
+        # self.send_assignment_email(order_item)
 
         return render(request, self.template_name, {'order_item': order_item})
 
-    def get_first_available_delivery_agent(self, seller):
-        # Get the first available delivery agent for the seller
-        available_agents = DeliveryAgent.objects.filter(assigned_seller=seller, is_available=True).order_by('id')
+    # def get_first_available_delivery_agent(self, seller):
+    #     # Get the first available delivery agent for the seller
+    #     available_agents = DeliveryAgent.objects.filter(assigned_seller=seller, is_available=True).order_by('id')
 
-        if available_agents.exists():
-            return available_agents.first()
-        else:
-            # Handle the case where no available agents are found
-            # You might want to queue the order for later processing or take appropriate action
-            return None
+    #     if available_agents.exists():
+    #         return available_agents.first()
+    #     else:
+    #         # Handle the case where no available agents are found
+    #         # You might want to queue the order for later processing or take appropriate action
+    #         return None
         
-    def send_assignment_email(self, order_item):
-        subject = 'Order Assignment'
-        message = f'You have been assigned to deliver the product: {order_item.product.name}\n'
-        message += f'To the user at address: {order_item.order.user.address}\n'
-        message += 'Please proceed with the delivery as soon as possible.'
+    # def send_assignment_email(self, order_item):
+    #     subject = 'Order Assignment'
+    #     message = f'You have been assigned to deliver the product: {order_item.product.name}\n'
+    #     message += f'To the user at address: {order_item.order.user.address}\n'
+    #     message += 'Please proceed with the delivery as soon as possible.'
 
-        from_email = 'your-email@example.com'  # Update with your email address
-        to_email = order_item.delivery_agent.user.email
+    #     from_email = 'your-email@example.com'  # Update with your email address
+    #     to_email = order_item.delivery_agent.user.email
 
-        send_mail(subject, message, from_email, [to_email])
+    #     send_mail(subject, message, from_email, [to_email])
 
 #payment
 
@@ -1867,7 +1867,7 @@ def display_nearby_agents(request, seller_id):
         latitude__isnull=False, 
         longitude__isnull=False, 
         distance__lte=10
-    ).order_by('distance')[:3]
+    ).order_by('distance')[:4]
 
     print("Nearby Agents:")
     for agent in nearby_agents:
@@ -1880,7 +1880,7 @@ def display_nearby_agents(request, seller_id):
         'seller': seller,
         'delivery_agents': nearby_agents,
     }
-
+    
     return render(request, 'Seller/display_nearby_agents.html', context)
 def display_nearby_agents_map(request, seller_id):
     seller = get_object_or_404(Seller, id=seller_id)
@@ -1908,7 +1908,7 @@ def display_nearby_agents_map(request, seller_id):
         latitude__isnull=False, 
         longitude__isnull=False, 
         distance__lte=10
-    ).order_by('distance')[:3]
+    ).order_by('distance')[:4]
 
     print("Nearby Agents:")
     for agent in nearby_agents:
