@@ -21,6 +21,7 @@ from django.db import transaction
 
 
 
+
      
 from django.contrib.auth import get_user_model
 # class UserProfile(models.Model):
@@ -228,6 +229,53 @@ class Order(models.Model):
         PENDING = 'pending', 'Pending'
         SUCCESSFUL = 'successful', 'Successful'
         FAILED = 'failed', 'Failed'
+    
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=1)
+    
+    products = models.ManyToManyField(Product)  
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
+    order_date = models.DateTimeField(auto_now_add=True)
+    razorpay_order_id = models.CharField(max_length=255, default=1)
+    
+    payment_status = models.CharField(max_length=20, choices=PaymentStatusChoices.choices, default=PaymentStatusChoices.PENDING)
+#     def generate_qr_code(self):
+#         # Only generate QR code if payment_status is successful and there is no existing QR code
+#         if self.payment_status == self.PaymentStatusChoices.SUCCESSFUL and not self.qr_code:
+#             # Generate QR code data based on order information
+#             qr_code_data = f"Order ID: {self.id}, User: {self.user.name}, Total Price: ${self.total_price}"
+
+#             # Create a QR code instance
+#             qr = qrcode.QRCode(
+#                 version=1,
+#                 error_correction=qrcode.constants.ERROR_CORRECT_L,
+#                 box_size=10,
+#                 border=4,
+#             )
+#             qr.add_data(qr_code_data)
+#             qr.make(fit=True)
+
+#             # Create an image from the QR code
+#             img = qr.make_image(fill_color="black", back_color="white")
+
+#             # Save the image to a BytesIO buffer
+#             buffer = BytesIO()
+#             img.save(buffer, format="PNG")
+#             buffer.seek(0)
+
+#             # Save the QR code image to a file
+#             image_name = f"order_{self.id}_qr_code.png"
+#             self.qr_code.save(image_name, ContentFile(buffer.read()), save=True)
+
+# # Connect the Order model's save method to generate the QR code when an order is saved
+# @receiver(pre_save, sender=Order)
+# def order_pre_save(sender, instance: Order, **kwargs):
+#     instance.generate_qr_code()
+    
+class OrderItem(models.Model):
+  
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, default=1)
+    delivery_agent = models.ForeignKey(DeliveryAgent, blank=True, null=True, on_delete=models.SET_NULL)
+    qr_code = models.ImageField(upload_to='qr_codes/', blank=True, null=True)
     class DeliveryStatusChoices(models.TextChoices):
         PENDING = 'pending', 'Pending'
         IN_TRANSIT = 'in_transit', 'In Transit'
@@ -238,56 +286,39 @@ class Order(models.Model):
         choices=DeliveryStatusChoices.choices,
         default=DeliveryStatusChoices.PENDING,
     )
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=1)
-    
-    products = models.ManyToManyField(Product)  
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
-    order_date = models.DateTimeField(auto_now_add=True)
-    razorpay_order_id = models.CharField(max_length=255, default=1)
-    qr_code = models.ImageField(upload_to='qr_codes/', blank=True, null=True)
-    payment_status = models.CharField(max_length=20, choices=PaymentStatusChoices.choices, default=PaymentStatusChoices.PENDING)
-    def generate_qr_code(self):
-        # Only generate QR code if payment_status is successful and there is no existing QR code
-        if self.payment_status == self.PaymentStatusChoices.SUCCESSFUL and not self.qr_code:
-            # Generate QR code data based on order information
-            qr_code_data = f"Order ID: {self.id}, User: {self.user.name}, Total Price: ${self.total_price}"
-
-            # Create a QR code instance
-            qr = qrcode.QRCode(
-                version=1,
-                error_correction=qrcode.constants.ERROR_CORRECT_L,
-                box_size=10,
-                border=4,
-            )
-            qr.add_data(qr_code_data)
-            qr.make(fit=True)
-
-            # Create an image from the QR code
-            img = qr.make_image(fill_color="black", back_color="white")
-
-            # Save the image to a BytesIO buffer
-            buffer = BytesIO()
-            img.save(buffer, format="PNG")
-            buffer.seek(0)
-
-            # Save the QR code image to a file
-            image_name = f"order_{self.id}_qr_code.png"
-            self.qr_code.save(image_name, ContentFile(buffer.read()), save=True)
-
-# Connect the Order model's save method to generate the QR code when an order is saved
-@receiver(pre_save, sender=Order)
-def order_pre_save(sender, instance: Order, **kwargs):
-    instance.generate_qr_code()
-class OrderItem(models.Model):
-  
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, default=1)
-    delivery_agent = models.ForeignKey(DeliveryAgent, blank=True, null=True, on_delete=models.SET_NULL)
     delivery_date = models.DateTimeField(null=True, blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, default=1)
     seller = models.ForeignKey(Seller, on_delete=models.CASCADE, default=1)  # Assuming the seller is also a User
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
+    def generate_qr_code(self):
+        # Generate QR code data based on order item information
+        qr_code_data = f"OrderItem ID: {self.id}, Product: {self.product.name}, Quantity: {self.quantity}"
+
+        # Create a QR code instance
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(qr_code_data)
+        qr.make(fit=True)
+
+        # Create an image from the QR code
+        img = qr.make_image(fill_color="black", back_color="white")
+
+        # Save the image to a BytesIO buffer
+        buffer = BytesIO()
+        img.save(buffer, format="PNG")
+        buffer.seek(0)
+
+        # Save the QR code image to a file
+        image_name = f"order_item_{self.id}_qr_code.png"
+        self.qr_code.save(image_name, ContentFile(buffer.read()), save=True)
+
+# Connect the OrderItem model's save method to generate the QR code when an order item is saved
 
     def assign_delivery_agent(self):
         # Get the associated seller
@@ -368,6 +399,7 @@ class OrderItem(models.Model):
 
         if not self.delivery_agent:
             self.assign_delivery_agent()
+        self.generate_qr_code()
 
         try:
             # Save the instance and handle IntegrityError for unique constraint on id
@@ -384,7 +416,11 @@ class OrderItem(models.Model):
             # You can log the error or take appropriate action based on your requirements
             pass
     
-    
+@receiver(pre_save, sender=OrderItem)
+def order_item_pre_save(sender, instance: OrderItem, **kwargs):
+    instance.generate_qr_code()  
+
+pre_save.disconnect(order_item_pre_save, sender=OrderItem)  
     
 class AddCart(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE) 

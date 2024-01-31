@@ -112,7 +112,7 @@
             <p>Order Address: {{ order.user.address }}</p>
             <p>Total Price: {{ order.total_price }}</p>
             <p>Payment Status: {{ order.payment_status }}</p>
-            <p>Delivery Status: {{ order.delivery_status }}</p>
+            
             {% comment %} <a href="#" class="openQrCodeModal" 
                        data-bs-toggle="modal"
                        data-bs-target="#qrCodeModal"
@@ -120,14 +120,14 @@
                        data-qr-code-data="{{ order.total_price }}">
                        <img class="qr-code-image" src={{ order.qr_code.url }} alt="QR Code" width="150px"height="150px">
                     </a> {% endcomment %}
-                    <a href="#" class="openQrCodeModal" 
+                    {% comment %} <a href="#" class="openQrCodeModal" 
    data-bs-toggle="modal"
    data-bs-target="#qrCodeModal"
    data-order-id="{{ order.id }}"
    data-qr-code-data="{{ order.total_price }}"
    data-qr-code-url="{{ order.qr_code.url }}">
    <img class="QrCodeModal" src="{{ order.qr_code.url }}" alt="QR Code" width="150px" height="150px">
-</a>
+</a> {% endcomment %}
 
 
                     
@@ -141,7 +141,20 @@
                         <p>Quantity: {{ item.quantity }}</p>
                         <p>Price: ${{ item.price }}</p>
                         <p>Supplier: {{ item.product.seller.business_name }}</p>
+                        <p>Delivery Status: {{ item.delivery_status }}</p>
+                        {% if item.delivery_status == 'delivered' %}
                         <a href="{% url 'add_review' product_id=item.product.id %}" class="review-button">Add Review</a>
+                        {% else %}
+                        <a href="#" class="openQrCodeModal" 
+   data-bs-toggle="modal"
+   data-bs-target="#qrCodeModal"
+   data-order-id="{{ item.id }}"
+   data-qr-code-data="{{ item.total_price }}"
+   data-qr-code-url="{{ item.qr_code.url }}">
+   <img class="QrCodeModal" src="{{ item.qr_code.url }}" alt="QR Code" width="150px" height="150px">
+</a>
+{% endif %}
+                        
                     </li>
                 {% endfor %}
             </ul>

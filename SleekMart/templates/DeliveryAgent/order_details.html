@@ -307,6 +307,7 @@
                                             <th width="20%">Unit Price</th>
                                             <th width="20%">Quantity</th>
                                             <th width="20%" class="text-end">Total</th>
+                                            <th width="20%">Confirmation</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -324,7 +325,19 @@
                                             <td> ${{ order_item.price }} </td>
                                             <td> {{ order_item.quantity }} </td>
                                             <td class="text-end"> $ {{ order_item.total_price }}</td>
-                                            
+                                            <td>
+                                                {% if order_item.delivery_status == 'delivered' %}
+                                                    <a class="btn btn-primary" href="#">Delivered</a>
+                                                {% else %}
+                                                    <!-- Use data attributes to store relevant information -->
+                                                    <a class="btn btn-primary confirmOrderButton"
+                                                       data-order-id="{{ order_item.id }}"
+                                                       data-qr-code-data="{{ order_item.total_price }}"
+                                                       data-qr-code-cuser="{{ order_item.order.user.name }}"
+                                                       data-qr-code-url="{{ order_item.qr_code.url }}"
+                                                       href="#">Confirm Order</a>
+                                                {% endif %}
+                                            </td>
                                         </tr>
                                         {% endfor %}
                                         {% comment %} <tr>
@@ -393,20 +406,7 @@
                                     </tbody>
                                 </table>
                             </div> <!-- table-responsive// -->
-                            {% if order.delivery_status == 'delivered' %}
                             
-                            
-                            <a class="btn btn-primary" href="#">Delivered</a>
-                            
-        {% else %}
-            <a id="confirmOrderButton" class="btn btn-primary" href="#">Confirm Order</a><br>
-             {% comment %} <p>OR</p><br>
-             <form id="qrCodeUploadForm">
-                <label for="qrCodeFile">Upload QR Code:</label>
-                <input type="file" id="qrCodeFile" accept="image/*" />
-                <button type="button" onclick="uploadQRCode()">Upload</button>
-            </form> {% endcomment %}
-        {% endif %}
                         </div> <!-- col// -->
                         <div class="col-lg-1"></div>
                         <div class="col-lg-4">
@@ -455,7 +455,100 @@
     <script src="{% static 'assets/js/main.js' %}" type="text/javascript"></script>
     <script src="{% static 'assets/js/custom-chart.js' %}" type="text/javascript"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
+            // Disable caching
+            $.ajaxSetup({ cache: false });
+        });
+        
+        window.onpageshow = function (event) {
+            // Check if the page is loaded from the cache
+            if (event.persisted) {
+                // Page is loaded from cache (back button was used)
+                window.location.reload(); // Refresh the page
+            }
+        };
+        
+        document.addEventListener('DOMContentLoaded', function () {
+            var confirmOrderButtons = document.querySelectorAll('.confirmOrderButton');
+            
+            confirmOrderButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    var orderId = button.dataset.orderId;
+                    var qrCodeData = button.dataset.qrCodeData;
+                    var cuser = button.dataset.qrCodeCuser;
+                    var qrCodeUrl = button.dataset.qrCodeUrl;
+        
+                    console.log(orderId);
+                    console.log(qrCodeData);
+                    console.log(qrCodeUrl);
+        
+                    var content2 = {
+                        orderId: orderId,
+                        qrCodeData: qrCodeData,
+                        cuser: cuser
+                    };
+        
+                    $('#qrCodeModal').modal('show');
+        
+                    let scanner = new Instascan.Scanner({ video: document.getElementById('scanner') });
+        
+                    scanner.addListener('scan', function (scannedContent) {
+                        var scannedOrderId = scannedContent.match(/OrderItem ID: (\d+)/);
+                        console.log("Hello " + scannedOrderId);
+                        console.log(orderId);
+                        if (scannedOrderId) {
+                            console.log("Scanned Order ID: " + scannedOrderId[1]);
+                            console.log("Content2 Order ID: " + content2.orderId);
+                            if (scannedOrderId[1] === content2.orderId) {
+                                console.log("Entering the if block.");
+                            console.log(orderId);
+                            $.ajax({
+                                url: '/update_delivery_status/',
+                                method: 'POST',
+                                data: { order_id: content2.orderId, delivery_status: 'delivered' },
+                                success: function (response) {
+                                    if (response.success) {
+                                        alert('QR Code scanned. Content matches the order. Order Delivered!' + scannedContent);
+                                        scanner.stop();
+                                        $('#qrCodeModal').modal('hide');
+                                        button.innerText = 'Delivered';
+                                        button.classList.remove('btn-primary');
+                                        button.classList.add('btn-success');
+                                    } else {
+                                        alert('Failed to update delivery status.');
+                                    }
+                                    
+                                },
+                                error: function () {
+                                    alert('Error updating delivery status.');
+                                }
+                            });
+                        } else {
+                            console.log("Not entering the if block.");
+                            alert('QR Code does not match the order. Please scan the correct QR Code.' + scannedContent);
+                        }
+                    } else {
+                        alert('Invalid QR Code content.' + scannedContent);
+                    }
+                    });
+        
+                    Instascan.Camera.getCameras().then(function (cameras) {
+                        if (cameras.length > 0) {
+                            scanner.start(cameras[0]);
+                        } else {
+                            alert('No cameras found.');
+                            $('#qrCodeModal').modal('hide');
+                        }
+                    });
+                });
+            });
+        
+            $('#qrCodeModal').on('hidden.bs.modal', function () {
+                scanner.stop();
+            });
+        });
+        
+        {% comment %} $(document).ready(function() {
           // Disable caching
           $.ajaxSetup({ cache: false });
       });
@@ -467,11 +560,14 @@
           }
       };
       document.addEventListener('DOMContentLoaded', function () {
-        confirmOrderButton.addEventListener('click', function () {
-            var orderId = {{ order.id|safe }};
-            var qrCodeData = {{ order.total_price|safe }};
-            var cuser = "{{ order.user.name|safe}}";
-            var qrCodeUrl = "{{ order.qr_code.url|safe }}";
+        console.log("DOM content loaded");
+        var confirmOrderButtons = document.querySelectorAll('.confirmOrderButton');
+        confirmOrderButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                var orderId = button.dataset.orderId;
+                var qrCodeData = button.dataset.qrCodeData;
+                var cuser = button.dataset.qrCodeCuser;
+                var qrCodeUrl = button.dataset.qrCodeUrl;
             console.log(orderId);
             console.log(qrCodeData);
             console.log(qrCodeUrl);
@@ -538,6 +634,8 @@
             scanner.stop();
         });
     });
+}); {% endcomment %}
+
     </script> 
 </body>
 

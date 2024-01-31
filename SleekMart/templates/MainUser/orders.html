@@ -255,7 +255,6 @@
                                     <th>Price</th>
                                     <th>Payment Status</th>
                                     <th>Date</th>
-                                    <th>Delivery Status</th>
                                     <th class="text-end"> Action </th>
                                 </tr>
                             </thead>
@@ -267,13 +266,7 @@
                                     <td>$948.55</td>
                                     <td><span class="badge rounded-pill alert-success">Received</span></td>
                                     <td>{{ orders.order_date|date:"d.m.Y" }}</td>
-                                    <td>
-                                        {% if orders.delivery_status == "delivered" %}
-                                            <span class="badge rounded-pill alert-success">{{ orders.delivery_status }}</span>
-                                        {% else %}
-                                            <span class="badge rounded-pill alert-danger">{{ orders.delivery_status }}</span>
-                                        {% endif %}
-                                    </td>
+                                    
                                     <td class="text-end">
                                         <a href="{% url 'details_order' orders.id%}" class="btn btn-md rounded font-sm">Detail</a>
                                         {% comment %} <div class="dropdown">

@@ -457,6 +457,7 @@ class OrderDetailsView(View):
     def get(self, request, *args, **kwargs):
         order_item_id = kwargs.get('order_item_id')
         order_item = OrderItem.objects.get(id=order_item_id)
+        return render(request, self.template_name, {'order_item': order_item})
 
         # Assign the first available delivery agent based on the seller
         # delivery_agent = self.get_first_available_delivery_agent(order_item.seller)
@@ -467,7 +468,7 @@ class OrderDetailsView(View):
 
         # self.send_assignment_email(order_item)
 
-        return render(request, self.template_name, {'order_item': order_item})
+        
 
     # def get_first_available_delivery_agent(self, seller):
     #     # Get the first available delivery agent for the seller
@@ -916,7 +917,7 @@ def update_delivery_status(request):
         delivery_status = request.POST.get('delivery_status', 'delivered')
 
         try:
-            order = Order.objects.get(pk=order_id)
+            order = OrderItem.objects.get(pk=order_id)
             order.delivery_status = delivery_status
             order.save()
             return JsonResponse({'success': True})

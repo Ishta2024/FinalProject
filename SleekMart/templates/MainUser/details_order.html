@@ -287,6 +287,8 @@
                                             <th width="40%">Product</th>
                                             <th width="20%">Unit Price</th>
                                             <th width="20%">Seller</th>
+                                            <th width="20%">Confirmation</th>
+
                                             <th width="20%" class="text-end">Delivery Agent</th>
                                         </tr>
                                     </thead>
@@ -304,6 +306,13 @@
                                             </td>
                                             <td> ${{ order_item.price }} </td>
                                             <td> {{ order_item.product.seller.user.name }} </td>
+                                            <td>
+                                                {% if order_item.delivery_status == "delivered" %}
+                                                    <span class="badge rounded-pill alert-success">{{ order_item.delivery_status }}</span>
+                                                {% else %}
+                                                    <span class="badge rounded-pill alert-danger">{{ order_item.delivery_status }}</span>
+                                                {% endif %}
+                                            </td>
                                             <td class="text-end"> {{ order_item.delivery_agent.user.name }}</td>
                                             
                                         </tr>
