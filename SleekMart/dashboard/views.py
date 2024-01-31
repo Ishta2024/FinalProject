@@ -457,7 +457,18 @@ class OrderDetailsView(View):
     def get(self, request, *args, **kwargs):
         order_item_id = kwargs.get('order_item_id')
         order_item = OrderItem.objects.get(id=order_item_id)
+
+        self.send_email_to_seller(order_item)
+
         return render(request, self.template_name, {'order_item': order_item})
+    
+    def send_email_to_seller(self, order_item):
+        subject = 'New Order Placed'
+        message = f'Hi {order_item.seller.user.name},\n\nA new order has been placed for the product {order_item.product.name}.'
+        from_email = 'your-email@example.com'
+        recipient_list = [order_item.seller.user.email]
+
+        send_mail(subject, message, from_email, recipient_list)
 
         # Assign the first available delivery agent based on the seller
         # delivery_agent = self.get_first_available_delivery_agent(order_item.seller)

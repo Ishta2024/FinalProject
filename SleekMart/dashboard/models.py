@@ -316,8 +316,9 @@ class OrderItem(models.Model):
 
         # Save the QR code image to a file
         image_name = f"order_item_{self.id}_qr_code.png"
-        self.qr_code.save(image_name, ContentFile(buffer.read()), save=True)
-
+        content_file = ContentFile(buffer.read())
+        self.qr_code.save(image_name, content_file, save=False)
+        self.save
 # Connect the OrderItem model's save method to generate the QR code when an order item is saved
 
     def assign_delivery_agent(self):
@@ -335,12 +336,13 @@ class OrderItem(models.Model):
             if assigned_products_count < 4:
                 # Assign the next delivery agent to the order item
                 self.delivery_agent = agent
-                self.save()
+                break
+                # self.save()
 
-                # Send email notification to the assigned delivery agent
-                self.send_assignment_email()
+                # # Send email notification to the assigned delivery agent
+                # self.send_assignment_email()
 
-                break  # Exit the loop after assigning to the first suitable delivery agent
+                # Exit the loop after assigning to the first suitable delivery agent
 
         # If no suitable delivery agent is found, assign to the agent with the fewest assigned order items
             else:
@@ -351,10 +353,10 @@ class OrderItem(models.Model):
 
             # Assign the order item to the agent with the fewest assigned order items
                 self.delivery_agent = min_assigned_agent
-                self.save()
+            #     self.save()
 
-            # Send email notification to the assigned delivery agent
-                self.send_assignment_email()
+            # # Send email notification to the assigned delivery agent
+            #     self.send_assignment_email()
         # Determine the number of products already assigned to delivery agents
         # assigned_products_count = OrderItem.objects.filter(
         #     seller=seller, delivery_agent__in=delivery_agents
@@ -369,7 +371,10 @@ class OrderItem(models.Model):
 
         # # Send email notification to the assigned delivery agent
         # self.send_assignment_email()
+            self.save()
 
+    # Send email notification to the assigned delivery agent
+            self.send_assignment_email()
     def send_assignment_email(self):
         subject = 'Order Assignment'
         message = f'You have been assigned to deliver the product: {self.product.name}\n'
