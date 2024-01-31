@@ -102,7 +102,7 @@
     <a href="{% url 'dashboard_home' %}"> Go to Homepage</a>
 
     <h1>Your Order History</h1>
-
+    {% if page_obj %}
     {% for order in page_obj %}
         <div class="order-details">
             <h2>Order Details</h2>
@@ -185,7 +185,9 @@
             </div>
         </span>
     </div>
-    
+    {% else %}
+    <p>No Orders Yet</p>
+    {% endif %}
 </body>
 <!-- Include jQuery (you can use your own preferred way to include jQuery) -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>

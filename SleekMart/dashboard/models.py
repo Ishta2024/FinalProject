@@ -293,6 +293,8 @@ class OrderItem(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
     def generate_qr_code(self):
+        
+
         # Generate QR code data based on order item information
         qr_code_data = f"OrderItem ID: {self.id}, Product: {self.product.name}, Quantity: {self.quantity}"
 
@@ -318,7 +320,7 @@ class OrderItem(models.Model):
         image_name = f"order_item_{self.id}_qr_code.png"
         content_file = ContentFile(buffer.read())
         self.qr_code.save(image_name, content_file, save=False)
-        self.save
+        # self.save()
 # Connect the OrderItem model's save method to generate the QR code when an order item is saved
 
     def assign_delivery_agent(self):
@@ -404,28 +406,38 @@ class OrderItem(models.Model):
 
         if not self.delivery_agent:
             self.assign_delivery_agent()
+
+        # Save the instance to get an ID
+        super(OrderItem, self).save(*args, **kwargs)
+
+        # Generate the QR code now that the ID is available
         self.generate_qr_code()
 
-        try:
-            # Save the instance and handle IntegrityError for unique constraint on id
-            with transaction.atomic():
-                super(OrderItem, self).save(*args, **kwargs)
+        # Update the total order price in the associated Order model
+        order = self.order
+        order.total_price = sum(order_item.total_price for order_item in order.orderitem_set.all())
+        order.save()
 
-                # Update the total order price in the associated Order model
-                order = self.order
-                order.total_price = sum(order_item.total_price for order_item in order.orderitem_set.all())
-                order.save()
+        # try:
+        #     # Save the instance and handle IntegrityError for unique constraint on id
+        #     with transaction.atomic():
+        #         super(OrderItem, self).save(*args, **kwargs)
 
-        except IntegrityError:
-            # Handle IntegrityError, possibly due to concurrent saves
-            # You can log the error or take appropriate action based on your requirements
-            pass
+        #         # Update the total order price in the associated Order model
+        #         order = self.order
+        #         order.total_price = sum(order_item.total_price for order_item in order.orderitem_set.all())
+        #         order.save()
+
+        # except IntegrityError:
+        #     # Handle IntegrityError, possibly due to concurrent saves
+        #     # You can log the error or take appropriate action based on your requirements
+        #     pass
     
-@receiver(pre_save, sender=OrderItem)
-def order_item_pre_save(sender, instance: OrderItem, **kwargs):
-    instance.generate_qr_code()  
+# @receiver(pre_save, sender=OrderItem)
+# def order_item_pre_save(sender, instance: OrderItem, **kwargs):
+#     instance.generate_qr_code()  
 
-pre_save.disconnect(order_item_pre_save, sender=OrderItem)  
+# pre_save.disconnect(order_item_pre_save, sender=OrderItem)  
     
 class AddCart(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE) 
