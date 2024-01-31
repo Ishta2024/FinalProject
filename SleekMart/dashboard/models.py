@@ -12,7 +12,7 @@ from django.core.files.base import ContentFile
 from django.db import models
 from django.db.models.signals import pre_save
 from django.db.models.signals import post_save
-
+import logging
 from django.dispatch import receiver
 from django.core.mail import send_mail
 from django.db import IntegrityError
@@ -240,6 +240,9 @@ class Order(models.Model):
     razorpay_order_id = models.CharField(max_length=255, default=1)
     
     payment_status = models.CharField(max_length=20, choices=PaymentStatusChoices.choices, default=PaymentStatusChoices.PENDING)
+
+    def __str__(self):
+       return self.user.name
 #     def generate_qr_code(self):
 #         # Only generate QR code if payment_status is successful and there is no existing QR code
 #         if self.payment_status == self.PaymentStatusChoices.SUCCESSFUL and not self.qr_code:
@@ -274,50 +277,74 @@ class Order(models.Model):
 #     instance.generate_qr_code()
 
 
+
+
 class OrderItem(models.Model):
-    order = models.ForeignKey('Order', on_delete=models.CASCADE, default=1)
-    delivery_agent = models.ForeignKey('DeliveryAgent', blank=True, null=True, on_delete=models.SET_NULL)
+  
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, default=1)
+    delivery_agent = models.ForeignKey(DeliveryAgent, blank=True, null=True, on_delete=models.SET_NULL)
     qr_code = models.ImageField(upload_to='qr_codes/', blank=True, null=True)
+    class DeliveryStatusChoices(models.TextChoices):
+        PENDING = 'pending', 'Pending'
+        IN_TRANSIT = 'in_transit', 'In Transit'
+        DELIVERED = 'delivered', 'Delivered'
+
     delivery_status = models.CharField(
         max_length=20,
-        choices=[(choice, choice) for choice in ['pending', 'in_transit', 'delivered']],
-        default='pending',
+        choices=DeliveryStatusChoices.choices,
+        default=DeliveryStatusChoices.PENDING,
     )
     delivery_date = models.DateTimeField(null=True, blank=True)
-    product = models.ForeignKey('Product', on_delete=models.CASCADE, default=1)
-    seller = models.ForeignKey('Seller', on_delete=models.CASCADE, default=1)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, default=1)
+    seller = models.ForeignKey(Seller, on_delete=models.CASCADE, default=1)  # Assuming the seller is also a User
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
-
     def generate_qr_code(self):
-       
+        # Only generate QR code if payment_status is successful and there is no existing QR code
+        # Only generate QR code if payment_status is successful and there is no existing QR code
+        if not self.qr_code:
+            # Use a database transaction to ensure the object is saved before retrieving the ID
+            with transaction.atomic():
+                # Reload the object to get the updated ID
+                self.refresh_from_db()
 
-        # Generate QR code data based on order item information
-        qr_code_data = f"OrderItem ID: {self.id}, Product: {self.product.name}, Quantity: {self.quantity}"
+                # Generate QR code data based on order information
+                qr_code_data = f"OrderItem ID: {self.id}, Product: {self.product.name}, Total Price: ${self.total_price}"
 
-        # Create a QR code instance
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=10,
-            border=4,
-        )
-        qr.add_data(qr_code_data)
-        qr.make(fit=True)
+                # Create a QR code instance
+                qr = qrcode.QRCode(
+                    version=1,
+                    error_correction=qrcode.constants.ERROR_CORRECT_L,
+                    box_size=10,
+                    border=4,
+                )
+                qr.add_data(qr_code_data)
+                qr.make(fit=True)
 
-        # Create an image from the QR code
-        img = qr.make_image(fill_color="black", back_color="white")
+            try:
+                    # Create an image from the QR code
+                img = qr.make_image(fill_color="black", back_color="white")
 
-        # Save the image to a BytesIO buffer
-        buffer = BytesIO()
-        img.save(buffer, format="PNG")
-        buffer.seek(0)
+                    # Save the image to a BytesIO buffer
+                buffer = BytesIO()
+                img.save(buffer, format="PNG")
+                buffer.seek(0)
 
-        # Save the QR code image to a file
-        image_name = f"order_item_{self.id}_qr_code.png"
-        self.qr_code.save(image_name, ContentFile(buffer.read()), save=False)
+                    # Save the QR code image to a file
+                image_name = f"order_item_{self.id}_qr_code.png"
+                self.qr_code.save(image_name, ContentFile(buffer.read()), save=True)
+                return image_name, ContentFile(buffer.read())
+            except Exception as e:
+                    # Log the exception
+                    logging.error(f"Error generating QR code for OrderItem ID {self.id}: {e}")
+                    # Return default name and content
+                    return f"default_qr_code_{self.id}.png", ContentFile(b"default content")
 
+        # Return a default name and ContentFile if no QR code is generated
+        return f"default_qr_code_{self.id}.png", ContentFile(b"default content")
+
+    
     def assign_delivery_agent(self):
         # Get the associated seller
         seller = self.seller
@@ -333,56 +360,28 @@ class OrderItem(models.Model):
             if assigned_products_count < 4:
                 # Assign the next delivery agent to the order item
                 self.delivery_agent = agent
-                self.save()
-                self.send_assignment_email()
                 break
-                # self.save()
-
-                # # Send email notification to the assigned delivery agent
-                # self.send_assignment_email()
-
-                # Exit the loop after assigning to the first suitable delivery agent
-
-        # If no suitable delivery agent is found, assign to the agent with the fewest assigned order items
+              
             else:
             # Find the delivery agent with the fewest assigned order items
                 min_assigned_agent = min(delivery_agents, key=lambda agent: OrderItem.objects.filter(
                 seller=seller, delivery_agent=agent
             ).exclude(id=self.id).count())
 
-            # Assign the order item to the agent with the fewest assigned order items
+           
                 self.delivery_agent = min_assigned_agent
-                self.save()
-                self.send_assignment_email()
-            #     self.save()
+        self.send_assignment_email()
 
-            # # Send email notification to the assigned delivery agent
-            #     self.send_assignment_email()
-        # Determine the number of products already assigned to delivery agents
-        # assigned_products_count = OrderItem.objects.filter(
-        #     seller=seller, delivery_agent__in=delivery_agents
-        # ).exclude(id=self.id).count()
-
-        # # Find the next available delivery agent
-        # next_delivery_agent = delivery_agents[assigned_products_count % len(delivery_agents)]
-
-        # # Assign the next delivery agent to the order item
-        # self.delivery_agent = next_delivery_agent
-        # self.save()
-
-        # # Send email notification to the assigned delivery agent
-        # self.send_assignment_email()
-             
-
-    # Send email notification to the assigned delivery agent
-             
+        OrderItem.objects.filter(pk=self.pk).update(delivery_agent=self.delivery_agent)   
+                
+    
     def send_assignment_email(self):
         subject = 'Order Assignment'
         message = f'You have been assigned to deliver the product: {self.product.name}\n'
         message += f'To the user at address: {self.order.user.address}\n'
         message += 'Please proceed with the delivery as soon as possible.'
 
-        from_email = 'mailtoshowvalidationok@gmail.com'
+        from_email = 'mailtoshowvalidationok@gmail.com'  # Update with your email address
         to_email = self.delivery_agent.user.email
 
         send_mail(subject, message, from_email, [to_email])
@@ -395,207 +394,29 @@ class OrderItem(models.Model):
             self.assign_delivery_agent()
 
         super(OrderItem, self).save(*args, **kwargs)
-        self.generate_qr_code()
 
-        try:
-            # Save the instance and handle IntegrityError for the unique constraint on id
-            with transaction.atomic():
+        # Generate and save the QR code after the object is saved
+        image_name, image_content = self.generate_qr_code()
+        self.qr_code.save(image_name, image_content, save=False)
 
-                # Update the total order price in the associated Order model
-                order = self.order
-                order.total_price = sum(order_item.total_price for order_item in order.orderitem_set.all())
-                order.save()
-
-
-
-
-        except IntegrityError:
-            # Handle IntegrityError, possibly due to concurrent saves
-            # You can log the error or take appropriate action based on your requirements
-            pass
-@receiver(post_save, sender=OrderItem)
-def order_item_post_save(sender, instance:OrderItem, **kwargs):
-          instance.generate_qr_code()
-
-# Ensure that the signal is connected
-post_save.connect(order_item_post_save, sender=OrderItem)
+        # Update the total order price in the associated Order model
+        order = self.order
+        order.total_price = sum(order_item.total_price for order_item in order.orderitem_set.all())
+        order.save()
 
 # @receiver(pre_save, sender=OrderItem)
-# def order_item_pre_save(sender, instance: OrderItem, **kwargs):
-#     instance.generate_qr_code()
-
-# pre_save.disconnect(order_item_pre_save, sender=OrderItem)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# class OrderItem(models.Model):
-  
-#     order = models.ForeignKey(Order, on_delete=models.CASCADE, default=1)
-#     delivery_agent = models.ForeignKey(DeliveryAgent, blank=True, null=True, on_delete=models.SET_NULL)
-#     qr_code = models.ImageField(upload_to='qr_codes/', blank=True, null=True)
-#     class DeliveryStatusChoices(models.TextChoices):
-#         PENDING = 'pending', 'Pending'
-#         IN_TRANSIT = 'in_transit', 'In Transit'
-#         DELIVERED = 'delivered', 'Delivered'
-
-#     delivery_status = models.CharField(
-#         max_length=20,
-#         choices=DeliveryStatusChoices.choices,
-#         default=DeliveryStatusChoices.PENDING,
-#     )
-#     delivery_date = models.DateTimeField(null=True, blank=True)
-#     product = models.ForeignKey(Product, on_delete=models.CASCADE, default=1)
-#     seller = models.ForeignKey(Seller, on_delete=models.CASCADE, default=1)  # Assuming the seller is also a User
-#     quantity = models.PositiveIntegerField()
-#     price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
-#     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
-#     def generate_qr_code(self):
-#         # Generate QR code data based on order item information
-#         qr_code_data = f"OrderItem ID: {self.id}, Product: {self.product.name}, Quantity: {self.quantity}"
-
-#         # Create a QR code instance
-#         qr = qrcode.QRCode(
-#             version=1,
-#             error_correction=qrcode.constants.ERROR_CORRECT_L,
-#             box_size=10,
-#             border=4,
-#         )
-#         qr.add_data(qr_code_data)
-#         qr.make(fit=True)
-
-#         # Create an image from the QR code
-#         img = qr.make_image(fill_color="black", back_color="white")
-
-#         # Save the image to a BytesIO buffer
-#         buffer = BytesIO()
-#         img.save(buffer, format="PNG")
-#         buffer.seek(0)
-
-#         # Save the QR code image to a file
-#         image_name = f"order_item_{self.id}_qr_code.png"
-#         self.qr_code.save(image_name, ContentFile(buffer.read()), save=True)
-
-# # Connect the OrderItem model's save method to generate the QR code when an order item is saved
-
-#     def assign_delivery_agent(self):
-#         # Get the associated seller
-#         seller = self.seller
-
-#         # Get all delivery agents associated with the seller
-#         delivery_agents = DeliveryAgent.objects.filter(seller=seller)
-        
-#         for agent in delivery_agents:
-#             assigned_products_count = OrderItem.objects.filter(
-#                 seller=seller, delivery_agent=agent
-#             ).exclude(id=self.id).count()
-
-#             if assigned_products_count < 4:
-#                 # Assign the next delivery agent to the order item
-#                 self.delivery_agent = agent
-#                 break
-#                 # self.save()
-
-#                 # # Send email notification to the assigned delivery agent
-#                 # self.send_assignment_email()
-
-#                 # Exit the loop after assigning to the first suitable delivery agent
-
-#         # If no suitable delivery agent is found, assign to the agent with the fewest assigned order items
-#             else:
-#             # Find the delivery agent with the fewest assigned order items
-#                 min_assigned_agent = min(delivery_agents, key=lambda agent: OrderItem.objects.filter(
-#                 seller=seller, delivery_agent=agent
-#             ).exclude(id=self.id).count())
-
-#             # Assign the order item to the agent with the fewest assigned order items
-#                 self.delivery_agent = min_assigned_agent
-#             #     self.save()
-
-#             # # Send email notification to the assigned delivery agent
-#             #     self.send_assignment_email()
-#         # Determine the number of products already assigned to delivery agents
-#         # assigned_products_count = OrderItem.objects.filter(
-#         #     seller=seller, delivery_agent__in=delivery_agents
-#         # ).exclude(id=self.id).count()
-
-#         # # Find the next available delivery agent
-#         # next_delivery_agent = delivery_agents[assigned_products_count % len(delivery_agents)]
-
-#         # # Assign the next delivery agent to the order item
-#         # self.delivery_agent = next_delivery_agent
-#         # self.save()
-
-#         # # Send email notification to the assigned delivery agent
-#         # self.send_assignment_email()
-#             self.save()
-
-#     # Send email notification to the assigned delivery agent
-#             self.send_assignment_email()
-#     def send_assignment_email(self):
-#         subject = 'Order Assignment'
-#         message = f'You have been assigned to deliver the product: {self.product.name}\n'
-#         message += f'To the user at address: {self.order.user.address}\n'
-#         message += 'Please proceed with the delivery as soon as possible.'
-
-#         from_email = 'mailtoshowvalidationok@gmail.com'  # Update with your email address
-#         to_email = self.delivery_agent.user.email
-
-#         send_mail(subject, message, from_email, [to_email])
-
-#     # def save(self, *args, **kwargs):
-#     #     # Calculate the total price for this order item based on quantity and price
-#     #     self.total_price = self.quantity * self.price
-
-#     #     if not self.delivery_agent:
-#     #         self.assign_delivery_agent()
-#     #     super(OrderItem, self).save(*args, **kwargs)
-        
-#     #     # Update the total order price in the associated Order model
-#     #     order = self.order
-#     #     order.total_price = sum(order_item.total_price for order_item in order.orderitem_set.all())
-#     #     order.save()
-#     def save(self, *args, **kwargs):
-#         # Calculate the total price for this order item based on quantity and price
-#         self.total_price = self.quantity * self.price
-
-#         if not self.delivery_agent:
-#             self.assign_delivery_agent()
-#         self.generate_qr_code()
-
-#         try:
-#             # Save the instance and handle IntegrityError for unique constraint on id
-#             with transaction.atomic():
-#                 super(OrderItem, self).save(*args, **kwargs)
-
-#                 # Update the total order price in the associated Order model
-#                 order = self.order
-#                 order.total_price = sum(order_item.total_price for order_item in order.orderitem_set.all())
-#                 order.save()
-
-#         except IntegrityError:
-#             # Handle IntegrityError, possibly due to concurrent saves
-#             # You can log the error or take appropriate action based on your requirements
-#             pass
-    
+# def order_pre_save(sender, instance: OrderItem, **kwargs):
+#      instance.generate_qr_code()
+ 
 # @receiver(pre_save, sender=OrderItem)
-# def order_item_pre_save(sender, instance: OrderItem, **kwargs):
-#       instance.generate_qr_code()  
-
-# pre_save.disconnect(order_item_pre_save, sender=OrderItem)  
+# def order_pre_save(sender, instance: OrderItem, **kwargs):
+#     # Pass the correct order_item_id when calling generate_qr_code
+#     image_name, image_content = instance.generate_qr_code(instance.id)
     
+#     if image_name and image_content:
+#         instance.qr_code.save(image_name, image_content, save=False)
+
+
 class AddCart(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE) 
     cart_date = models.DateTimeField(auto_now_add=True)

@@ -519,8 +519,9 @@
                                     }
                                     
                                 },
-                                error: function () {
-                                    alert('Error updating delivery status.');
+                                error: function (jqXHR, textStatus, errorThrown) {
+                                    console.error('Error updating delivery status:', textStatus, errorThrown);
+                                    alert('Error updating delivery status. Check the console for more details.');
                                 }
                             });
                         } else {
