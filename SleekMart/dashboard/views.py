@@ -912,14 +912,22 @@ def order_itemdetails(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     order_items = OrderItem.objects.filter(order=order)
     print(order)
+    print(order_items)
+
     return render(request, 'Seller/order_details.html', {'order': order,'order_items': order_items})
 
 @login_required
 def delivery_order_itemdetails(request, order_id):
     
     order = get_object_or_404(Order, id=order_id)
-    order_items = OrderItem.objects.filter(order=order)
-    print(order)
+    # order_items = OrderItem.objects.filter(order=order)
+    delivery_agent = DeliveryAgent.objects.get(user=request.user)
+    order_items = OrderItem.objects.filter(
+        Q(delivery_agent__user=request.user) & Q(order_id=order_id)
+    ).distinct()
+
+  
+    print("Hello: ", order_items)
     return render(request, 'DeliveryAgent/order_details.html', {'order': order,'order_items': order_items})
 @csrf_exempt
 def update_delivery_status(request):
@@ -1174,9 +1182,13 @@ def delivery_orders(request):
     delivery_agent = DeliveryAgent.objects.get(user=request.user)
 
     delivery_orders = Order.objects.filter(orderitem__delivery_agent=delivery_agent).distinct()
+    delivery_order_items = OrderItem.objects.filter(
+        Q(order__orderitem__delivery_agent=delivery_agent)
+    ).distinct()
 
     context = {
         'delivery_orders': delivery_orders,
+        'delivery_order_items': delivery_order_items,
     }
 
     return render(request, 'DeliveryAgent/orderview.html', context)

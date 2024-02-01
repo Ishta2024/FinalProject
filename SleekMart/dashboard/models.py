@@ -344,35 +344,66 @@ class OrderItem(models.Model):
         # Return a default name and ContentFile if no QR code is generated
         return f"default_qr_code_{self.id}.png", ContentFile(b"default content")
 
-    
     def assign_delivery_agent(self):
-        # Get the associated seller
+    # Get the associated seller
         seller = self.seller
 
         # Get all delivery agents associated with the seller
         delivery_agents = DeliveryAgent.objects.filter(seller=seller)
-        
-        for agent in delivery_agents:
-            assigned_products_count = OrderItem.objects.filter(
-                seller=seller, delivery_agent=agent
-            ).exclude(id=self.id).count()
 
-            if assigned_products_count < 4:
-                # Assign the next delivery agent to the order item
-                self.delivery_agent = agent
-                break
-              
+        # Iterate through delivery agents to find the one with the fewest assigned products
+        min_assigned_agent = min(delivery_agents, key=lambda agent: OrderItem.objects.filter(
+            seller=seller, delivery_agent=agent
+        ).exclude(id=self.id).count())
+
+        # Check if the selected delivery agent has fewer than 4 assigned products
+        if OrderItem.objects.filter(seller=seller, delivery_agent=min_assigned_agent).count() < 4:
+            self.delivery_agent = min_assigned_agent
+        else:
+            # If the selected delivery agent already has 4 or more assigned products, find another available agent
+            available_agents = [agent for agent in delivery_agents if OrderItem.objects.filter(
+                seller=seller, delivery_agent=agent
+            ).exclude(id=self.id).count() < 4]
+
+            if available_agents:
+                self.delivery_agent = available_agents[0]
             else:
-            # Find the delivery agent with the fewest assigned order items
-                min_assigned_agent = min(delivery_agents, key=lambda agent: OrderItem.objects.filter(
-                seller=seller, delivery_agent=agent
-            ).exclude(id=self.id).count())
+                # Handle the case when all agents have 4 or more assigned products
+                # You may want to implement additional logic here (e.g., notify admin, log the issue)
+                pass
 
-           
-                self.delivery_agent = min_assigned_agent
         self.send_assignment_email()
 
-        OrderItem.objects.filter(pk=self.pk).update(delivery_agent=self.delivery_agent)   
+        OrderItem.objects.filter(pk=self.pk).update(delivery_agent=self.delivery_agent)
+
+    # def assign_delivery_agent(self):
+    #     # Get the associated seller
+    #     seller = self.seller
+
+    #     # Get all delivery agents associated with the seller
+    #     delivery_agents = DeliveryAgent.objects.filter(seller=seller)
+        
+    #     for agent in delivery_agents:
+    #         assigned_products_count = OrderItem.objects.filter(
+    #             seller=seller, delivery_agent=agent
+    #         ).exclude(id=self.id).count()
+
+    #         if assigned_products_count < 4:
+    #             # Assign the next delivery agent to the order item
+    #             self.delivery_agent = agent
+    #             break
+              
+    #         else:
+    #         # Find the delivery agent with the fewest assigned order items
+    #             min_assigned_agent = min(delivery_agents, key=lambda agent: OrderItem.objects.filter(
+    #             seller=seller, delivery_agent=agent
+    #         ).exclude(id=self.id).count())
+
+           
+    #             self.delivery_agent = min_assigned_agent
+    #     self.send_assignment_email()
+
+    #     OrderItem.objects.filter(pk=self.pk).update(delivery_agent=self.delivery_agent)   
                 
     
     def send_assignment_email(self):

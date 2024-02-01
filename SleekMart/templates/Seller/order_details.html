@@ -259,7 +259,7 @@
                         <div class="text">
                             <h6 class="mb-1">Order info</h6>
                             <p class="mb-1">
-                                {{order.user.address}} <br> Pay method: UPI <br> Status: Confirmed<br>Transaction Id:  {{order.razorpay_order_id}}
+                                {{order.user.address}} <br> Pay method: UPI <br> Payment Status: Confirmed<br>Transaction Id:  {{order.razorpay_order_id}}
                             </p>
                             {% comment %} <a href="page-orders-detail.html#">Download info</a> {% endcomment %}
                         </div>
@@ -289,6 +289,7 @@
                                     <th width="40%">Product</th>
                                     <th width="20%">Unit Price</th>
                                     <th width="20%">Quantity</th>
+                                    <th width="20%">Delivery Status</th>
                                     <th width="20%" class="text-end">Total</th>
                                 </tr>
                             </thead>
@@ -306,7 +307,8 @@
                                     </td>
                                     <td> ${{ order_item.price }} </td>
                                     <td> {{ order_item.quantity }} </td>
-                                    <td class="text-end"> $ {{ order_item.total_price }}</td>
+                                    <td> {{ order_item.delivery_status }} </td>
+                                    <td class="text-end"> ${{ order_item.total_price }}</td>
                                     
                                 </tr>
                                 {% endfor %}
@@ -365,7 +367,7 @@
                                                 <dd> <b class="h5">$ {{ order.total_price }}</b> </dd>
                                             </dl>
                                             <dl class="dlist">
-                                                <dt class="text-muted">Status:</dt>
+                                                <dt class="text-muted">Payment Status:</dt>
                                                 <dd>
                                                     <span class="badge rounded-pill alert-success text-success">Payment done</span>
                                                 </dd>
