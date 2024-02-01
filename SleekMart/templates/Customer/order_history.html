@@ -141,6 +141,7 @@
                         <p>Quantity: {{ item.quantity }}</p>
                         <p>Price: ${{ item.price }}</p>
                         <p>Supplier: {{ item.product.seller.business_name }}</p>
+                        <p>Delivery Agent: {{ item.delivery_agent.user.name }}</p>
                         <p>Delivery Status: {{ item.delivery_status }}</p>
                         {% if item.delivery_status == 'delivered' %}
                         <a href="{% url 'add_review' product_id=item.product.id %}" class="review-button">Add Review</a>

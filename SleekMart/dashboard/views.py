@@ -1543,6 +1543,55 @@ def delete_category(request, category_slug):
 
     context = {'category': category}
     return render(request, 'MainUser/deletecategory.html', context)
+
+from django.utils.timezone import make_aware
+from django.utils import timezone
+
+def filter_orders(request):
+    selected_date = request.GET.get('date')
+    print("Selected Date (Aware):", selected_date)
+
+    # Convert the selected_date to an aware datetime object
+    selected_date_aware = make_aware(datetime.strptime(selected_date, '%Y-%m-%d'))
+    print("Selected Date (Aware):", selected_date_aware)
+
+    # Filter orders based on the aware datetime
+    filtered_orders = Order.objects.filter(order_date__date=selected_date_aware)
+    print("Number of Filtered Orders:", len(filtered_orders))
+    print("Filtered Orders:", filtered_orders)
+
+
+    # Return a JsonResponse with serialized data
+    data = [{'id': order.id, 'user_name': order.user.name, 'user_email': order.user.email, 'total_price': order.total_price, 'payment_status': order.payment_status, 'order_date': order.order_date} for order in filtered_orders]
+
+    return JsonResponse(data, safe=False)
+def filter_orders_by_status(request):
+    selected_status = request.GET.get('status').strip()  # Clean leading/trailing whitespaces
+    print("Selected Status:", repr(selected_status), "Length:", len(selected_status))
+
+    if selected_status and selected_status.lower() != 'show all':
+        print("Enter")
+        # Print the repr of payment_status values in the database
+        print("Database Status Values:", repr(Order.objects.values_list('payment_status', flat=True)))
+
+        filtered_orders = Order.objects.filter(payment_status__iexact=selected_status)
+        print("Filtered Orders:", filtered_orders)
+    else:
+        filtered_orders = Order.objects.all()
+
+    data = [
+        {
+            'id': order.id,
+            'user_name': order.user.name,
+            'user_email': order.user.email,
+            'total_price': order.total_price,
+            'payment_status': order.payment_status,
+            'order_date': order.order_date.strftime('%Y-%m-%d')
+        }
+        for order in filtered_orders
+    ]
+
+    return JsonResponse(data, safe=False)
 @login_required
 def subcategories(request):
 

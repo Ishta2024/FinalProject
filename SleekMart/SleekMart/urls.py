@@ -127,6 +127,8 @@ urlpatterns = [
     path('editproduct/<int:product_id>/', views.editproduct, name='editproduct'),
     path('productdelete/<int:product_id>/', views.productdelete, name='productdelete'),
 
+    path('filter_orders/', views.filter_orders, name='filter_orders'),
+    path('filter_orders_by_status/', views.filter_orders_by_status, name='filter_orders_by_status'),
 
     path('delete_customer/<int:customer_id>/',  views.delete_customer, name='delete_customer'),
     path('delete_customer/<int:customer_id>/',  views.delete_customer, name='delete_customer'),
