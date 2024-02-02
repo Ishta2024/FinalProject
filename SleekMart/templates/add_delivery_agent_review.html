@@ -1,0 +1,12 @@
+{% block content %}
+  <h2>Add Review for Delivery Agent {{ delivery_agent.user.username }}</h2>
+
+  <form method="post" action="{% url 'add_delivery_agent_review' delivery_agent.id %}">
+    {% csrf_token %}
+    
+    <label for="comment">Comment:</label>
+    <textarea name="comment" id="comment" rows="4" required></textarea>
+    
+    <button type="submit">Submit Review</button>
+  </form>
+{% endblock %}

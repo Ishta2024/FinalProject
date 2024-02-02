@@ -5,7 +5,7 @@ from django.contrib import messages
 from .models import Customer, CustomUser, Seller, AddWishlist,WishlistItems,AddCart, CartItems, Order, OrderItem, Review, ReviewRating
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from .models import Category, Product, Subcategory, Shippings, DeliveryAgent, Notification
+from .models import Category, Product, Subcategory, Shippings, DeliveryAgent, Notification,DeliveryAgentReview
 from django.urls import reverse
 from django.core.mail import send_mail
 from django.urls import reverse_lazy
@@ -1301,6 +1301,101 @@ def productlist(request):
         'selected_subcategory': selected_subcategory,
     }
     return render(request, template_name, context)
+
+from textblob import TextBlob
+@login_required
+def add_delivery_agent_review(request, delivery_agent_id):
+    delivery_agent = get_object_or_404(DeliveryAgent, id=delivery_agent_id)
+
+    if request.method == 'POST':
+        comment = request.POST.get('comment')
+        
+        if comment:
+            # Sentiment Analysis using TextBlob
+            sentiment_score = analyze_sentiment(comment)
+
+            # Calculate the rating based on sentiment score
+            rating = map_sentiment_to_rating(sentiment_score)
+
+            # Save the review
+            DeliveryAgentReview.objects.create(
+                user=request.user,
+                rating=rating,
+                comment=comment,
+                delivery_agent=delivery_agent
+            )
+
+            # Redirect to the reviews page for this delivery agent or another appropriate page
+            return redirect('delivery_agent_reviews', delivery_agent_id=delivery_agent_id)
+        else:
+            # Handle invalid form data
+            return HttpResponse("Invalid form data. Comment is required.")
+
+    return render(request, 'add_delivery_agent_review.html', {'delivery_agent': delivery_agent})
+
+def analyze_sentiment(text):
+    analysis = TextBlob(text)
+    sentiment_score = analysis.sentiment.polarity
+    return sentiment_score
+
+def map_sentiment_to_rating(sentiment_score):
+    if sentiment_score >= 0.5:
+        return 5
+    elif sentiment_score >= 0.2:
+        return 4
+    elif sentiment_score >= -0.2:
+        return 3
+    elif sentiment_score >= -0.5:
+        return 2
+    else:
+        return 1
+
+def delivery_agent_reviews(request, delivery_agent_id):
+    delivery_agent = get_object_or_404(DeliveryAgent, id=delivery_agent_id)
+    reviews = DeliveryAgentReview.objects.filter(delivery_agent=delivery_agent)
+
+    # Calculate the average rating for the delivery agent
+    total_rating = sum(review.rating for review in reviews)
+    average_rating = total_rating / len(reviews) if len(reviews) > 0 else 0.0
+
+    context = {
+        'delivery_agent': delivery_agent,
+        'reviews': reviews,
+        'average_rating': average_rating,
+    }
+
+    return render(request, 'delivery_agent_reviews.html', context)
+def delivery_agent_reviews(request, delivery_agent_id):
+
+    cart_count = 0  # Default to 0
+    wishlist_count = 0
+    wishlist = None
+    if request.user.is_authenticated:
+        user = request.user
+        user_id = request.user.id
+        cart_count = CartItems.objects.filter(cart__user=user).count()
+        wishlist = WishlistItems.objects.filter(wishlist__user_id=user_id).values_list('products__id', flat=True)
+        wishlist_count = WishlistItems.objects.filter(wishlist__user=request.user).count()
+    
+    delivery_agent = get_object_or_404(DeliveryAgent, id=delivery_agent_id)
+    reviews = DeliveryAgentReview.objects.filter(delivery_agent=delivery_agent)
+
+    # Calculate the average rating for the delivery agent
+    total_rating = sum(review.rating for review in reviews)
+    average_rating = total_rating / len(reviews) if len(reviews) > 0 else 0.0
+    
+   
+    context = {
+        'delivery_agent': delivery_agent,
+        'reviews': reviews,
+        'average_rating': average_rating,
+        'cart_count' : cart_count,
+        'wishlist': wishlist,
+        'wishlist_count': wishlist_count
+    }
+
+    return render(request, 'delivery_agent_reviews.html', context)
+
 @login_required
 def reviews(request):
     reviews = Review.objects.all()

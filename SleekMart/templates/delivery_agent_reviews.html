@@ -1,0 +1,659 @@
+<!-- delivery_agent_reviews.html -->
+
+
+{% load static %}
+{% block content %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+Wy5q6ZxyLCTek5C4C/PQ4p1L92AC2IbbqP" crossorigin="anonymous">
+
+    <title>SleekMart - Product Detail Page</title>
+
+
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/templatemo-hexashop.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/owl-carousel.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/lightbox.css' %}">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'js/popper.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+   
+    <script src="{% static 'js/myscript.js' %}"></script>
+    <style>
+        .page-heading {
+            margin-top: 80px;
+            margin-bottom: 30px;
+            background-image: url('{{ product.subcategory.image.url }}');
+            background-position: center center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            
+           
+        }
+        
+      .review-table {
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        height:50px;
+        width:400px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        {% comment %} overflow: hidden; {% endcomment %}
+      }
+
+      .review-table th, .review-table td {
+        border: 1px solid #dee2e6;
+        padding: 12px;
+        text-align: center;
+      }
+
+      .review-table th {
+        background-color: #007bff;
+        color: #fff;
+      }
+
+      .review-table tbody tr:nth-child(even) {
+        background-color: #f8f9fa;
+      }
+
+      .no-reviews {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 18px;
+        color: #555;
+      }
+        .header-area.header-sticky {
+            min-height: 80px;
+            background-color: #34a3b4;
+            z-index: 1000;
+          }
+          #product .right-content ul.stars {
+            position: relative;
+            right: -210px;
+            top: -45px;
+          }
+        /* Define styles for the products heading container */
+        .products-heading {
+            background-color: #34a3b4;
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        /* Define styles for the section title */
+        .section-title {
+            color: #333;
+            font-size: 30px;
+            margin: 0;
+            text-transform: uppercase;
+            background-color: #fff;
+            border: 2px solid #007bff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            display: inline-block;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+            animation: floatAnimation 3s ease-in-out infinite, colorChange 4s alternate infinite; /* Apply both animations */
+        }
+        .stars {
+            display: inline-block;
+            font-size: 1.2em; /* Adjust the font size of the stars */
+        }
+        
+        .star-rating {
+            width: 0; /* Initially no stars are filled */
+            white-space: nowrap;
+            overflow: hidden;
+            background: linear-gradient(90deg, gold, gold);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        /* Keyframes for the floating animation */
+        @keyframes floatAnimation {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px); /* Adjust the vertical float distance */
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+        
+        /* Keyframes for changing text color */
+        @keyframes colorChange {
+            0% {
+                color: #007bff; /* Initial color */
+            }
+            100% {
+                color: #ff0000; /* New color (you can adjust this) */
+            }
+        }
+        .main-border-button1 {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #e74c3c;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        
+        .main-border-button1:hover {
+            background-color: #c0392b;
+        }
+        .wishlist-button {
+            display: inline-block;
+            padding: 15px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            text-align: center;
+            text-decoration: none;
+            margin-right: -60px;
+            transition: background-color 0.3s ease;
+            position: relative; /* Add this to enable top adjustment */
+            top: 55px; /* Adjust this value to move the button down */
+        }
+        
+        
+        .minus-wishlist {
+            background-color: #FF5252;
+        }
+        
+        .plus-wishlist {
+            background-color: #4CAF50;
+        }
+        
+        .wishlist-button i {
+            margin-right: 10px;
+        }
+        
+        .wishlist-button:hover {
+            background-color: #FF0000;
+            transform: translateY(-3px);
+        }
+        
+        .wishlist-button:active {
+            transform: translateY(1px); /* Change translateY to push down */
+        }
+        
+        .product-reviews-container {
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+        
+        .product-reviews {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .review-item {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .review-item:last-child {
+            border-bottom: none;
+        }
+        
+        .review-user {
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .review-content {
+            flex-grow: 1;
+        }
+        
+        .no-review {
+            font-style: italic;
+        }
+        
+        ul.submenu {
+            display: none;
+            position: absolute;
+            background-color: #fff; /* White background */
+            border: 1px solid #ccc; /* Border to separate submenu */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow */
+            padding: 10px;
+            z-index: 1000; /* Ensure it appears above other elements */
+            width: auto; /* Adjust width dynamically based on content */
+        }
+        
+        ul.submenu li {
+            display: block;
+            margin-bottom: 10px;
+            white-space: normal;  /* Adjust space between submenu items */
+        }
+        
+        ul.submenu li a {
+            color: #333; /* Darker text color */
+            text-decoration: none;
+            display: block;
+            padding: 8px 50px; /* Adjust padding for each category item */
+            transition: background-color 0.3s ease; /* Smooth hover effect */
+            box-sizing: border-box;
+            white-space: nowrap;
+        }
+        
+        ul.submenu li a:hover {
+            background-color: #f5f5f5; /* Light gray background on hover */
+        }
+        
+        /* Style the main "Categories" link */
+        li.has-submenu:hover ul.submenu {
+            display: block;
+        }
+        
+        /* Position the submenu below the main link */
+        li.has-submenu {
+            position: relative;
+        }
+        
+        li.has-submenu .submenu {
+            top: 100%;
+            left: 0;
+        }
+        
+       .section{
+        height:225px;
+       }
+    
+    </style>
+</head>
+
+<body>
+
+
+<header class="header-area header-sticky">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav class="main-nav">
+                    <!-- ***** Logo Start ***** -->
+                    <a href="{% url 'dashboard_home' %}" class="logo">
+                        <h5 style="color:black;position:absolute;top:35px;">Sleek Mart </h5>
+                    </a>
+                    <!-- ***** Logo End ***** -->
+                    <!-- ***** Menu Start ***** -->
+                    <ul class="nav">
+                        <li class="scroll-to-section"><a href="{% url 'dashboard_home' %}" class="active">Home</a></li>
+                        {% comment %} {% for category in categories %}
+                        <li class="scroll-to-section"><a href="{% url 'products' category.id %}">{{ category.name }}</a></li>
+                        {% endfor %} {% endcomment %}
+                        <li class="has-submenu">
+                            <a href="#">Shop By Categories</a>
+                            <ul class="submenu">
+                                {% for category in categories %}
+                                    
+                                        <li>
+                                            <a href="{% url 'products' category.id %}" style="color: white;">
+                                                {{ category.name }}
+                                            </a>
+                                        </li>
+                                    
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        {% comment %} <li class="submenu">
+                            <a href="javascript:;">Pages</a>
+                            <ul>
+                                <li><a href="about">About Us</a></li>
+                                <li><a href="products">Products</a></li>
+                                <li><a href="single-product">Single Product</a></li>
+                                <li><a href="contact">Contact Us</a></li>
+                            </ul>
+                        </li>
+                        <li class="submenu">
+                            <a href="javascript:;">Features</a>
+                            <ul>
+                                <li><a href="#">Features Page 1</a></li>
+                                <li><a href="#">Features Page 2</a></li>
+                                <li><a href="#">Features Page 3</a></li>
+                                <li><a rel="nofollow" href="https://templatemo.com/page/4" target="_blank">Template Page 4</a></li>
+                            </ul>
+                        </li> {% endcomment %}
+                        <li class="scroll-to-section">
+                          <a href="{% url 'cart_details' %}">Cart <span class="cart-count" style="color:red;">({{ cart_count }})</span></a>
+                      </li>
+                        <li class="scroll-to-section">
+                            <a href="{% url 'view_wishlist' %}"> Wishlist <span class="wishlist-count" style="color:red;">({{ wishlist_count }})</span></a>
+                        </li>
+                        <li class="scroll-to-section">
+                            
+                            <a href="{% url 'order_history' %}"> Order History </a>
+                        </li>
+                        {% if user.is_authenticated %}
+                        <li class="scroll-to-section"><a href="{% url 'loggout' %}">Logout</a></li>
+                        {% else %}
+                        <li class="scroll-to-section"><a href="{% url 'loggout' %}">SignIn/Signup</a></li>
+                        {% endif %}
+                    </ul>        
+                    <a class='menu-trigger'>
+                        <span>Menu</span>
+                    </a>
+                    <!-- ***** Menu End ***** -->
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+    <!-- ***** Header Area End ***** -->
+
+    <!-- ***** Main Banner Area Start ***** -->
+    {% comment %} <div class="page-heading" id="top">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="inner-content">
+                        <h2>{{ product.name }}</h2>
+                        <span>{{ product.description }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ***** Main Banner Area End ***** -->
+    <div class="products-heading">
+        <h2 class="section-title">{{ product.name }}</h2>
+    </div> {% endcomment %}
+
+    <!-- ***** Product Area Starts ***** -->
+  
+    <section class="section" id="product">
+        <div class="container d-flex flex-column align-items-center justify-content-center min-vh-75">
+            <div class="col-lg-8">
+                <h2 class="section-title mb-4 text-center">Reviews for Delivery Agent: {{ delivery_agent.user.name }}</h2>
+    
+                {% if reviews %}
+                    <div class="review-table mb-4">
+                        
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Rating</th>
+                                    <th>Comment</th>
+                                    <th>Created at</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for review in reviews %}
+                                    <tr>
+                                        <td>{{ review.rating }}</td>
+                                        <td>{{ review.comment }}</td>
+                                        <td>{{ review.created_at }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                
+
+                {% else %}
+                    <p class="no-reviews text-center">No reviews available for this delivery agent.</p>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+    
+    
+    <!-- ***** Footer Start ***** -->
+    <footer class="py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="first-item">
+                        <div class="logo">
+                            {% comment %} <img src="{% static 'images/white-logo.png' %}" alt="hexashop ecommerce templatemo"> {% endcomment %}
+                        </div>
+                        <ul>
+                            <li><a href="#">16501 SleekMart, Kochi, FL 33160, Kerala</a></li>
+                            <li><a href="#">sleekmart@company.com</a></li>
+                            <li><a href="#">010-020-0340</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <h4>Shopping &amp; Categories</h4>
+                    <ul>
+                        <li><a href="#">Electronic Appliances</a></li>
+                        <li><a href="#">Kitchen Appliances</a></li>
+                        <li><a href="#">Home Appliances</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h4>Useful Links</h4>
+                    <ul>
+                        <li><a href="#">Homepage</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Help</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h4>Help &amp; Information</h4>
+                    <ul>
+                        <li><a href="#">Help</a></li>
+                        <li><a href="#">FAQ's</a></li>
+                        <li><a href="#">Shipping</a></li>
+                        <li><a href="#">Tracking ID</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-12">
+                    <div class="under-footer">
+                        <p>Copyright © 2022 sleekmart Co., Ltd. All Rights Reserved. 
+                        
+                        {% comment %} <br>Design: <a href="https://templatemo.com" target="_parent" title="free css templates">TemplateMo</a></p> {% endcomment %}
+                        <ul>
+                            <li><a href="#"><i class="fa fa-facebook"></i></a></li>
+                            <li><a href="#"><i class="fa fa-twitter"></i></a></li>
+                            <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
+                            <li><a href="#"><i class="fa fa-behance"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Plugins -->
+    <script src="{% static 'js/owl-carousel.js' %}"></script>
+    <script src="{% static 'js/accordions.js' %}"></script>
+    <script src="{% static 'js/datepicker.js' %}"></script>
+    <script src="{% static 'js/scrollreveal.min.js' %}"></script>
+    <script src="{% static 'js/waypoints.min.js' %}"></script>
+    <script src="{% static 'js/jquery.counterup.min.js' %}"></script>
+    <script src="{% static 'js/imgfix.min.js' %}"></script> 
+    <script src="{% static 'js/slick.js' %}"></script> 
+    <script src="{% static 'js/lightbox.js' %}"></script> 
+    <script src="{% static 'js/isotope.js' %}"></script> 
+    <script src="{% static 'js/quantity.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js" integrity="sha384-m2m3I3UTa6OM5b4qvuynf+THOMhpLWE+5lqAe1EI+3jAHDl3D/Dly/E6nBfiQLp1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+Wy5q6ZxyLCTek5C4C/PQ4p1L92AC2IbbqP" crossorigin="anonymous"></script>
+    <!-- Global Init -->
+    <script src="{% static 'js/custom.js' %}"></script>
+   
+    <script>
+
+        $(function() {
+            var selectedClass = "";
+            $("p").click(function(){
+            selectedClass = $(this).attr("data-rel");
+            $("#portfolio").fadeTo(50, 0.1);
+                $("#portfolio div").not("."+selectedClass).fadeOut();
+            setTimeout(function() {
+              $("."+selectedClass).fadeIn();
+              $("#portfolio").fadeTo(50, 1);
+            }, 500);
+                
+            });
+        });
+        function validateQuantity(input) {
+            // Ensure the input value is a positive integer
+            if (input.value < 1 || isNaN(input.value) || !Number.isInteger(parseFloat(input.value))) {
+                input.value = 1; // Reset to 1 if invalid input
+            } else if (input.value > {{ product.quantity }}) {
+                input.value = {{ product.quantity }}; // Reset to maximum product quantity if input exceeds it
+            }
+        }
+        
+        $(document).ready(function () {
+
+            $('#addToCartBtn').on('click', function (event) {
+                event.preventDefault(); // Prevent the default form submission
+                console.log("Add to Cart button clicked");
+                var currentQuantity = parseInt($('#quantityInput_{{ product.id }}').val(), 10);
+        
+                // Update the hidden input field with the selected quantity
+                $('#selectedQuantity').val(currentQuantity);
+        
+                // Now, you can submit the form with the current quantity
+                $('form').submit();
+            });
+            // Add an event listener for changes to the quantity input
+            $('[id^="quantityInput_"]').on('input', function () {
+                updateTotalPrice($(this));
+            });
+            
+            // Add event listeners for the plus and minus buttons
+            $('.plus').on('click', function () {
+                var input = $(this).siblings('input[name="quantity"]');
+                console.log(input.val())
+                var currentVal = parseInt(input.val(), 10);
+                input.val(currentVal + 1);
+                console.log(currentVal)
+                updateTotalPrice(input);
+            });
+    
+            $('.minus').on('click', function () {
+                var input = $(this).siblings('input[name="quantity"]');
+                var currentVal = parseInt(input.val(), 10);
+                if (currentVal > 1) {
+                    input.val(currentVal - 1);
+                    updateTotalPrice(input);
+                }
+            });
+            
+            
+            
+          
+            function updateTotalPrice(input) {
+                var quantity = parseInt(input.val(), 10);
+                var productId = input.attr('id').split('_')[1];
+                var sellingPrice = parseFloat($('#totalPrice_' + productId).data('selling-price'));
+                var newTotalPrice = sellingPrice * quantity;
+                $('#totalPrice_' + productId).text('$' + newTotalPrice.toFixed(2));
+            }
+      
+            var selectedRating = 0;
+
+   // Function to send the rating to the server (AJAX)
+function sendRatingToServer(rating) {
+    // Get the CSRF token from the form
+    var csrfToken = $('input[name=csrfmiddlewaretoken]').val();
+
+    $.ajax({
+        type: 'POST',
+        url: '/rate_product/', // Replace with your URL
+        data: {
+            csrfmiddlewaretoken: csrfToken, // Include the CSRF token
+            rating: rating,
+            product_id: '{{ product.id }}' // Replace with your product ID
+        },
+        success: function (data) {
+            // Handle success, e.g., show a thank you message
+            console.log('Rating sent successfully');
+        },
+        error: function (xhr, status, error) {
+            // Handle errors
+            console.error('Error sending rating: ' + error);
+        }
+    });
+}
+
+// Highlight stars on hover
+$('#star-rating li i').hover(function () {
+    var rating = $(this).data('rating');
+    highlightStars(rating);
+});
+
+// Remove highlight when not hovering
+$('#star-rating').mouseleave(function () {
+    highlightStars(selectedRating);
+});
+
+// Handle click on stars
+$('#star-rating li i').click(function () {
+    selectedRating = $(this).data('rating');
+    sendRatingToServer(selectedRating);
+});
+
+// Function to highlight stars up to the selected rating
+function highlightStars(rating) {
+    $('#star-rating li i').removeClass('fa-star').addClass('fa-star-o');
+    $('#star-rating li i').each(function () {
+        if ($(this).data('rating') <= rating) {
+            $(this).removeClass('fa-star-o').addClass('fa-star');
+        }
+    });
+}
+
+    $.ajaxSetup({ cache: false });
+
+window.onpageshow = function(event) {
+    // Check if the page is loaded from the cache
+    if (event.persisted) {
+        // Page is loaded from cache (back button was used)
+        window.location.reload(); // Refresh the page
+    }
+};
+});
+    </script>
+{% endblock %}
+  </body>
+
+</html>
+
+
+    
+
+    <!-- Add this to include Bootstrap JavaScript at the bottom of the body -->
+   

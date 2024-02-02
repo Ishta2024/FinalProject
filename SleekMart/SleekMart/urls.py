@@ -129,6 +129,8 @@ urlpatterns = [
 
     path('filter_orders/', views.filter_orders, name='filter_orders'),
     path('filter_orders_by_status/', views.filter_orders_by_status, name='filter_orders_by_status'),
+    path('add_delivery_agent_review/<int:delivery_agent_id>/', views.add_delivery_agent_review, name='add_delivery_agent_review'),
+    path('delivery_agent_reviews/<int:delivery_agent_id>/', views.delivery_agent_reviews, name='delivery_agent_reviews'),
 
     path('delete_customer/<int:customer_id>/',  views.delete_customer, name='delete_customer'),
     path('delete_customer/<int:customer_id>/',  views.delete_customer, name='delete_customer'),

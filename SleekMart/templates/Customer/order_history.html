@@ -144,7 +144,9 @@
                         <p>Delivery Agent: {{ item.delivery_agent.user.name }}</p>
                         <p>Delivery Status: {{ item.delivery_status }}</p>
                         {% if item.delivery_status == 'delivered' %}
-                        <a href="{% url 'add_review' product_id=item.product.id %}" class="review-button">Add Review</a>
+                        <a href="{% url 'add_delivery_agent_review' delivery_agent_id=item.delivery_agent.id %}" class="review-button">How was the delivery service?</a>
+
+                        <a href="{% url 'add_review' product_id=item.product.id %}" class="review-button">Add Review For Your Product</a>
                         {% else %}
                         <a href="#" class="openQrCodeModal" 
    data-bs-toggle="modal"

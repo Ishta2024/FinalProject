@@ -5,6 +5,8 @@ from django.utils import timezone
 from django.conf import settings
 from django.db.models import Avg
 import qrcode
+# pylance: reportMissingImports=false
+from textblob import TextBlob
 from PIL import ImageFile, Image
 from io import BytesIO
 import qrcode
@@ -487,7 +489,17 @@ class ReviewRating(models.Model):
 
     def __str__(self):
         return f"Rating for Review ID {self.review.id}"
+class DeliveryAgentReview(models.Model):
+    delivery_agent = models.ForeignKey(DeliveryAgent, related_name='reviews', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    rating = models.DecimalField(max_digits=3, decimal_places=1, default=0.0)
+    comment = models.TextField()
+    sentiment = models.CharField(max_length=10, blank=True, null=True)
+
     
+    def __str__(self):
+        return f"Review for {self.delivery_agent.user.name} by {self.user.name}"
 class Shippings(models.Model):
      user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
      order = models.ForeignKey(Order, null=True, blank=True, on_delete=models.SET_NULL)
