@@ -1366,7 +1366,7 @@ def delivery_agent_reviews(request, delivery_agent_id):
 
     return render(request, 'delivery_agent_reviews.html', context)
 def delivery_agent_reviews(request, delivery_agent_id):
-
+    categories = Category.objects.filter(status=False)
     cart_count = 0  # Default to 0
     wishlist_count = 0
     wishlist = None
@@ -1391,7 +1391,8 @@ def delivery_agent_reviews(request, delivery_agent_id):
         'average_rating': average_rating,
         'cart_count' : cart_count,
         'wishlist': wishlist,
-        'wishlist_count': wishlist_count
+        'wishlist_count': wishlist_count,
+        'categories' : categories
     }
 
     return render(request, 'delivery_agent_reviews.html', context)

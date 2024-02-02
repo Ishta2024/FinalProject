@@ -99,6 +99,7 @@
             color: #333;
             font-size: 30px;
             margin: 0;
+            margin-top:-120px;
             text-transform: uppercase;
             background-color: #fff;
             border: 2px solid #007bff;
@@ -401,7 +402,7 @@
         <div class="container d-flex flex-column align-items-center justify-content-center min-vh-75">
             <div class="col-lg-8">
                 <h2 class="section-title mb-4 text-center">Reviews for Delivery Agent: {{ delivery_agent.user.name }}</h2>
-    
+                 <h4>Average Rating: {{average_rating}}</h4>
                 {% if reviews %}
                     <div class="review-table mb-4">
                         
