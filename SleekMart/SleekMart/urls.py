@@ -128,6 +128,7 @@ urlpatterns = [
     path('productdelete/<int:product_id>/', views.productdelete, name='productdelete'),
 
     path('filter_orders/', views.filter_orders, name='filter_orders'),
+    path('order_tracking/<int:order_item_id>/', views.order_tracking, name='order_tracking'),
     path('filter_orders_by_status/', views.filter_orders_by_status, name='filter_orders_by_status'),
     path('add_delivery_agent_review/<int:delivery_agent_id>/', views.add_delivery_agent_review, name='add_delivery_agent_review'),
     path('delivery_agent_reviews/<int:delivery_agent_id>/', views.delivery_agent_reviews, name='delivery_agent_reviews'),

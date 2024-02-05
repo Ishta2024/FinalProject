@@ -22,6 +22,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+   
 </head>
 
 <body>
@@ -259,7 +260,7 @@
                         <div class="text">
                             <h6 class="mb-1">Order info</h6>
                             <p class="mb-1">
-                                {{order.user.address}} <br> Pay method: UPI <br> Payment Status: Confirmed<br>Transaction Id:  {{order.razorpay_order_id}}
+                                Pay method: UPI <br> Payment Status: Confirmed<br>Transaction Id:  {{order.razorpay_order_id}}
                             </p>
                             {% comment %} <a href="page-orders-detail.html#">Download info</a> {% endcomment %}
                         </div>
@@ -281,10 +282,10 @@
                 </div> <!-- col// -->
             </div> <!-- row // -->
             <div class="row">
-                <div class="col-lg-7">
+                <div class="col-lg-9">
                     <div class="table-responsive">
                         <table class="table">
-                            <thead>
+                            <thead >
                                 <tr>
                                     <th width="40%">Product</th>
                                     <th width="20%">Unit Price</th>
@@ -308,7 +309,22 @@
                                     <td> ${{ order_item.price }} </td>
                                     <td> {{ order_item.quantity }} </td>
                                     <td> {{ order_item.delivery_status }} </td>
+                                    
+                                        {% comment %} <form method="post" action="">
+                                            {% csrf_token %}
+                                            <div class="col-lg-2 col-6 col-md-3">
+                                                <select class="form-select" id="statusFilter" style="padding-right:95px;">
+                                                    <option value="order_confirmed" {% if order_item.new_status == 'order_confirmed' %}selected{% endif %}>Order Confirmed</option>
+                                                    <option value="order_processed" {% if order_item.new_status == 'order_processed' %}selected{% endif %}>Order Processed</option>
+                                                    <option value="quality_check" {% if order_item.new_status == 'quality_check' %}selected{% endif %}>Quality Check</option>
+                                                    <option value="product_dispatched" {% if order_item.new_status == 'product_dispatched' %}selected{% endif %}>Product Dispatched</option>
+                                                </select>
+                                            </div>
+                                            
+                                        </form> {% endcomment %}
+                                    
                                     <td class="text-end"> ${{ order_item.total_price }}</td>
+                                    <td><a class="btn btn-primary" style="width:150px;height:40px;"href="{% url 'order_tracking' order_item.id %}">Update</a></td>
                                     
                                 </tr>
                                 {% endfor %}
@@ -379,7 +395,6 @@
                         </table>
                     </div> <!-- table-responsive// -->
         
-    <a class="btn btn-primary" href="">View Order Tracking</a>
 
                 </div> <!-- col// -->
                 <div class="col-lg-1"></div>

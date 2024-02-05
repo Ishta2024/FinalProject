@@ -1365,6 +1365,10 @@ def delivery_agent_reviews(request, delivery_agent_id):
     }
 
     return render(request, 'delivery_agent_reviews.html', context)
+def order_tracking(request,order_item_id):
+    order_item = get_object_or_404(OrderItem, id=order_item_id)
+
+    return render(request, 'Seller/order_tracking.html',{'order_item': order_item})
 def delivery_agent_reviews(request, delivery_agent_id):
     categories = Category.objects.filter(status=False)
     cart_count = 0  # Default to 0

@@ -286,6 +286,28 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, default=1)
     delivery_agent = models.ForeignKey(DeliveryAgent, blank=True, null=True, on_delete=models.SET_NULL)
     qr_code = models.ImageField(upload_to='qr_codes/', blank=True, null=True)
+    order_confirmed = models.BooleanField(default=False)
+    order_confirmed_date = models.DateTimeField(null=True, blank=True)
+    order_processed_date = models.DateTimeField(null=True, blank=True)
+    order_qualitycheck_date = models.DateTimeField(null=True, blank=True)
+    product_dispatched_date = models.DateTimeField(null=True, blank=True)
+    delivered_date = models.DateTimeField(null=True, blank=True)
+    order_processed = models.BooleanField(default=False)
+    order_qualitycheck = models.BooleanField(default=False)
+    product_dispatched = models.BooleanField(default=False)
+    delivered = models.BooleanField(default=False)
+    class OrderStatusChoices(models.TextChoices):
+        PENDING = 'pending', 'Pending'
+        CONFIRMED = 'confirmed', 'Confirmed'
+        PROCESSED = 'processed', 'Processed'
+        QUALITYCHECK = 'qualitycheck', 'QualityCheck'
+        DISPATCHED = 'dispatched', 'Dispatched'
+        DELIVERED = 'delivered', 'Delivered'
+    order_status = models.CharField(
+        max_length=20,
+        choices=OrderStatusChoices.choices,
+        default=OrderStatusChoices.PENDING,
+    )
     class DeliveryStatusChoices(models.TextChoices):
         PENDING = 'pending', 'Pending'
         IN_TRANSIT = 'in_transit', 'In Transit'
@@ -302,6 +324,8 @@ class OrderItem(models.Model):
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
+
+  
     def generate_qr_code(self):
         # Only generate QR code if payment_status is successful and there is no existing QR code
         # Only generate QR code if payment_status is successful and there is no existing QR code
@@ -437,6 +461,18 @@ class OrderItem(models.Model):
         order.total_price = sum(order_item.total_price for order_item in order.orderitem_set.all())
         order.save()
 
+@receiver(pre_save, sender=OrderItem)
+def update_order_confirmed_date(sender, instance:OrderItem, **kwargs):
+       if instance.order_confirmed and not instance.order_confirmed_date:
+        instance.order_confirmed_date = timezone.now()
+       if instance.order_processed and not instance.order_processed_date:
+        instance.order_processed_date = timezone.now()
+       if instance.order_qualitycheck and not instance.order_qualitycheck_date:
+        instance.order_qualitycheck_date = timezone.now()
+       if instance.product_dispatched and not instance.product_dispatched_date:
+        instance.product_dispatched_date = timezone.now()
+       if instance.delivered and not instance.delivered_date:
+        instance.delivered_date = timezone.now()
 # @receiver(pre_save, sender=OrderItem)
 # def order_pre_save(sender, instance: OrderItem, **kwargs):
 #      instance.generate_qr_code()
