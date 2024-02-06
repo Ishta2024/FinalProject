@@ -457,7 +457,8 @@ class OrderDetailsView(View):
     def get(self, request, *args, **kwargs):
         order_item_id = kwargs.get('order_item_id')
         order_item = OrderItem.objects.get(id=order_item_id)
-
+        order_item.order_confirmed=True
+        order_item.save()
         self.send_email_to_seller(order_item)
 
         return render(request, self.template_name, {'order_item': order_item})
@@ -910,7 +911,8 @@ def add_review(request, product_id):
 def order_itemdetails(request, order_id):
     
     order = get_object_or_404(Order, id=order_id)
-    order_items = OrderItem.objects.filter(order=order)
+    # order_items = OrderItem.objects.filter(order=order)
+    order_items = OrderItem.objects.filter(order=order, seller=request.user.seller)
     print(order)
     print(order_items)
 
@@ -929,6 +931,29 @@ def delivery_order_itemdetails(request, order_id):
   
     print("Hello: ", order_items)
     return render(request, 'DeliveryAgent/order_details.html', {'order': order,'order_items': order_items})
+def update_order_status(request):
+    if request.method == 'POST':
+        order_item_id = request.POST.get('order_item_id')
+        selected_status = request.POST.get('selected_status')
+        print(order_item_id)
+        print(selected_status)
+
+        order_item = get_object_or_404(OrderItem, id=order_item_id)
+
+        if selected_status == 'order_processed':
+            order_item.order_processed = True
+        elif selected_status == 'quality_check':
+            order_item.order_qualitycheck = True
+        elif selected_status == 'product_dispatched':
+            order_item.product_dispatched = True
+        
+        order_item.save()
+        # Update the corresponding order_item status based on selected_status
+
+        return JsonResponse({'status': 'success'})
+    else:
+        return JsonResponse({'status': 'error'})
+    
 @csrf_exempt
 def update_delivery_status(request):
     if request.method == 'POST':
@@ -938,6 +963,7 @@ def update_delivery_status(request):
         try:
             order = OrderItem.objects.get(pk=order_id)
             order.delivery_status = delivery_status
+            order.delivered = True
             order.save()
             return JsonResponse({'success': True})
         except Order.DoesNotExist:

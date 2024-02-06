@@ -306,7 +306,7 @@
                                             <div class="info">{{ order_item.product.name }}</div>
                                         </a>
                                     </td>
-                                    <td> ${{ order_item.price }} </td>
+                                    <td> ₹{{ order_item.price }} </td>
                                     <td> {{ order_item.quantity }} </td>
                                     <td> {{ order_item.delivery_status }} </td>
                                     
@@ -323,7 +323,7 @@
                                             
                                         </form> {% endcomment %}
                                     
-                                    <td class="text-end"> ${{ order_item.total_price }}</td>
+                                    <td class="text-end"> ₹{{ order_item.total_price }}</td>
                                     <td><a class="btn btn-primary" style="width:150px;height:40px;"href="{% url 'order_tracking' order_item.id %}">Update</a></td>
                                     
                                 </tr>
@@ -380,7 +380,7 @@
                                             </dl> {% endcomment %}
                                             <dl class="dlist">
                                                 <dt>Grand total:</dt>
-                                                <dd> <b class="h5">$ {{ order.total_price }}</b> </dd>
+                                                <dd> <b class="h5">₹ {{ order.total_price}}</b> </dd>
                                             </dl>
                                             <dl class="dlist">
                                                 <dt class="text-muted">Payment Status:</dt>

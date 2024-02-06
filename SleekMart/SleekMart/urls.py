@@ -76,6 +76,7 @@ urlpatterns = [
     
     # path('buy_now/<int:product_id>/', views.buy_now, name='buy_now'),
     path('update_delivery_status/', views.update_delivery_status, name='update_delivery_status'),
+    path('update_order_status/', views.update_order_status, name='update_order_status'),
     path('add_review/<int:product_id>/', views.add_review, name='add_review'),
     path('reviews', views.reviews, name='reviews'),
     path('sellerreviews', views.sellerreviews, name='sellerreviews'),
