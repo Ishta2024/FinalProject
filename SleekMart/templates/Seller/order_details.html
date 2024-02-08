@@ -370,18 +370,18 @@
                                 <tr>
                                     <td colspan="4">
                                         <article class="float-end">
-                                            <dl class="dlist">
+                                            {% comment %} <dl class="dlist">
                                                 <dt>Subtotal:</dt>
                                                 <dd>$ {{ order.total_price }}</dd>
-                                            </dl>
+                                            </dl> {% endcomment %}
                                             {% comment %} <dl class="dlist">
                                                 <dt>Shipping cost:</dt>
                                                 <dd>$10.00</dd>
                                             </dl> {% endcomment %}
-                                            <dl class="dlist">
+                                            {% comment %} <dl class="dlist">
                                                 <dt>Grand total:</dt>
                                                 <dd> <b class="h5">₹ {{ order.total_price}}</b> </dd>
-                                            </dl>
+                                            </dl> {% endcomment %}
                                             <dl class="dlist">
                                                 <dt class="text-muted">Payment Status:</dt>
                                                 <dd>
