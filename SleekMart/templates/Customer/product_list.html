@@ -6,43 +6,123 @@
     <title>Product List</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Include any CSS and JavaScript files for styling and functionality -->
+<style>
+    .container {
+        display: flex;
+    }
+    
+    .sidebar {
+        width: 30%; /* Adjust width as needed */
+        padding: 20px;
+    }
+    
+    .product-list {
+        display: flex;
+        flex-wrap: wrap;
+        width: 70%; /* Adjust width as needed */
+        padding: 20px;
+        border-left: 1px solid #ccc; /* Add a border between sidebar and product list */
+    }
+    
+    .product {
+        display: flex;
+        border: 1px solid #ccc; /* Add border to each product */
+        padding: 10px;
+        max-width:90%;
+        min-width:90%;
+        margin-bottom: 10px;
+        
+    }
+    .product-image {
+        flex: 0 0 auto;
+        margin-right: 20px; /* Adjust as needed */
+    }
+    
+    .product-image img {
+        width: 150px; /* Set your desired width */
+        height: 150px; /* Set your desired height */
+        object-fit: cover; /* This property ensures that the image covers the specified dimensions */
+    }
+    
+    .product-details {
+        flex: 1 1 auto;
+    } 
+    
+    
+    .product-inner {
+        display: flex;
+        flex-direction: column;
+        height: 100%; /* Set height of the product div */
+        border: 1px solid #ccc; /* Optional: Add border for visual separation */
+    }
+    .category {
+        cursor: pointer;
+    }
+    .price-range {
+        cursor: pointer;
+    }
+    
+   
+</style>
 </head>
 <body>
-    <div class="sidebar">
-        <h2>Categories</h2>
-        <ul id="category-list">
-            {% for category in categories %}
-                <li>
-                    <input type="checkbox" id="{{ category.name }}" name="category" value="{{ category.id }}">
-                    <label for="{{ category.name }}">{{ category.name }}</label>
-                </li>
-            {% endfor %}
-        </ul>
-        <h2>Price Range</h2>
-        <!-- Include price range slider -->
-        <!-- Example: -->
-        <input type="range" id="price-range" name="price-range" min="0" max="100" value="50">
-        <span id="price-value">50</span>
-    </div>
-    <div class="product-list">
-        {% if products %}
-            {% for product in products %}
-                <div class="product">
-                    <h3>{{ product.name }}</h3>
-                    <p>{{ product.description }}</p>
-                    <p>Price: ${{ product.selling_price }}</p>
-                    <!-- Display category details -->
-                    <p>Category: {{ product.subcategory.name }}</p>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Categories</h2>
+            <ul id="category-list">
+                {% for category in categories %}
+                    <li>
+                        <span class="category" data-id="{{ category.id }}">{{ category.name }}</span>
+
+                        {% comment %} <input type="checkbox" id="{{ category.name }}" name="category" value="{{ category.id }}">
+                        <label for="{{ category.name }}">{{ category.name }}</label> {% endcomment %}
+                    </li>
+                {% endfor %}
+            </ul>
+            <div class="price-range">
+                <h2>Price Range</h2>
+                <ul id="price-range-list">
+                    <li>
+                        <span class="price-range" data-value="under_500">Under ₹500</span>
+                    </li>
+                    <li>
+                        <span class="price-range" data-value="500_1000">₹500 - ₹1000</span>
+                    </li>
+                    <li>
+                        <span class="price-range" data-value="1000_2000">₹1000 - ₹2000</span>
+                    </li>
+                    <!-- Add more price range options as needed -->
+                </ul>
+            </div>
+            
+        </div>
+        <div class="product-list">
+            {% if products %}
+                {% for product in products %}
+                    <div class="product">
+                        <div class="product-image">
+                            <img src="{{ product.product_image.url }}" alt="{{ product.name }}">
+                        </div>
+                        <div class="product-details">
+
+                        <h3>{{ product.name }}</h3>
+                        <p>{{ product.description }}</p>
+                        <p>Price: ₹{{ product.selling_price }}</p>
+                        <!-- Display category details -->
+                        <p>Category: {{ product.subcategory.name }}</p>
+                    </div>
                 </div>
-            {% endfor %}
-        {% else %}
-            <p>No products found.</p>
-        {% endif %}
+
+                {% endfor %}
+            {% else %}
+                <p style="font-color:black;">No products found.</p>
+            {% endif %}
+        </div> 
+       
     </div>
-    
 
     <script>
-        $(document).ready(function() {
+        {% comment %} $(document).ready(function() {
             // Handle category checkboxes
             $('input[type="checkbox"]').change(function() {
                 updateProductList();
@@ -95,7 +175,74 @@
                     console.log(errmsg);
                 }
             });
+        } {% endcomment %}
+        $(document).ready(function() {
+            // Handle category clicks
+            $('.category').click(function() {
+                var categoryId = $(this).data('id');
+                updateProductList(categoryId);
+            });
+        
+            // Handle price range clicks
+            $('.price-range').click(function() {
+                var priceRange = $(this).data('value');
+                updateProductList(null, priceRange);
+            });
+        });
+        
+        function updateProductList(categoryId=null, priceRange=null) {
+            var data = {};
+            console.log("Enetr");
+            if (categoryId !== null) {
+                console.log("Cat");
+
+                data.categories = [categoryId];
+            }
+            if (priceRange !== null) {
+                console.log("Price");
+
+                data.price_range = priceRange;
+            }
+        
+            $.ajax({
+                url: '/filter-products/',
+                method: 'GET',
+                data: data,
+                success: function(response) {
+                    // Clear existing product list
+                    console.log(response);
+
+                    $('.product-list').empty();
+                    
+                    // Loop through the array of products
+                    if (response.products && response.products.length > 0) {
+                        response.products.forEach(function(product) {
+                            var productHtml = `
+                                <div class="product">
+                                    <div class="product-image">
+                                        <img src="${product.product_image_url}" alt="${product.name}">
+                                    </div>
+                                    <div class="product-details">
+                                        <h3>${product.name}</h3>
+                                        <p>${product.description}</p>
+                                        <p>Price: ₹${product.price}</p>
+                                        <p>Category: ${product.subcategory_name}</p>
+                                    </div>
+                                </div>
+                            `;
+                            $('.product-list').append(productHtml);
+                        });
+                    } else {
+                        // Display a message if no products found
+                        $('.product-list').html('<p>No products found.</p>');
+                    }
+                },
+                error: function(xhr, errmsg, err) {
+                    console.log(errmsg);
+                }
+            });
         }
+        
     </script>
 </body>
 </html>

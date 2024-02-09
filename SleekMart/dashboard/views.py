@@ -2576,28 +2576,46 @@ def product_list(request):
 
 def filter_products(request):
     selected_categories = request.GET.getlist('categories[]')
-    # price_range = request.GET.get('price_range')
-
-    # Filter products based on selected categories and price range
+    price_range = request.GET.get('price_range')
+    print(price_range)
+    
     products = Product.objects.all()
 
     if selected_categories:
         products = products.filter(subcategory__id__in=selected_categories)
+        
+    if price_range:
+        # Assuming price_range is a string like "under_500" or "500_1000"
+        price_filters = {
+            'under_500': {'selling_price__lt': 500},
+            '500_1000': {'selling_price__gte': 500, 'selling_price__lt': 1000},
+            '1000_2000': {'selling_price__gte': 1000, 'selling_price__lt': 2000},
+            # Add more price range filters as needed
+        }
+        filter_args = price_filters.get(price_range)
+        if filter_args:
+            print(f"Applying filter: {filter_args}")  # Add this line for debugging
 
-    # if price_range:
-    #     products = products.filter(selling_price__lte=price_range)
+            products = products.filter(**filter_args)
+            print(products)
+        else:
+                print("Not")            
+                pass
 
-    # Render the filtered products as JSON response
+
     products_data = []
     for product in products:
         products_data.append({
             'name': product.name,
             'description': product.description,
             'price': product.selling_price,
+            'product_image_url': product.product_image.url,
+            'subcategory_name': product.subcategory.name
             # Add more fields as needed
         })
 
     return JsonResponse({'products': products_data})
+
 
 def view_products_by_category(request, category_slug):
     category = Category.objects.get(slug=category_slug)
