@@ -2588,6 +2588,7 @@ def filter_products(request):
         # Assuming price_range is a string like "under_500" or "500_1000"
         price_filters = {
             'under_500': {'selling_price__lt': 500},
+            
             '500_1000': {'selling_price__gte': 500, 'selling_price__lt': 1000},
             '1000_2000': {'selling_price__gte': 1000, 'selling_price__lt': 2000},
             # Add more price range filters as needed
