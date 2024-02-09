@@ -2568,7 +2568,36 @@ def generate_report(request):
 
 
 
+def product_list(request):
+    products = Product.objects.all()
+    categories = Category.objects.all()
+    context = {'products': products, 'categories': categories}
+    return render(request, 'Customer/product_list.html', context)
 
+def filter_products(request):
+    selected_categories = request.GET.getlist('categories[]')
+    # price_range = request.GET.get('price_range')
+
+    # Filter products based on selected categories and price range
+    products = Product.objects.all()
+
+    if selected_categories:
+        products = products.filter(subcategory__id__in=selected_categories)
+
+    # if price_range:
+    #     products = products.filter(selling_price__lte=price_range)
+
+    # Render the filtered products as JSON response
+    products_data = []
+    for product in products:
+        products_data.append({
+            'name': product.name,
+            'description': product.description,
+            'price': product.selling_price,
+            # Add more fields as needed
+        })
+
+    return JsonResponse({'products': products_data})
 
 def view_products_by_category(request, category_slug):
     category = Category.objects.get(slug=category_slug)
@@ -2609,15 +2638,7 @@ class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
     success_url = reverse_lazy('dashboard_home')
 
 
-from django_filters.views import FilterView
-from .models import Product
-from .filters import ProductFilter
 
-class ProductListView(FilterView):
-    model = Product
-    template_name = 'Customer/product_list.html'
-    filterset_class = ProductFilter
-    paginate_by = 10 
 
 def loggout(request):
     print('Logged Out')

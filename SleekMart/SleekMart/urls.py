@@ -24,7 +24,6 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.contrib.auth.views import LoginView
-from dashboard.views import ProductListView
 
 from django.conf.urls.static import static
 
@@ -145,7 +144,8 @@ urlpatterns = [
     path('notifications/', views.notifications, name='notifications'),
 
     path('loggout',  views.loggout, name='loggout'),
-    path('products/', ProductListView.as_view(), name='product_list'),
+    path('product_list', views.product_list, name='product_list'),
+    path('filter-products/', views.filter_products, name='filter_products'),
 
     path('password-reset/', ResetPasswordView.as_view(), name='password_reset'),
 

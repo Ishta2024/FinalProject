@@ -1,36 +1,101 @@
-<!-- product_list.html -->
-
-{% block content %}
-  <h1>Product List</h1>
-
-  <form method="get">
-    {{ filter.form.as_p }}
-    <input type="submit" value="Apply Filters">
-  </form>
-
-  {% for product in filter.qs %}
-    <div>
-      <h3>{{ product.name }}</h3>
-      <p>{{ product.description }}</p>
-      <!-- Add other product details as needed -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include any CSS and JavaScript files for styling and functionality -->
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Categories</h2>
+        <ul id="category-list">
+            {% for category in categories %}
+                <li>
+                    <input type="checkbox" id="{{ category.name }}" name="category" value="{{ category.id }}">
+                    <label for="{{ category.name }}">{{ category.name }}</label>
+                </li>
+            {% endfor %}
+        </ul>
+        <h2>Price Range</h2>
+        <!-- Include price range slider -->
+        <!-- Example: -->
+        <input type="range" id="price-range" name="price-range" min="0" max="100" value="50">
+        <span id="price-value">50</span>
     </div>
-  {% endfor %}
-
-  {% if filter.qs.paginator.num_pages > 1 %}
-    <div class="pagination">
-      <span class="step-links">
-        {% if filter.qs.has_previous %}
-          <a href="?{{ filter.qs.previous_page_number }}">previous</a>
+    <div class="product-list">
+        {% if products %}
+            {% for product in products %}
+                <div class="product">
+                    <h3>{{ product.name }}</h3>
+                    <p>{{ product.description }}</p>
+                    <p>Price: ${{ product.selling_price }}</p>
+                    <!-- Display category details -->
+                    <p>Category: {{ product.subcategory.name }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No products found.</p>
         {% endif %}
-
-        <span class="current">
-          Page {{ filter.qs.number }} of {{ filter.qs.paginator.num_pages }}.
-        </span>
-
-        {% if filter.qs.has_next %}
-          <a href="?{{ filter.qs.next_page_number }}">next</a>
-        {% endif %}
-      </span>
     </div>
-  {% endif %}
-{% endblock %}
+    
+
+    <script>
+        $(document).ready(function() {
+            // Handle category checkboxes
+            $('input[type="checkbox"]').change(function() {
+                updateProductList();
+            });
+
+            // Handle price range slider
+            $('#price-range').change(function() {
+                $('#price-value').text($(this).val());
+                updateProductList();
+            });
+        });
+
+        function updateProductList() {
+            var selectedCategories = [];
+            $('input[name="category"]:checked').each(function() {
+                console.log(selectedCategories);
+                selectedCategories.push($(this).val());
+            });
+            //var priceRange = $('#price-range').val();
+
+            $.ajax({
+                url: '/filter-products/',
+                method: 'GET',
+                data: {
+                    categories: selectedCategories,
+                   // price_range: priceRange
+                },
+                
+                success: function(response) {
+                    // Clear existing product list
+                    $('.product-list').empty();
+                
+                    // Loop through the array of products
+                    response.products.forEach(function(product) {
+                        // Create HTML elements for each product
+                        var productHtml = `
+                            <div class="product">
+                                <h3>${product.name}</h3>
+                                <p>${product.description}</p>
+                                <p>Price: $${product.price}</p>
+                            </div>
+                        `;
+                
+                        // Append the product HTML to the product list
+                        $('.product-list').append(productHtml);
+                    });
+                },
+                
+                error: function(xhr, errmsg, err) {
+                    console.log(errmsg);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
