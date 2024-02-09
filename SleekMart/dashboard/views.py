@@ -2608,6 +2608,17 @@ class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
     success_message = "Successfully Changed Your Password"
     success_url = reverse_lazy('dashboard_home')
 
+
+from django_filters.views import FilterView
+from .models import Product
+from .filters import ProductFilter
+
+class ProductListView(FilterView):
+    model = Product
+    template_name = 'Customer/product_list.html'
+    filterset_class = ProductFilter
+    paginate_by = 10 
+
 def loggout(request):
     print('Logged Out')
     logout(request)

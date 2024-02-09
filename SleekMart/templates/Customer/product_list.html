@@ -1,0 +1,36 @@
+<!-- product_list.html -->
+
+{% block content %}
+  <h1>Product List</h1>
+
+  <form method="get">
+    {{ filter.form.as_p }}
+    <input type="submit" value="Apply Filters">
+  </form>
+
+  {% for product in filter.qs %}
+    <div>
+      <h3>{{ product.name }}</h3>
+      <p>{{ product.description }}</p>
+      <!-- Add other product details as needed -->
+    </div>
+  {% endfor %}
+
+  {% if filter.qs.paginator.num_pages > 1 %}
+    <div class="pagination">
+      <span class="step-links">
+        {% if filter.qs.has_previous %}
+          <a href="?{{ filter.qs.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+          Page {{ filter.qs.number }} of {{ filter.qs.paginator.num_pages }}.
+        </span>
+
+        {% if filter.qs.has_next %}
+          <a href="?{{ filter.qs.next_page_number }}">next</a>
+        {% endif %}
+      </span>
+    </div>
+  {% endif %}
+{% endblock %}
