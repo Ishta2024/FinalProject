@@ -575,7 +575,7 @@ li.has-submenu .submenu {
                                 {% endfor %}
                             </ul>
                         </li>
-                        <a href="{% url 'product_list' %}">View Products</a>
+                       
                         <li class="scroll-to-section"><a href="#explore" style="color: white;">Products</a></li>
                         <li class="scroll-to-section"><a href="#contact" style="color: white;">Contact</a></li>
                           
@@ -842,7 +842,8 @@ li.has-submenu .submenu {
                         <p>Explore the latest appliances and electronic devices that will simplify your life. Stay ahead with our top-notch refrigerators, kitchen appliances, cooling appliances, and more.</p>
                         <p>Pamper yourself with our beauty and wellness products. Discover a selection of skincare, haircare, makeup, and wellness items to help you look and feel your best.</p>
                         <div class="main-border-button">
-                            <a href="{% url 'dashboard_home' %}">Discover More</a>
+                            {% comment %} <a href="{% url 'dashboard_home' %}">Discover More</a> {% endcomment %}
+                            <a href="{% url 'product_list' %}">View Products By Filtering</a>
                         </div>
                     </div>
                 </div>

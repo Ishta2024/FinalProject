@@ -188,6 +188,41 @@ class Product(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
+
+    @classmethod
+    def compare_products(cls, subcategory=None, min_price=None, max_price=None,min_rating=None):
+      print("Debugging compare_products method:")
+      print("Subcategory:", subcategory)
+      print("Min price:", min_price)
+      print("Max price:", max_price)
+
+      products = cls.objects.filter(status=0)  # Assuming you want to compare active products
+      print("Initial queryset:", products)
+
+      if subcategory:
+        products = products.filter(subcategory=subcategory)
+        print("Filtered by subcategory:", products)
+
+      if min_price is not None:
+        products = products.filter(selling_price__gte=min_price)
+        print("Filtered by min_price:", products)
+
+      if max_price is not None:
+        products = products.filter(selling_price__lte=max_price)
+        print("Filtered by max_price:", products)
+
+      if min_rating is not None:
+        # Annotate each product with its average rating
+        products = products.annotate(avg_rating=Avg('reviews__rating__rating'))
+        # Filter products based on the minimum rating
+        products = products.filter(avg_rating__gte=min_rating)
+
+      print("Final queryset:", products)
+
+      return products
+
+
+
     def reduce_quantity(self, quantity_to_reduce):
         """
         Reduce the product quantity.
@@ -438,7 +473,7 @@ class OrderItem(models.Model):
         message += f'To the user at address: {self.order.user.address}\n'
         message += 'Please proceed with the delivery as soon as possible.'
 
-        from_email = 'mailtoshowvalidationok@gmail.com'  # Update with your email address
+        from_email = 'ishtarachelmathew2024@mca.ajce.in'  # Update with your email address
         to_email = self.delivery_agent.user.email
 
         send_mail(subject, message, from_email, [to_email])

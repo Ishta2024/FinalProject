@@ -256,7 +256,48 @@
             left: 0;
         }
         
-
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000; /* Ensure the modal appears above other content */
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%); /* Center the modal horizontally and vertically */
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            max-width: 600px; /* Adjust the maximum width as needed */
+            max-height: 50vh; 
+           
+        }
+        
+        .modal-content {
+            width: 100%; /* Ensure the content inside the modal spans the entire width */
+        }
+        
+        /* Table styles */
+        #comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        #comparison-table th, #comparison-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        #comparison-table th {
+            background-color: #f2f2f2;
+        }
+        
+        /* Hover effect on table rows */
+        #comparison-table tr:hover {
+            background-color: #f2f2f2;
+        }
+        
     
     </style>
 </head>
@@ -363,10 +404,14 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-8">
-                <div class="left-images">
-                    <img src="{{ product.product_image.url }}" alt="{{ product.name }}" style="max-width: 300px;">
-                </div>
+                    <div class="left-images">
+                        <img src="{{ product.product_image.url }}" alt="{{ product.name }}" style="max-width: 300px;" class="product-image" data-product-id="{{ product.id }}">
+                    </div>
+                    
             </div>
+
+
+
             <div class="col-lg-4">
                 <div class="right-content">
                     <h4>{{ product.name }}{% if product.quantity == 0 %} (Out of Stock){% endif %}</h4>
@@ -412,6 +457,9 @@
                        
                         
                     </div>
+                    
+
+          
                     <div class="total">
                         
                         <h4>Total: <span style="font-size:25px;" id="totalPrice_{{ product.id }}" data-selling-price="{{ product.selling_price }}">$ {{ product.selling_price }}</span></h4>
@@ -463,6 +511,17 @@
                 </form>
                 {% endif %} {% endcomment %}
             </div>
+
+            <div id="comparison-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Product Comparison</h2>
+                    <table id="comparison-table">
+                        <!-- Comparison products will be dynamically populated here -->
+                    </table>
+                </div>
+            </div>
+
             <h2>Product Reviews</h2>
 <div class="product-reviews-container">
     <ul class="product-reviews">
@@ -492,7 +551,7 @@
             </div>
         </div>
     </section>
-
+   
     <!-- ***** Product Area Ends ***** -->
     
     <!-- ***** Footer Start ***** -->
@@ -706,6 +765,98 @@ window.onpageshow = function(event) {
 };
 });
     </script>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        // Show modal and fetch comparison products on image click
+        $('.product-image').click(function() {
+            console.log("OKK");
+            var productId = $(this).data('product-id');
+            $.ajax({
+                url: '/compare-products/',
+                method: 'GET',
+                data: {product_id: productId},
+                success: function(data) {
+                    // Populate the modal with the fetched comparison products
+                    populateModal(data);
+                    $('#comparison-modal').show();
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        });
+    
+        // Close modal on close button click
+        $('.close').click(function() {
+            $('#comparison-modal').hide();
+        });
+    
+        // Close modal when clicking outside of it
+        $(window).click(function(event) {
+            if (event.target == $('#comparison-modal')[0]) {
+                $('#comparison-modal').hide();
+            }
+        });
+    
+        // Function to populate the modal with comparison products
+        function populateModal(products) {
+            var table = $('#comparison-table');
+            table.empty(); // Clear previous data
+        
+            // Add header row with CSS classes
+            table.append('<tr class="header-row"><th>Image</th><th>Name</th><th>Price</th><th>Rating</th></tr>');
+        
+            // Add comparison products with alternating row colors
+            for (var i = 0; i < products.length; i++) {
+                var product = products[i];
+                var rowClass = i % 2 === 0 ? 'even-row' : 'odd-row'; // Alternating row colors
+             
+                table.append('<tr class="' + rowClass + '"><td><img src="' + product.product_image_url + '"></td><td>' + product.name + '</td><td>' + product.selling_price + '</td><td>' + product.avg_ratings + '</td></tr>');
+                console.log(product.product_image_url);
+            }
+        
+            // Apply additional styling to the modal
+            $('#comparison-modal').css({
+                'background-color': '#fff',
+                'border': '1px solid #ccc',
+                'border-radius': '5px',
+                'padding': '20px',
+                'max-width': '600px',
+                'margin': '0 auto'
+            });
+        
+            // Apply styling to the table
+            table.css({
+                'width': '100%',
+                'border-collapse': 'collapse'
+            });
+        
+            // Apply styling to table headers
+            $('.header-row th').css({
+                'background-color': '#f2f2f2',
+                'border': '1px solid #ddd',
+                'padding': '8px',
+                'text-align': 'left'
+            });
+        
+            // Apply styling to table rows
+            $('.even-row td, .odd-row td').css({
+                'border': '1px solid #ddd',
+                'padding': '8px'
+            });
+        
+            // Apply hover effect on table rows
+            $('.even-row:hover, .odd-row:hover').css({
+                'background-color': '#f2f2f2'
+            });
+        }
+        
+    });
+    </script>
+    
 {% endblock %}
   </body>
 

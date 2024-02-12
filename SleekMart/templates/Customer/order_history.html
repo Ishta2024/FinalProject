@@ -135,6 +135,21 @@
    <img class="QrCodeModal" src="{{ order.qr_code.url }}" alt="QR Code" width="150px" height="150px">
 </a> {% endcomment %}
 
+<div class="modal fade" id="addReviewModal" tabindex="-1" role="dialog" aria-labelledby="addReviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addReviewModalLabel">Add Review for Delivery Service</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Content will be loaded here dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
 
                     
             <h2>Order Items</h2>
@@ -150,8 +165,11 @@
                         <p>Delivery Agent: {{ item.delivery_agent.user.name }}</p>
                         <p>Delivery Status: {{ item.delivery_status }}</p>
                         {% if item.delivery_status == 'delivered' %}
-                        <a href="{% url 'add_delivery_agent_review' delivery_agent_id=item.delivery_agent.id %}" class="review-button">How was the delivery service?</a>
-
+                        {% comment %} <a href="{% url 'add_delivery_agent_review' delivery_agent_id=item.delivery_agent.id %}" class="review-button">How was the delivery service?</a> {% endcomment %}
+                        {% comment %} <a href="#" onclick="showModal('{% url 'add_delivery_agent_review' delivery_agent_id=item.delivery_agent.id %}')" class="review-button">How was the delivery service?</a> {% endcomment %}
+                        <button type="button" class="review-button" data-toggle="modal" data-target="#addReviewModal" data-url="{% url 'add_delivery_agent_review' delivery_agent_id=item.delivery_agent.id %}">
+                            How was the delivery service?
+                        </button>
                         <a href="{% url 'add_review' product_id=item.product.id %}" class="review-button">Add Review For Your Product</a>
                         {% else %}
                         <a href="#" class="openQrCodeModal" 
@@ -289,5 +307,12 @@
         });
     });
 </script>
-
+<script>
+    $(document).ready(function() {
+        $('.review-button').click(function() {
+            var url = $(this).data('url');
+            $('#addReviewModal .modal-body').load(url);
+        });
+    });
+</script>
 </html>

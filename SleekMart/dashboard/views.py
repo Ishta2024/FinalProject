@@ -164,8 +164,9 @@ def each_product(request, product_id):
         user_id = request.user.id
         user=request.user
         average_rating = Decimal(product.calculate_average_rating()) 
+        print("Rating: ", average_rating)
         average_rating_percentage = Decimal((average_rating / Decimal('5.0'))) * Decimal('100')
-
+ 
         # Fetch the user's wishlist products' IDs and count
         cart_count = CartItems.objects.filter(cart__user=user).count()
         wishlist = WishlistItems.objects.filter(wishlist__user_id=user_id).values_list('products__id', flat=True)
@@ -1376,6 +1377,44 @@ def map_sentiment_to_rating(sentiment_score):
     else:
         return 1
 
+from django.db.models import Avg, Min
+from django.core.serializers import serialize
+from django.db.models import Min
+
+def compare_products(request):
+    if request.method == 'GET':
+        product_id = request.GET.get('product_id')
+        product = get_object_or_404(Product, pk=product_id)
+        
+        # Fetch comparison products based on the clicked product
+        comparison_products = Product.compare_products(
+            subcategory=product.subcategory,
+            min_price=product.selling_price - 500,
+            max_price=product.selling_price + 1000,
+            min_rating=1.0,
+           
+        )
+        
+        # Apply annotations to get the necessary fields and group by name
+        comparison_products = comparison_products.values('name').annotate(
+            min_id=Min('id'),
+            selling_price=Min('selling_price'),
+            avg_ratings=Avg('reviews__rating__rating'),
+            product_image_url=Min('product_image')
+            
+        )
+        
+        print("hi", comparison_products)
+        
+        # Convert serialized data to a list of dictionaries
+        products_dict = list(comparison_products)
+        
+        return JsonResponse(products_dict, safe=False)
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+
+
 def delivery_agent_reviews(request, delivery_agent_id):
     delivery_agent = get_object_or_404(DeliveryAgent, id=delivery_agent_id)
     reviews = DeliveryAgentReview.objects.filter(delivery_agent=delivery_agent)
@@ -2169,7 +2208,7 @@ def approveseller(request, seller_id):
     login_url = request.build_absolute_uri(reverse('login_page'))
     subject = 'Seller Account Approved'
     message = f'Your seller account has been approved. You can now log in using the following link:\n\n{login_url}'
-    from_email = 'mailtoshowvalidationok@gmail.com'  # Replace with your email
+    from_email = 'ishtarachelmathew2024@mca.ajce.in'  # Replace with your email
     recipient_list = [seller.user.email]
     send_mail(subject, message, from_email, recipient_list, fail_silently=False)
     messages.success(request, 'Seller approval successful. An approval email with the login link has been sent to the seller.')
@@ -2181,7 +2220,7 @@ def rejectseller(request, seller_id):
     seller.save() # Call the reject method to change the status to 'declined'
     subject = 'Seller Account Rejected'
     message = f'Your seller account has been rejected.'
-    from_email = 'mailtoshowvalidationok@gmail.com'  # Replace with your email
+    from_email = 'ishtarachelmathew2024@mca.ajce.in'  # Replace with your email
     recipient_list = [seller.user.email]
     send_mail(subject, message, from_email, recipient_list, fail_silently=False)
     messages.success(request, 'Seller Requestt Rejected')
@@ -2212,7 +2251,7 @@ def sellregister(request):
 
                 subject = 'Seller Registration Confirmation'
                 message = 'Thank You For Registering As a Seller. Your Registration Was Successful And Your Account Will Be Activated Soon. You Can Login After Approved By Admin'
-                from_email = 'mailtoshowvalidationok@gmail.com'  # Replace with your email
+                from_email = 'ishtarachelmathew2024@mca.ajce.in'  # Replace with your email
                 recipient_list = [email]
 
                 send_mail(subject, message, from_email, recipient_list, fail_silently=False)
@@ -2274,7 +2313,7 @@ def add_da(request):
 
         subject = 'Welcome to SleekMart Delivery Team'
         message = f'Hi {agent_name},\n\nYou have been added as a delivery agent on SleekMart.\n\nYour login credentials:\nEmail: {email}\nPassword: {password}\n\nThank you for joining our team!'
-        from_email = 'mailtoshowvalidationok@gmail.com'  # Replace with your email
+        from_email = 'ishtarachelmathew2024@mca.ajce.in'  # Replace with your email
         recipient_list = [email]
 
         send_mail(subject, message, from_email, recipient_list, fail_silently=False)
@@ -2313,7 +2352,7 @@ def register(request):
                 login_url = request.build_absolute_uri(reverse('login_page'))
                 subject = 'Customer Registration Confirmation'
                 message = f'Thank You For Registering As A Customer. Your Registration Was Successful. You can now log in using the following link:\n\n{login_url}'
-                from_email = 'mailtoshowvalidationok@gmail.com'  # Replace with your email
+                from_email = 'ishtarachelmathew2024@mca.ajce.in'  # Replace with your email
                 recipient_list = [email]
                 send_mail(subject, message, from_email, recipient_list, fail_silently=False)
                 # messages.success(request, 'Registration successful. You can now log in.')
@@ -2574,10 +2613,66 @@ def product_list(request):
     context = {'products': products, 'categories': categories}
     return render(request, 'Customer/product_list.html', context)
 
+from django.http import JsonResponse
+from .models import Product
+
+# def filter_products(request):
+#     if request.method == 'GET':
+#         # Retrieve selected categories from request parameters
+#         selected_categories = request.GET.getlist('categories[]')
+#         print("Categories:", selected_categories)  # Debugging statement
+        
+#         # Retrieve price range from request parameters
+#         price_range = request.GET.get('price_range')
+#         print("Price range:", price_range)  # Debugging statement
+        
+#         # Retrieve all products
+#         products = Product.objects.all()
+
+#         # Filter products based on selected categories
+#         if selected_categories:
+#             products = products.filter(subcategory__id__in=selected_categories)
+        
+#         # Apply price range filtering
+#         if price_range:
+#             # Define price range filters
+#             price_filters = {
+#                 'under_500': {'selling_price__lt': 500},
+#                 '500_1000': {'selling_price__gte': 500, 'selling_price__lt': 1000},
+#                 '1000_2000': {'selling_price__gte': 1000, 'selling_price__lt': 2000},
+#                 # Add more price range filters as needed
+#             }
+            
+#             # Retrieve filter arguments based on price range
+#             filter_args = price_filters.get(price_range)
+            
+#             # Apply filter if found
+#             if filter_args:
+#                 print("Applying filter:", filter_args)  # Debugging statement
+#                 products = products.filter(**filter_args)
+#             else:
+#                 print("No filter found for the price range.")  # Debugging statement
+
+#         # Serialize filtered products into JSON response
+#         products_data = []
+#         for product in products:
+#             products_data.append({
+#                 'name': product.name,
+#                 'description': product.description,
+#                 'price': product.selling_price,
+#                 'product_image_url': product.product_image.url,
+#                 'subcategory_name': product.subcategory.name
+#                 # Add more fields as needed
+#             })
+
+#         return JsonResponse({'products': products_data})
+
 def filter_products(request):
-    selected_categories = request.GET.getlist('categories[]')
+    selected_categories = request.GET.getlist('category_id')
+    print("Categories:", selected_categories)
     price_range = request.GET.get('price_range')
-    print(price_range)
+    print("Price range:", price_range)
+    ratings = request.GET.getlist('ratings[]')
     
     products = Product.objects.all()
 
@@ -2585,25 +2680,21 @@ def filter_products(request):
         products = products.filter(subcategory__id__in=selected_categories)
         
     if price_range:
-        # Assuming price_range is a string like "under_500" or "500_1000"
         price_filters = {
             'under_500': {'selling_price__lt': 500},
-            
             '500_1000': {'selling_price__gte': 500, 'selling_price__lt': 1000},
             '1000_2000': {'selling_price__gte': 1000, 'selling_price__lt': 2000},
             # Add more price range filters as needed
         }
         filter_args = price_filters.get(price_range)
         if filter_args:
-            print(f"Applying filter: {filter_args}")  # Add this line for debugging
-
             products = products.filter(**filter_args)
-            print(products)
         else:
-                print("Not")            
-                pass
-
-
+                print("No filter found for the price range.")  
+    if ratings:
+         for rating in ratings:
+             products = products.filter(reviews__rating__rating=float(rating))
+    # Construct JSON response
     products_data = []
     for product in products:
         products_data.append({
@@ -2616,7 +2707,6 @@ def filter_products(request):
         })
 
     return JsonResponse({'products': products_data})
-
 
 def view_products_by_category(request, category_slug):
     category = Category.objects.get(slug=category_slug)

@@ -1,12 +1,65 @@
 {% block content %}
-  <h2>Add Review for Delivery Agent {{ delivery_agent.user.username }}</h2>
+  <style>
+    .add-review-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
 
-  <form method="post" action="{% url 'add_delivery_agent_review' delivery_agent.id %}">
-    {% csrf_token %}
+    .add-review-title {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .add-review-form .form-group {
+      margin-bottom: 20px;
+    }
+
+    .add-review-form .form-label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .add-review-form .form-control {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      resize: vertical; /* Allow vertical resizing of the textarea */
+    }
+
+    .add-review-form .btn-primary {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .add-review-form .btn-primary:hover {
+      background-color: #0056b3;
+    }
+  </style>
+
+  <div class="add-review-container">
+    {% comment %} <h2 class="add-review-title">Add Review for Delivery Agent: {{ delivery_agent.user.username }}</h2> {% endcomment %}
     
-    <label for="comment">Comment:</label>
-    <textarea name="comment" id="comment" rows="4" required></textarea>
-    
-    <button type="submit">Submit Review</button>
-  </form>
+    <form class="add-review-form" method="post" action="{% url 'add_delivery_agent_review' delivery_agent.id %}">
+      {% csrf_token %}
+      
+      <div class="form-group">
+        <label for="comment" class="form-label">Your Review:</label>
+        <textarea class="form-control" name="comment" id="comment" rows="4" required></textarea>
+      </div>
+      
+      <button type="submit" class="btn btn-primary">Submit Review</button>
+    </form>
+  </div>
 {% endblock %}

@@ -94,7 +94,15 @@
                     <!-- Add more price range options as needed -->
                 </ul>
             </div>
-            
+            <div id="rating-filter">
+                <h2>Filter by Ratings:</h2>
+                <input type="checkbox" name="ratings[]" value="1"> 1 Star<br>
+                <input type="checkbox" name="ratings[]" value="2"> 2 Stars<br>
+                <input type="checkbox" name="ratings[]" value="3"> 3 Stars<br>
+                <input type="checkbox" name="ratings[]" value="4"> 4 Stars<br>
+                <input type="checkbox" name="ratings[]" value="5"> 5 Stars<br>
+            </div>
+             
         </div>
         <div class="product-list">
             {% if products %}
@@ -176,7 +184,85 @@
                 }
             });
         } {% endcomment %}
+
         $(document).ready(function() {
+            // Handle category clicks
+            $('.category').click(function() {
+                var categoryId = $(this).data('id');
+                var priceRange = $('.price-range.selected').data('value'); // Get selected price range
+                updateProductList(categoryId, priceRange); // Pass both categoryId and priceRange
+            });
+        
+            // Handle price range clicks
+            $('.price-range').click(function() {
+                var priceRange = $(this).data('value');
+                var categoryId = $('.category.selected').data('id'); // Get selected category ID
+                updateProductList(categoryId, priceRange); // Pass both categoryId and priceRange
+            });
+
+            $('input[name="ratings[]"]').change(function() {
+                console.log("Ok");
+                updateProductList();
+            });
+        });
+        
+        function updateProductList(categoryId=null, priceRange=null) {
+            var data = {};
+
+            var selectedRatings = [];
+            $('input[name="ratings[]"]:checked').each(function() {
+                selectedRatings.push($(this).val());
+            });
+            if (selectedRatings.length > 0) {
+                console.log("Hello",selectedRatings);
+                data.ratings = selectedRatings;
+            }
+
+            if (categoryId !== null) {
+                data.category_id = categoryId;
+            }
+            if (priceRange !== null) {
+                data.price_range = priceRange;
+            }
+        
+            // Perform AJAX request only if data is not empty
+            if (!$.isEmptyObject(data)) {
+                $.ajax({
+                    url: '/filter-products/',
+                    method: 'GET',
+                    data: data,
+                    success: function(response) {
+                        $('.product-list').empty();
+                        if (response.products && response.products.length > 0) {
+                            response.products.forEach(function(product) {
+                                var productHtml = `
+                                    <div class="product">
+                                        <div class="product-image">
+                                            <img src="${product.product_image_url}" alt="${product.name}">
+                                        </div>
+                                        <div class="product-details">
+                                            <h3>${product.name}</h3>
+                                            <p>${product.description}</p>
+                                            <p>Price: ₹${product.price}</p>
+                                            <p>Category: ${product.subcategory_name}</p>
+                                        </div>
+                                    </div>
+                                `;
+                                $('.product-list').append(productHtml);
+                            });
+                        } else {
+                            // Display a message if no products found
+                            $('.product-list').html('<p>No products found.</p>');
+                        }
+                    },
+                    error: function(xhr, errmsg, err) {
+                        console.log(errmsg);
+                    }
+                });
+            }
+        }
+        
+        {% comment %} $(document).ready(function() {
             // Handle category clicks
             $('.category').click(function() {
                 var categoryId = $(this).data('id');
@@ -192,56 +278,54 @@
         
         function updateProductList(categoryId=null, priceRange=null) {
             var data = {};
-            console.log("Enetr");
             if (categoryId !== null) {
-                console.log("Cat");
-
-                data.categories = [categoryId];
+                console.log("Ok");
+                data.category_id = categoryId;
+                console.log(data.category_id);
             }
             if (priceRange !== null) {
-                console.log("Price");
-
                 data.price_range = priceRange;
             }
         
-            $.ajax({
-                url: '/filter-products/',
-                method: 'GET',
-                data: data,
-                success: function(response) {
-                    // Clear existing product list
-                    console.log(response);
+            // Perform AJAX request only if data is not empty
+            if (!$.isEmptyObject(data)) {
+                console.log("Enter");
 
-                    $('.product-list').empty();
-                    
-                    // Loop through the array of products
-                    if (response.products && response.products.length > 0) {
-                        response.products.forEach(function(product) {
-                            var productHtml = `
-                                <div class="product">
-                                    <div class="product-image">
-                                        <img src="${product.product_image_url}" alt="${product.name}">
+                $.ajax({
+                    url: '/filter-products/',
+                    method: 'GET',
+                    data: data,
+                    success: function(response) {
+                        $('.product-list').empty();
+                        if (response.products && response.products.length > 0) {
+                            response.products.forEach(function(product) {
+                                var productHtml = `
+                                    <div class="product">
+                                        <div class="product-image">
+                                            <img src="${product.product_image_url}" alt="${product.name}">
+                                        </div>
+                                        <div class="product-details">
+                                            <h3>${product.name}</h3>
+                                            <p>${product.description}</p>
+                                            <p>Price: ₹${product.price}</p>
+                                            <p>Category: ${product.subcategory_name}</p>
+                                        </div>
                                     </div>
-                                    <div class="product-details">
-                                        <h3>${product.name}</h3>
-                                        <p>${product.description}</p>
-                                        <p>Price: ₹${product.price}</p>
-                                        <p>Category: ${product.subcategory_name}</p>
-                                    </div>
-                                </div>
-                            `;
-                            $('.product-list').append(productHtml);
-                        });
-                    } else {
-                        // Display a message if no products found
-                        $('.product-list').html('<p>No products found.</p>');
+                                `;
+                                $('.product-list').append(productHtml);
+                            });
+                        } else {
+                            // Display a message if no products found
+                            $('.product-list').html('<p>No products found.</p>');
+                        }
+                    },
+                    error: function(xhr, errmsg, err) {
+                        console.log(errmsg);
                     }
-                },
-                error: function(xhr, errmsg, err) {
-                    console.log(errmsg);
-                }
-            });
-        }
+                });
+            }
+        } {% endcomment %}
+        
         
     </script>
 </body>

@@ -146,6 +146,7 @@ urlpatterns = [
     path('loggout',  views.loggout, name='loggout'),
     path('product_list', views.product_list, name='product_list'),
     path('filter-products/', views.filter_products, name='filter_products'),
+    path('compare-products/', views.compare_products, name='compare_products'),
 
     path('password-reset/', ResetPasswordView.as_view(), name='password_reset'),
 
