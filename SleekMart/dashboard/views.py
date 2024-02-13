@@ -2078,6 +2078,13 @@ def assign_nearby_agents_to_seller(seller, nearby_agents):
 #     }
 
 #     return render(request, 'Seller/display_nearby_agents.html', context)
+    
+def view_map(request):
+    sellers = Seller.objects.all()
+    delivery_agents = DeliveryAgent.objects.all()
+    customers = Customer.objects.all()
+    return render(request, 'MainUser/view_map.html', {'sellers': sellers, 'delivery_agents': delivery_agents, 'customers': customers})
+
 def display_nearby_agents(request, seller_id):
     # Retrieve the seller's location
     seller = get_object_or_404(Seller, id=seller_id)

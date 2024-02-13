@@ -83,6 +83,7 @@ urlpatterns = [
     path('sellerreviews', views.sellerreviews, name='sellerreviews'),
     path('seller_orders', views.seller_orders, name='seller_orders'),
     path('delivery_orders', views.delivery_orders, name='delivery_orders'),
+    path('view-map/', views.view_map, name='view_map'),
 
     path('contact' , views.contact, name='contact'),
     path('about' , views.about, name='about'),

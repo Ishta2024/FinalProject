@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map</title>
+    <!-- Import Folium CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 500px;
+            width: 50%;
+            margin: auto;
+        }
+        #legend {
+            float: left;
+            margin-left: 20px;
+            margin-top:-450px;
+        }
+        
+        #legend table {
+            border-collapse: collapse;
+            border: 1px solid black;
+        }
+        
+        #legend th, #legend td {
+            padding: 5px;
+            border: 1px solid black;
+            text-align: left;
+        }
+        
+        .blue { background-color: #6495ED; }
+        .green { background-color: #32CD32; }
+        .red { background-color: #FF6347; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="legend">
+        <h2>Legend</h2>
+        <table>
+            <tr>
+                <th>Color</th>
+                <th>Entity</th>
+            </tr>
+            <tr class="blue">
+                <td></td>
+                <td>Seller</td>
+            </tr>
+            <tr class="green">
+                <td></td>
+                <td>Delivery Agent</td>
+            </tr>
+            <tr class="red">
+                <td></td>
+                <td>Customer</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Import Folium JavaScript -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Initialize map
+        var mymap = L.map('map').setView([0, 0], 2);
+
+        // Add tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(mymap);
+
+        // Function to add marker
+        function addMarker(latitude, longitude, popupText, iconColor) {
+             // Default to blue for sellers
+            if (iconColor === 'green') {
+                markerColor = 'green'; // Green for delivery agents
+            } else if (iconColor === 'red') {
+                markerColor = 'red'; // Red for customers
+            }
+            else if(iconColor === 'blue') {
+                markerColor = 'blue';
+            }
+
+            var iconUrl = 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-' + markerColor + '.png';
+
+            L.marker([latitude, longitude], {icon: L.icon({
+                iconUrl: iconUrl,
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                tooltipAnchor: [16, -28],
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+                shadowSize: [41, 41],
+                shadowAnchor: [12, 41]
+            })}).bindPopup(popupText).addTo(mymap);
+        }
+
+        // Add markers for sellers
+        {% for seller in sellers %}
+            addMarker({{ seller.latitude }}, {{ seller.longitude }}, "{{ seller.business_name }}", 'blue');
+        {% endfor %}
+
+        // Add markers for delivery agents
+        {% for agent in delivery_agents %}
+            addMarker({{ agent.latitude }}, {{ agent.longitude }}, "{{ agent.user.email }}", 'green');
+        {% endfor %}
+
+        // Add markers for customers
+        {% for customer in customers %}
+            addMarker({{ customer.latitude }}, {{ customer.longitude }}, "{{ customer.user.email }}", 'red');
+        {% endfor %}
+    </script>
+</body>
+</html>
