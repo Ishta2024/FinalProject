@@ -187,7 +187,7 @@ class Product(models.Model):
     trending = models.BooleanField(default=False, help_text="0=default,1=Trending")
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
-
+    model_file = models.FileField(upload_to="3d_models", null=True, blank=True)
 
     @classmethod
     def compare_products(cls, subcategory=None, min_price=None, max_price=None,min_rating=None):
@@ -598,3 +598,16 @@ class Notification(models.Model):
     def __str__(self):
         return self.message
     
+
+class Post(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class Comment(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)

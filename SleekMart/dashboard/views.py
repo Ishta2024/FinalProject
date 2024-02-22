@@ -5,7 +5,7 @@ from django.contrib import messages
 from .models import Customer, CustomUser, Seller, AddWishlist,WishlistItems,AddCart, CartItems, Order, OrderItem, Review, ReviewRating
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from .models import Category, Product, Subcategory, Shippings, DeliveryAgent, Notification,DeliveryAgentReview
+from .models import Category, Product, Subcategory, Shippings, DeliveryAgent, Notification,DeliveryAgentReview, Post
 from django.urls import reverse
 from django.core.mail import send_mail
 from django.urls import reverse_lazy
@@ -29,9 +29,19 @@ class Acos(Func):
 from django.http import HttpResponse
 def dashboard_home(request):
     categories = Category.objects.filter(status=False)
+    posts = Post.objects.all()
     category_data = []
     cart_count = 0  # Default to 0
     categories_with_subcategories = Category.objects.filter(subcategory__isnull=False, status=False)
+    if request.method == 'POST':
+        print("Enetr")
+        title = request.POST.get('title')
+        content = request.POST.get('content')
+        author = request.user
+
+        post = Post.objects.create(title=title, content=content, author=author)
+        print("Ok")
+        return redirect('dashboard_home')
 
     if request.user.is_authenticated:
         user = request.user
@@ -50,6 +60,7 @@ def dashboard_home(request):
         'category_data': category_data,
         'categories': categories,
         'cart_count': cart_count,
+        'posts' : posts,
         'categories_with_subcategories' : categories_with_subcategories
     }
     
@@ -2462,6 +2473,55 @@ def edit_profile(request):
     }
 
     return render(request, 'Customer/edit-profile.html', context)  
+
+def refrigerator_view(request):
+    return render(request, '3D_model.html')
+
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+from io import BytesIO
+from .models import Product
+import base64
+
+def highest_selling_products(request):
+    # Retrieve data
+    products = Product.objects.all()
+
+    # Process data
+    product_sales = {}
+    for product in products:
+        if product.name not in product_sales:
+            product_sales[product.name] = 0
+        product_sales[product.name] += product.quantity
+
+    # Sort products by quantity sold
+    sorted_products = sorted(product_sales.items(), key=lambda x: x[1], reverse=True)
+
+    # Get top N products
+    top_products = sorted_products[:5]  # Adjust the number as needed
+
+    # Create graph
+    fig = Figure(figsize=(15, 8))  # Larger figure size
+    ax = fig.add_subplot(111)
+    ax.bar([product[0] for product in top_products], [product[1] for product in top_products], color='skyblue')
+    ax.set_xlabel('Products')
+    ax.set_ylabel('Quantity Sold')
+    ax.set_title('Highest Selling Products')
+    ax.tick_params(axis='x', rotation=89)  # Rotate x-axis labels
+    ax.grid(True)
+
+    # Render the graph as an image
+    buf = BytesIO()
+    fig.savefig(buf, format='png')
+    buf.seek(0)
+    graph = base64.b64encode(buf.getvalue()).decode('utf-8')
+    buf.close()
+
+ 
+
+    # Pass the graph to the template
+    return render(request, 'Seller/pro_graph.html', {'graph': graph})
+
 @login_required
 def view_customer(request):
     customers = CustomUser.objects.filter(role='customer')  # Fetch all customer profiles from the database
@@ -2673,6 +2733,20 @@ from .models import Product
 #             })
 
 #         return JsonResponse({'products': products_data})
+
+@login_required
+def new_post(request):
+    if request.method == 'POST':
+        print("Enetr")
+        title = request.POST.get('title')
+        content = request.POST.get('content')
+        author = request.user
+
+        post = Post.objects.create(title=title, content=content, author=author)
+        print("Ok")
+        return redirect('dashboard_home')
+
+    return render(request, 'dashboard_home.html')
 
 def filter_products(request):
     selected_categories = request.GET.getlist('category_id')

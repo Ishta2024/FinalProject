@@ -447,7 +447,37 @@ li.has-submenu .submenu {
     left: 0;
 }
 
+.blog-post {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+        height: 300px; /* Set a fixed height for each blog post */
+        overflow: hidden;
+}
 
+.author-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.author-avatar img {
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
+
+.author-details h4 {
+    margin: 0;
+}
+
+.post-content {
+    margin-top: 10px;
+}
 
       </style>
     </head>
@@ -878,6 +908,40 @@ li.has-submenu .submenu {
             </div>
         </div>
     </section>
+    <section class="section" id="explore">
+        <div class="container">
+            <h2>Explore The Blogs</h2>
+            <br>
+            <div class="row">
+                {% for post in posts %}
+                {% if forloop.counter0|divisibleby:3 %}
+                </div><div class="row">
+                {% endif %}
+                <div class="col-lg-4">
+                    <div class="blog-post-box">
+                        <div class="blog-post">
+                            <h4>{{ post.title }}</h4>
+                            <p>{{ post.content }}</p>
+                            <p>Created at: {{ post.created_at }}</p>
+                        </div>
+                        <div class="author-info">
+                            <div class="author-avatar">
+                                <img src="{{ post.author.profile_pic.url }}" alt="Author Image">
+                            </div>
+                            <div class="author-details">
+                                <h5>{{ post.author.name }}</h5>
+                                <p>{{ post.author.profile.bio }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    
+    
+    
     <!-- ***** Explore Area Ends ***** -->
 
     <!-- ***** Social Area Starts ***** -->
@@ -971,28 +1035,30 @@ li.has-submenu .submenu {
             <div class="row">
                 <div class="col-lg-8">
                     <div class="section-heading">
-                        <h2>By Subscribing To Our Newsletter You Can Get 30% Off</h2>
-                        <span>Details to details is what makes Sleekmart different from the other themes.</span>
+                        <h2>By Sending Blogs To Our Newsletter You Are More Powerfull</h2>
+                        <span>Details to details is what makes Sleekmart different from the other shops.</span>
                     </div>
-                    <form id="subscribe" action="" method="get">
+                    <form id="subscribe" action="" method="post">
+                        {% csrf_token %}
                         <div class="row">
-                          <div class="col-lg-5">
-                            <fieldset>
-                              <input name="name" type="text" id="name" placeholder="Your Name" required="">
-                            </fieldset>
-                          </div>
-                          <div class="col-lg-5">
-                            <fieldset>
-                              <input name="email" type="text" id="email" pattern="[^ @]*@[^ @]*" placeholder="Your Email Address" required="">
-                            </fieldset>
-                          </div>
-                          <div class="col-lg-2">
-                            <fieldset>
-                              <button type="submit" id="form-submit" class="main-dark-button"><i class="fa fa-paper-plane"></i></button>
-                            </fieldset>
-                          </div>
+                            <div class="col-lg-5">
+                                <fieldset>
+                                    <input name="title" type="text" id="title" placeholder="Enter Title" required="">
+                                </fieldset>
+                            </div>
+                            <div class="col-lg-5">
+                                <fieldset>
+                                    <input name="content" type="text" id="content" placeholder="Enter Content" required=""><br>
+                                </fieldset>
+                            </div>
+                            <div class="col-lg-2">
+                                <fieldset>
+                                    <button type="submit" id="form-submit" class="main-dark-button"><i class="fa fa-paper-plane"></i></button>
+                                </fieldset>
+                            </div>
                         </div>
                     </form>
+                    
                 </div>
                 <div class="col-lg-4">
                     <div class="row">
@@ -1079,6 +1145,9 @@ li.has-submenu .submenu {
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@alan-ai/alan-sdk-web/dist/alan.min.js"></script>
+
     <!-- jQuery -->
     <script src="{% static 'js/jquery-2.1.0.min.js' %}"></script>
 
@@ -1100,7 +1169,16 @@ li.has-submenu .submenu {
     
     <!-- Global Init -->
     <script src="{% static 'js/custom.js' %}"></script>
-
+    <script>
+        const alanKey = '4694c21610f8f3e6baf09f877aa573522e956eca572e1d8b807a3e2338fdd0dc/stage';
+        alanBtn = alanBtn({
+            key: alanKey,
+            onCommand: function (commandData) {
+              
+                
+            }
+        });
+    </script>
     <script>
 
         $(function() {

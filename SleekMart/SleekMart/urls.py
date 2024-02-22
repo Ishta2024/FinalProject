@@ -144,6 +144,9 @@ urlpatterns = [
     path('rejectseller/<int:seller_id>/', views.rejectseller, name='rejectseller'),
     path('notifications/', views.notifications, name='notifications'),
 
+    path('highest_selling_products/', views.highest_selling_products, name='highest_selling_products'),
+    path('refrigerator/', views.refrigerator_view, name='refrigerator_view'),
+
     path('loggout',  views.loggout, name='loggout'),
     path('product_list', views.product_list, name='product_list'),
     path('filter-products/', views.filter_products, name='filter_products'),

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 # from .models import UserProfile
-from .models import CustomUser, Seller, Customer, DeliveryAgent, Shippings, Notification,DeliveryAgentReview
+from .models import CustomUser, Seller, Customer, DeliveryAgent, Shippings, Notification,DeliveryAgentReview, Post, Comment
 from .models import Category,Product, Subcategory,AddWishlist,WishlistItems,AddCart,CartItems,OrderItem, Order,Review,ReviewRating,Route
 
 # class UserProfileAdmin(admin.ModelAdmin):
@@ -16,6 +16,8 @@ admin.site.register(Product)
 admin.site.register(Subcategory)
 admin.site.register(AddWishlist)
 admin.site.register(WishlistItems)
+admin.site.register(Post)
+admin.site.register(Comment)
 
 # class SellerAdmin(admin.ModelAdmin):
 #     list_display = ('business_name', 'is_approved')

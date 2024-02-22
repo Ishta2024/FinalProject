@@ -5,6 +5,7 @@
 <html>
 <head>
     <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/ar.js"></script>
 
     <title>SleekMart - Product Detail Page</title>
 
@@ -405,7 +406,9 @@
             <div class="row">
                 <div class="col-lg-8">
                     <div class="left-images">
-                        <img src="{{ product.product_image.url }}" alt="{{ product.name }}" style="max-width: 300px;" class="product-image" data-product-id="{{ product.id }}">
+                        <a href="{% url 'refrigerator_view' %}">
+                            <img src="{{ product.product_image.url }}" alt="{{ product.name }}" style="max-width: 300px;" class="product-image">
+                        </a>
                     </div>
                     
             </div>
@@ -457,8 +460,8 @@
                        
                         
                     </div>
-                    
-
+                  
+                      
           
                     <div class="total">
                         
@@ -499,7 +502,11 @@
                     </div>
                 
                 </form>
+                
                 </div>
+                {% comment %} <button onclick="toggleAR()">AR view</button> {% endcomment %}
+              
+               
                 {% comment %} {% if user_has_ordered_product %}
                 <form method="post" action="{% url 'add_review' product.id %}">
                     {% csrf_token %}
@@ -511,6 +518,13 @@
                 </form>
                 {% endif %} {% endcomment %}
             </div>
+{% comment %}              
+            <a-scene embedded arjs>
+                <a-assets>
+                  <a-asset-item id="model" href="{% static 'images/baner_right_1.gltf' %}"></a-asset-item>
+                </a-assets>
+                <a-entity gltf-model="#model"></a-entity>
+              </a-scene> {% endcomment %}
 
             <div id="comparison-modal" class="modal">
                 <div class="modal-content">
@@ -855,8 +869,28 @@ window.onpageshow = function(event) {
         }
         
     });
+
+    {% comment %} function toggleAR() {
+        console.log("Toggle AR function called");
+        var scene = document.querySelector('a-scene');
+        console.log("Scene:", scene);
+
+        var button = document.querySelector('button');
+        console.log("Button:", button);
+
+        if (scene.style.display === 'none') {
+            console.log("Displaying AR scene");
+            scene.style.display = 'block';
+            button.innerText = 'Exit AR';
+        } else {
+            console.log("Hiding AR scene");
+            scene.style.display = 'none';
+            button.innerText = 'AR view';
+        }
+    } {% endcomment %}
     </script>
-    
+   
+      
 {% endblock %}
   </body>
 
