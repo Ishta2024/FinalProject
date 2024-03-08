@@ -406,9 +406,9 @@
             <div class="row">
                 <div class="col-lg-8">
                     <div class="left-images">
-                        <a href="{% url 'refrigerator_view' %}">
-                            <img src="{{ product.product_image.url }}" alt="{{ product.name }}" style="max-width: 300px;" class="product-image">
-                        </a>
+                       
+                            <img src="{{ product.product_image.url }}" alt="{{ product.name }}" style="max-width: 300px;" class="product-image" data-product-id="{{ product.id }}">
+                      
                     </div>
                     
             </div>
@@ -420,7 +420,7 @@
                     <h4>{{ product.name }}{% if product.quantity == 0 %} (Out of Stock){% endif %}</h4>
                     <span class="price">$ {{ product.selling_price }}</span>
                     
-                    <span class="price">Average Rating:</span>
+                    <span class="price">Average Rating: {{ average_rating }}</span>
                     {% if average_rating_percentage is not None and average_rating_percentage > 0 %}
                     <div class="stars" style="min-width: 20px;">
                     <div class="star-rating" style="width: {{ average_rating_percentage }}%;">
@@ -821,14 +821,14 @@ window.onpageshow = function(event) {
             table.empty(); // Clear previous data
         
             // Add header row with CSS classes
-            table.append('<tr class="header-row"><th>Image</th><th>Name</th><th>Price</th><th>Rating</th></tr>');
+            table.append('<tr class="header-row"><th>Name</th><th>Price(₹⟩</th><th>Rating(Out of 5)</th></tr>');
         
             // Add comparison products with alternating row colors
             for (var i = 0; i < products.length; i++) {
                 var product = products[i];
                 var rowClass = i % 2 === 0 ? 'even-row' : 'odd-row'; // Alternating row colors
              
-                table.append('<tr class="' + rowClass + '"><td><img src="' + product.product_image_url + '"></td><td>' + product.name + '</td><td>' + product.selling_price + '</td><td>' + product.avg_ratings + '</td></tr>');
+                table.append('<tr class="' + rowClass + '"><td>' + product.name + '</td><td>' + product.selling_price + '</td><td>' + product.avg_ratings + '</td></tr>');
                 console.log(product.product_image_url);
             }
         

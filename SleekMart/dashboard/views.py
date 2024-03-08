@@ -175,6 +175,7 @@ def each_product(request, product_id):
         user_id = request.user.id
         user=request.user
         average_rating = Decimal(product.calculate_average_rating()) 
+        print(average_rating)
         print("Rating: ", average_rating)
         average_rating_percentage = Decimal((average_rating / Decimal('5.0'))) * Decimal('100')
  
@@ -2494,6 +2495,9 @@ def highest_selling_products(request):
             product_sales[product.name] = 0
         product_sales[product.name] += product.quantity
 
+    # Remove duplicate products
+    product_sales = {k: v for k, v in product_sales.items() if v > 0}
+
     # Sort products by quantity sold
     sorted_products = sorted(product_sales.items(), key=lambda x: x[1], reverse=True)
 
@@ -2507,7 +2511,7 @@ def highest_selling_products(request):
     ax.set_xlabel('Products')
     ax.set_ylabel('Quantity Sold')
     ax.set_title('Highest Selling Products')
-    ax.tick_params(axis='x', rotation=89)  # Rotate x-axis labels
+    ax.tick_params(axis='x', rotation=45, labelsize='medium')  # Rotate x-axis labels and increase font size
     ax.grid(True)
 
     # Render the graph as an image
@@ -2516,8 +2520,6 @@ def highest_selling_products(request):
     buf.seek(0)
     graph = base64.b64encode(buf.getvalue()).decode('utf-8')
     buf.close()
-
- 
 
     # Pass the graph to the template
     return render(request, 'Seller/pro_graph.html', {'graph': graph})
