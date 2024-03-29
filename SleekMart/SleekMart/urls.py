@@ -130,6 +130,8 @@ urlpatterns = [
     path('editproduct/<int:product_id>/', views.editproduct, name='editproduct'),
     path('productdelete/<int:product_id>/', views.productdelete, name='productdelete'),
 
+    path('sales-statistics/', views.sales_statistics, name='sales_statistics'),
+
     path('filter_orders/', views.filter_orders, name='filter_orders'),
     path('order_tracking/<int:order_item_id>/', views.order_tracking, name='order_tracking'),
     path('filter_orders_by_status/', views.filter_orders_by_status, name='filter_orders_by_status'),

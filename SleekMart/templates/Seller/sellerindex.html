@@ -72,7 +72,7 @@
                     </div>
                 </li>
                 <li class="menu-item has-submenu">
-                    <a class="menu-link" href="page-orders-1.html"> <i class="icon material-icons md-shopping_cart"></i>
+                    <a class="menu-link" href="{% url 'seller_orders' %}"> <i class="icon material-icons md-shopping_cart"></i>
                         <span class="text">Orders</span>
                     </a>
                     <div class="submenu">
@@ -115,11 +115,12 @@
                     </div>
                 </li> {% endcomment %}
                 <li class="menu-item has-submenu">
-                    <a class="menu-link" href="index.html#"> <i class="icon material-icons md-person"></i>
+                    <a class="menu-link" href="{% url 'sellerprofile' %}"> <i class="icon material-icons md-person"></i>
                         <span class="text">Account</span>
                     </a>
                     <div class="submenu">
                         <a href="{% url 'sellerprofile' %}">My Details</a>
+                        <a href="{% url 'sales_statistics' %}">Sales Statistics</a>
                         <a href="{% url 'display_nearby_agents' seller_id=request.user.seller.id %}">View Nearby Agents</a>
                        
                     </div>

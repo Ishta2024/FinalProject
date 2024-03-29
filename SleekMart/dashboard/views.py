@@ -2879,3 +2879,52 @@ def loggout(request):
         # else:
         #     return render (request, "Customer/register.html")
 
+from django.db.models import Count, Sum
+from django.utils import timezone
+from datetime import timedelta
+
+from django.db.models import Sum, F, ExpressionWrapper, DecimalField
+from django.utils import timezone
+from datetime import timedelta
+
+from calendar import month_name
+from django.db.models import Sum, F, DecimalField
+from datetime import datetime, timedelta
+from django.utils import timezone
+
+def calculate_sales_data():
+    # Calculate total sales quantity and revenue for each product
+    products = Product.objects.annotate(
+        total_quantity=Sum('order__orderitem__quantity'),
+        total_revenue=Sum(F('order__orderitem__quantity') * F('selling_price'), output_field=DecimalField())
+    )
+
+    # Calculate total sales quantity and revenue for each month
+    start_date = timezone.now() - timedelta(days=365)  # Calculate for the last year
+    end_date = timezone.now()
+    sales_data = OrderItem.objects.filter(order__order_date__range=(start_date, end_date)).extra(
+        select={'month': "strftime('%%m', order_date)", 'year': "strftime('%%Y', order_date)"}).values(
+        'month', 'year').annotate(
+        total_quantity=Sum('quantity'),
+        total_revenue=Sum(F('quantity') * F('product__selling_price'), output_field=DecimalField())
+    )
+
+    # Add month name to sales_data
+    for item in sales_data:
+        month_number = int(item['month'])
+        item['month_name'] = month_name[month_number]
+
+    return products, sales_data
+
+
+from django.shortcuts import render
+from .models import Product, OrderItem
+
+def sales_statistics(request):
+    products, sales_data = calculate_sales_data()
+    context = {
+        'products': products,
+        'sales_data': sales_data
+    }
+    return render(request, 'sales_statistics.html', context)
+
